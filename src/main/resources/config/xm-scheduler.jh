@@ -1,0 +1,36 @@
+
+entity Task {
+	key String,
+	name String,
+	typeKey String required,
+    stateKey String,
+    createdBy String required,
+    startDate Instant,
+    endDate Instant,
+    scheduletype Scheduletype,
+    delay Long,
+    clonExpression String,
+    channelType Channeltype,
+    description String,
+    data String
+}
+
+
+enum Scheduletype {
+	FIXED_RATE, FIXED_DELAY, CRON
+}
+
+enum Channeltype {
+	QUEUE, TOPIC
+}
+
+
+paginate Task with pagination
+
+dto Task with mapstruct
+
+service all with serviceImpl
+
+filter Task
+
+microservice * with 'scheduler'
