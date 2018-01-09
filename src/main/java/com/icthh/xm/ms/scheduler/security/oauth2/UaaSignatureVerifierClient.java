@@ -1,6 +1,7 @@
 package com.icthh.xm.ms.scheduler.security.oauth2;
 
 import com.icthh.xm.ms.scheduler.config.oauth2.OAuth2Properties;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,12 +9,19 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.security.jwt.crypto.sign.RsaVerifier;
 import org.springframework.security.jwt.crypto.sign.SignatureVerifier;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 /**
@@ -42,12 +50,22 @@ public class UaaSignatureVerifierClient implements OAuth2SignatureVerifierClient
     public SignatureVerifier getSignatureVerifier() throws Exception {
         try {
             HttpEntity<Void> request = new HttpEntity<Void>(new HttpHeaders());
-            String key = (String) restTemplate
-                .exchange(getPublicKeyEndpoint(), HttpMethod.GET, request, Map.class).getBody()
-                .get("value");
+            String key = restTemplate.exchange(getPublicKeyEndpoint(), HttpMethod.GET, request, String.class).getBody();
+
+            // TODO - move key conversation to separate method
+            if (StringUtils.isBlank(key)) {
+                throw new CertificateException("Received empty certificate from config.");
+            }
+            InputStream fin = new ByteArrayInputStream(key.getBytes());
+            CertificateFactory f = CertificateFactory.getInstance("X.509");
+            X509Certificate certificate = (X509Certificate) f.generateCertificate(fin);
+            PublicKey pk = certificate.getPublicKey();
+            key = String.format("-----BEGIN PUBLIC KEY-----%n%s%n-----END PUBLIC KEY-----",
+                                new String(Base64.encode(pk.getEncoded())));
+
             return new RsaVerifier(key);
         } catch (IllegalStateException ex) {
-            log.warn("could not contact UAA to get public key");
+            log.warn("could not contact [{}] to get public key", getPublicKeyEndpoint());
             return null;
         }
     }
