@@ -32,10 +32,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {
 //    SchedulingConfiguration.class,
-    SchedulerManagerTest.TestConfiguration.class
+    SchedulerManagerUnitTest.TestConfiguration.class
 })
 @Slf4j
-public class SchedulerManagerTest {
+public class SchedulerManagerUnitTest {
 
     private AtomicLong aLong = new AtomicLong();
 
