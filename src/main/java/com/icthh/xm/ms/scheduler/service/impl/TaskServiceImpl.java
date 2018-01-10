@@ -22,9 +22,9 @@ public class TaskServiceImpl implements TaskService {
 
     private final Logger log = LoggerFactory.getLogger(TaskServiceImpl.class);
 
-    private final TaskRepository taskRepository;
+    final TaskRepository taskRepository;
 
-    private final TaskMapper taskMapper;
+    final TaskMapper taskMapper;
 
     public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;

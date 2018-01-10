@@ -34,6 +34,8 @@ apply plugin: 'war'
 apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'idea'
+apply plugin: 'net.ltgt.apt'
+
 
 dependencyManagement {
   imports {
@@ -140,6 +142,10 @@ repositories {
 }
 
 dependencies {
+
+    provided "org.projectlombok:lombok:${lombok_version}"
+    apt "org.projectlombok:lombok:${lombok_version}"
+
     compile "org.springframework.boot:spring-boot-starter-cache"
     compile "io.github.jhipster:jhipster"
     compile "io.dropwizard.metrics:metrics-core"

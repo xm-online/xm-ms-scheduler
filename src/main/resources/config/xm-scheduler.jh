@@ -7,20 +7,20 @@ entity Task {
     createdBy String required,
     startDate Instant,
     endDate Instant,
-    scheduletype Scheduletype,
+    scheduleType ScheduleType,
     delay Long,
-    clonExpression String,
-    channelType Channeltype,
+    cronExpression String,
+    channelType ChannelType,
     description String,
     data String
 }
 
 
-enum Scheduletype {
+enum ScheduleType {
 	FIXED_RATE, FIXED_DELAY, CRON
 }
 
-enum Channeltype {
+enum ChannelType {
 	QUEUE, TOPIC
 }
 
