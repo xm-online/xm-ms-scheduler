@@ -38,8 +38,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.icthh.xm.ms.scheduler.domain.enumeration.Scheduletype;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Channeltype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 /**
  * Test class for the TaskResource REST controller.
  *
@@ -70,17 +70,17 @@ public class TaskResourceIntTest {
     private static final Instant DEFAULT_END_DATE = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_END_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Scheduletype DEFAULT_SCHEDULETYPE = Scheduletype.FIXED_RATE;
-    private static final Scheduletype UPDATED_SCHEDULETYPE = Scheduletype.FIXED_DELAY;
+    private static final ScheduleType DEFAULT_SCHEDULE_TYPE = ScheduleType.FIXED_RATE;
+    private static final ScheduleType UPDATED_SCHEDULE_TYPE = ScheduleType.FIXED_DELAY;
 
     private static final Long DEFAULT_DELAY = 1L;
     private static final Long UPDATED_DELAY = 2L;
 
-    private static final String DEFAULT_CLON_EXPRESSION = "AAAAAAAAAA";
-    private static final String UPDATED_CLON_EXPRESSION = "BBBBBBBBBB";
+    private static final String DEFAULT_CRON_EXPRESSION = "AAAAAAAAAA";
+    private static final String UPDATED_CRON_EXPRESSION = "BBBBBBBBBB";
 
-    private static final Channeltype DEFAULT_CHANNEL_TYPE = Channeltype.QUEUE;
-    private static final Channeltype UPDATED_CHANNEL_TYPE = Channeltype.TOPIC;
+    private static final ChannelType DEFAULT_CHANNEL_TYPE = ChannelType.QUEUE;
+    private static final ChannelType UPDATED_CHANNEL_TYPE = ChannelType.TOPIC;
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
@@ -142,9 +142,9 @@ public class TaskResourceIntTest {
             .createdBy(DEFAULT_CREATED_BY)
             .startDate(DEFAULT_START_DATE)
             .endDate(DEFAULT_END_DATE)
-            .scheduletype(DEFAULT_SCHEDULETYPE)
+            .scheduleType(DEFAULT_SCHEDULE_TYPE)
             .delay(DEFAULT_DELAY)
-            .clonExpression(DEFAULT_CLON_EXPRESSION)
+            .cronExpression(DEFAULT_CRON_EXPRESSION)
             .channelType(DEFAULT_CHANNEL_TYPE)
             .description(DEFAULT_DESCRIPTION)
             .data(DEFAULT_DATA);
@@ -179,9 +179,9 @@ public class TaskResourceIntTest {
         assertThat(testTask.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
         assertThat(testTask.getStartDate()).isEqualTo(DEFAULT_START_DATE);
         assertThat(testTask.getEndDate()).isEqualTo(DEFAULT_END_DATE);
-        assertThat(testTask.getScheduletype()).isEqualTo(DEFAULT_SCHEDULETYPE);
+        assertThat(testTask.getScheduleType()).isEqualTo(DEFAULT_SCHEDULE_TYPE);
         assertThat(testTask.getDelay()).isEqualTo(DEFAULT_DELAY);
-        assertThat(testTask.getClonExpression()).isEqualTo(DEFAULT_CLON_EXPRESSION);
+        assertThat(testTask.getCronExpression()).isEqualTo(DEFAULT_CRON_EXPRESSION);
         assertThat(testTask.getChannelType()).isEqualTo(DEFAULT_CHANNEL_TYPE);
         assertThat(testTask.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testTask.getData()).isEqualTo(DEFAULT_DATA);
@@ -263,9 +263,9 @@ public class TaskResourceIntTest {
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
             .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
-            .andExpect(jsonPath("$.[*].scheduletype").value(hasItem(DEFAULT_SCHEDULETYPE.toString())))
+            .andExpect(jsonPath("$.[*].scheduleType").value(hasItem(DEFAULT_SCHEDULE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].delay").value(hasItem(DEFAULT_DELAY.intValue())))
-            .andExpect(jsonPath("$.[*].clonExpression").value(hasItem(DEFAULT_CLON_EXPRESSION.toString())))
+            .andExpect(jsonPath("$.[*].cronExpression").value(hasItem(DEFAULT_CRON_EXPRESSION.toString())))
             .andExpect(jsonPath("$.[*].channelType").value(hasItem(DEFAULT_CHANNEL_TYPE.toString())))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
             .andExpect(jsonPath("$.[*].data").value(hasItem(DEFAULT_DATA.toString())));
@@ -289,9 +289,9 @@ public class TaskResourceIntTest {
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.toString()))
             .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE.toString()))
             .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE.toString()))
-            .andExpect(jsonPath("$.scheduletype").value(DEFAULT_SCHEDULETYPE.toString()))
+            .andExpect(jsonPath("$.scheduleType").value(DEFAULT_SCHEDULE_TYPE.toString()))
             .andExpect(jsonPath("$.delay").value(DEFAULT_DELAY.intValue()))
-            .andExpect(jsonPath("$.clonExpression").value(DEFAULT_CLON_EXPRESSION.toString()))
+            .andExpect(jsonPath("$.cronExpression").value(DEFAULT_CRON_EXPRESSION.toString()))
             .andExpect(jsonPath("$.channelType").value(DEFAULT_CHANNEL_TYPE.toString()))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()))
             .andExpect(jsonPath("$.data").value(DEFAULT_DATA.toString()));
@@ -572,41 +572,41 @@ public class TaskResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllTasksByScheduletypeIsEqualToSomething() throws Exception {
+    public void getAllTasksByScheduleTypeIsEqualToSomething() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
 
-        // Get all the taskList where scheduletype equals to DEFAULT_SCHEDULETYPE
-        defaultTaskShouldBeFound("scheduletype.equals=" + DEFAULT_SCHEDULETYPE);
+        // Get all the taskList where scheduleType equals to DEFAULT_SCHEDULE_TYPE
+        defaultTaskShouldBeFound("scheduleType.equals=" + DEFAULT_SCHEDULE_TYPE);
 
-        // Get all the taskList where scheduletype equals to UPDATED_SCHEDULETYPE
-        defaultTaskShouldNotBeFound("scheduletype.equals=" + UPDATED_SCHEDULETYPE);
+        // Get all the taskList where scheduleType equals to UPDATED_SCHEDULE_TYPE
+        defaultTaskShouldNotBeFound("scheduleType.equals=" + UPDATED_SCHEDULE_TYPE);
     }
 
     @Test
     @Transactional
-    public void getAllTasksByScheduletypeIsInShouldWork() throws Exception {
+    public void getAllTasksByScheduleTypeIsInShouldWork() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
 
-        // Get all the taskList where scheduletype in DEFAULT_SCHEDULETYPE or UPDATED_SCHEDULETYPE
-        defaultTaskShouldBeFound("scheduletype.in=" + DEFAULT_SCHEDULETYPE + "," + UPDATED_SCHEDULETYPE);
+        // Get all the taskList where scheduleType in DEFAULT_SCHEDULE_TYPE or UPDATED_SCHEDULE_TYPE
+        defaultTaskShouldBeFound("scheduleType.in=" + DEFAULT_SCHEDULE_TYPE + "," + UPDATED_SCHEDULE_TYPE);
 
-        // Get all the taskList where scheduletype equals to UPDATED_SCHEDULETYPE
-        defaultTaskShouldNotBeFound("scheduletype.in=" + UPDATED_SCHEDULETYPE);
+        // Get all the taskList where scheduleType equals to UPDATED_SCHEDULE_TYPE
+        defaultTaskShouldNotBeFound("scheduleType.in=" + UPDATED_SCHEDULE_TYPE);
     }
 
     @Test
     @Transactional
-    public void getAllTasksByScheduletypeIsNullOrNotNull() throws Exception {
+    public void getAllTasksByScheduleTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
 
-        // Get all the taskList where scheduletype is not null
-        defaultTaskShouldBeFound("scheduletype.specified=true");
+        // Get all the taskList where scheduleType is not null
+        defaultTaskShouldBeFound("scheduleType.specified=true");
 
-        // Get all the taskList where scheduletype is null
-        defaultTaskShouldNotBeFound("scheduletype.specified=false");
+        // Get all the taskList where scheduleType is null
+        defaultTaskShouldNotBeFound("scheduleType.specified=false");
     }
 
     @Test
@@ -677,41 +677,41 @@ public class TaskResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllTasksByClonExpressionIsEqualToSomething() throws Exception {
+    public void getAllTasksByCronExpressionIsEqualToSomething() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
 
-        // Get all the taskList where clonExpression equals to DEFAULT_CLON_EXPRESSION
-        defaultTaskShouldBeFound("clonExpression.equals=" + DEFAULT_CLON_EXPRESSION);
+        // Get all the taskList where cronExpression equals to DEFAULT_CRON_EXPRESSION
+        defaultTaskShouldBeFound("cronExpression.equals=" + DEFAULT_CRON_EXPRESSION);
 
-        // Get all the taskList where clonExpression equals to UPDATED_CLON_EXPRESSION
-        defaultTaskShouldNotBeFound("clonExpression.equals=" + UPDATED_CLON_EXPRESSION);
+        // Get all the taskList where cronExpression equals to UPDATED_CRON_EXPRESSION
+        defaultTaskShouldNotBeFound("cronExpression.equals=" + UPDATED_CRON_EXPRESSION);
     }
 
     @Test
     @Transactional
-    public void getAllTasksByClonExpressionIsInShouldWork() throws Exception {
+    public void getAllTasksByCronExpressionIsInShouldWork() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
 
-        // Get all the taskList where clonExpression in DEFAULT_CLON_EXPRESSION or UPDATED_CLON_EXPRESSION
-        defaultTaskShouldBeFound("clonExpression.in=" + DEFAULT_CLON_EXPRESSION + "," + UPDATED_CLON_EXPRESSION);
+        // Get all the taskList where cronExpression in DEFAULT_CRON_EXPRESSION or UPDATED_CRON_EXPRESSION
+        defaultTaskShouldBeFound("cronExpression.in=" + DEFAULT_CRON_EXPRESSION + "," + UPDATED_CRON_EXPRESSION);
 
-        // Get all the taskList where clonExpression equals to UPDATED_CLON_EXPRESSION
-        defaultTaskShouldNotBeFound("clonExpression.in=" + UPDATED_CLON_EXPRESSION);
+        // Get all the taskList where cronExpression equals to UPDATED_CRON_EXPRESSION
+        defaultTaskShouldNotBeFound("cronExpression.in=" + UPDATED_CRON_EXPRESSION);
     }
 
     @Test
     @Transactional
-    public void getAllTasksByClonExpressionIsNullOrNotNull() throws Exception {
+    public void getAllTasksByCronExpressionIsNullOrNotNull() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
 
-        // Get all the taskList where clonExpression is not null
-        defaultTaskShouldBeFound("clonExpression.specified=true");
+        // Get all the taskList where cronExpression is not null
+        defaultTaskShouldBeFound("cronExpression.specified=true");
 
-        // Get all the taskList where clonExpression is null
-        defaultTaskShouldNotBeFound("clonExpression.specified=false");
+        // Get all the taskList where cronExpression is null
+        defaultTaskShouldNotBeFound("cronExpression.specified=false");
     }
 
     @Test
@@ -845,9 +845,9 @@ public class TaskResourceIntTest {
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
             .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
-            .andExpect(jsonPath("$.[*].scheduletype").value(hasItem(DEFAULT_SCHEDULETYPE.toString())))
+            .andExpect(jsonPath("$.[*].scheduleType").value(hasItem(DEFAULT_SCHEDULE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].delay").value(hasItem(DEFAULT_DELAY.intValue())))
-            .andExpect(jsonPath("$.[*].clonExpression").value(hasItem(DEFAULT_CLON_EXPRESSION.toString())))
+            .andExpect(jsonPath("$.[*].cronExpression").value(hasItem(DEFAULT_CRON_EXPRESSION.toString())))
             .andExpect(jsonPath("$.[*].channelType").value(hasItem(DEFAULT_CHANNEL_TYPE.toString())))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
             .andExpect(jsonPath("$.[*].data").value(hasItem(DEFAULT_DATA.toString())));
@@ -892,9 +892,9 @@ public class TaskResourceIntTest {
             .createdBy(UPDATED_CREATED_BY)
             .startDate(UPDATED_START_DATE)
             .endDate(UPDATED_END_DATE)
-            .scheduletype(UPDATED_SCHEDULETYPE)
+            .scheduleType(UPDATED_SCHEDULE_TYPE)
             .delay(UPDATED_DELAY)
-            .clonExpression(UPDATED_CLON_EXPRESSION)
+            .cronExpression(UPDATED_CRON_EXPRESSION)
             .channelType(UPDATED_CHANNEL_TYPE)
             .description(UPDATED_DESCRIPTION)
             .data(UPDATED_DATA);
@@ -916,9 +916,9 @@ public class TaskResourceIntTest {
         assertThat(testTask.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
         assertThat(testTask.getStartDate()).isEqualTo(UPDATED_START_DATE);
         assertThat(testTask.getEndDate()).isEqualTo(UPDATED_END_DATE);
-        assertThat(testTask.getScheduletype()).isEqualTo(UPDATED_SCHEDULETYPE);
+        assertThat(testTask.getScheduleType()).isEqualTo(UPDATED_SCHEDULE_TYPE);
         assertThat(testTask.getDelay()).isEqualTo(UPDATED_DELAY);
-        assertThat(testTask.getClonExpression()).isEqualTo(UPDATED_CLON_EXPRESSION);
+        assertThat(testTask.getCronExpression()).isEqualTo(UPDATED_CRON_EXPRESSION);
         assertThat(testTask.getChannelType()).isEqualTo(UPDATED_CHANNEL_TYPE);
         assertThat(testTask.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testTask.getData()).isEqualTo(UPDATED_DATA);

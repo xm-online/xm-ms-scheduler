@@ -1,8 +1,8 @@
 package com.icthh.xm.ms.scheduler.domain.enumeration;
 
 /**
- * The Scheduletype enumeration.
+ * The ScheduleType enumeration.
  */
-public enum Scheduletype {
+public enum ScheduleType {
     FIXED_RATE, FIXED_DELAY, CRON
 }

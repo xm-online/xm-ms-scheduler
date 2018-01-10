@@ -93,7 +93,7 @@ public class SchedulingManager {
 
         ScheduledFuture future;
 
-        switch (task.getScheduletype()) {
+        switch (task.getScheduleType()) {
             case FIXED_DELAY:
                 future = taskScheduler.scheduleWithFixedDelay(supplier.get(),
                                                               getStartDate(task),
@@ -107,10 +107,10 @@ public class SchedulingManager {
                 break;
             case CRON:
                 future = taskScheduler.schedule(supplier.get(),
-                                                new CronTrigger(task.getClonExpression()));
+                                                new CronTrigger(task.getCronExpression()));
                 break;
             default:
-                log.warn("Task was not scheduled for unknown type: {}", task.getScheduletype());
+                log.warn("Task was not scheduled for unknown type: {}", task.getScheduleType());
                 future = null;
         }
 

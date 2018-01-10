@@ -37,8 +37,8 @@
             "fieldType": "Instant"
         },
         {
-            "fieldName": "scheduletype",
-            "fieldType": "Scheduletype",
+            "fieldName": "scheduleType",
+            "fieldType": "ScheduleType",
             "fieldValues": "FIXED_RATE,FIXED_DELAY,CRON"
         },
         {
@@ -46,12 +46,12 @@
             "fieldType": "Long"
         },
         {
-            "fieldName": "clonExpression",
+            "fieldName": "cronExpression",
             "fieldType": "String"
         },
         {
             "fieldName": "channelType",
-            "fieldType": "Channeltype",
+            "fieldType": "ChannelType",
             "fieldValues": "QUEUE,TOPIC"
         },
         {

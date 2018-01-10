@@ -1,8 +1,8 @@
 package com.icthh.xm.ms.scheduler.service.dto;
 
 import java.io.Serializable;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Scheduletype;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Channeltype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import io.github.jhipster.service.filter.BooleanFilter;
 import io.github.jhipster.service.filter.DoubleFilter;
 import io.github.jhipster.service.filter.Filter;
@@ -26,15 +26,15 @@ import io.github.jhipster.service.filter.InstantFilter;
  */
 public class TaskCriteria implements Serializable {
     /**
-     * Class for filtering Scheduletype
+     * Class for filtering ScheduleType
      */
-    public static class ScheduletypeFilter extends Filter<Scheduletype> {
+    public static class ScheduleTypeFilter extends Filter<ScheduleType> {
     }
 
     /**
-     * Class for filtering Channeltype
+     * Class for filtering ChannelType
      */
-    public static class ChanneltypeFilter extends Filter<Channeltype> {
+    public static class ChannelTypeFilter extends Filter<ChannelType> {
     }
 
     private static final long serialVersionUID = 1L;
@@ -56,13 +56,13 @@ public class TaskCriteria implements Serializable {
 
     private InstantFilter endDate;
 
-    private ScheduletypeFilter scheduletype;
+    private ScheduleTypeFilter scheduleType;
 
     private LongFilter delay;
 
-    private StringFilter clonExpression;
+    private StringFilter cronExpression;
 
-    private ChanneltypeFilter channelType;
+    private ChannelTypeFilter channelType;
 
     private StringFilter description;
 
@@ -135,12 +135,12 @@ public class TaskCriteria implements Serializable {
         this.endDate = endDate;
     }
 
-    public ScheduletypeFilter getScheduletype() {
-        return scheduletype;
+    public ScheduleTypeFilter getScheduleType() {
+        return scheduleType;
     }
 
-    public void setScheduletype(ScheduletypeFilter scheduletype) {
-        this.scheduletype = scheduletype;
+    public void setScheduleType(ScheduleTypeFilter scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
     public LongFilter getDelay() {
@@ -151,19 +151,19 @@ public class TaskCriteria implements Serializable {
         this.delay = delay;
     }
 
-    public StringFilter getClonExpression() {
-        return clonExpression;
+    public StringFilter getCronExpression() {
+        return cronExpression;
     }
 
-    public void setClonExpression(StringFilter clonExpression) {
-        this.clonExpression = clonExpression;
+    public void setCronExpression(StringFilter cronExpression) {
+        this.cronExpression = cronExpression;
     }
 
-    public ChanneltypeFilter getChannelType() {
+    public ChannelTypeFilter getChannelType() {
         return channelType;
     }
 
-    public void setChannelType(ChanneltypeFilter channelType) {
+    public void setChannelType(ChannelTypeFilter channelType) {
         this.channelType = channelType;
     }
 
@@ -194,9 +194,9 @@ public class TaskCriteria implements Serializable {
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (startDate != null ? "startDate=" + startDate + ", " : "") +
                 (endDate != null ? "endDate=" + endDate + ", " : "") +
-                (scheduletype != null ? "scheduletype=" + scheduletype + ", " : "") +
+                (scheduleType != null ? "scheduleType=" + scheduleType + ", " : "") +
                 (delay != null ? "delay=" + delay + ", " : "") +
-                (clonExpression != null ? "clonExpression=" + clonExpression + ", " : "") +
+                (cronExpression != null ? "cronExpression=" + cronExpression + ", " : "") +
                 (channelType != null ? "channelType=" + channelType + ", " : "") +
                 (description != null ? "description=" + description + ", " : "") +
                 (data != null ? "data=" + data + ", " : "") +

@@ -1,8 +1,8 @@
 package com.icthh.xm.ms.scheduler.domain.enumeration;
 
 /**
- * The Channeltype enumeration.
+ * The ChannelType enumeration.
  */
-public enum Channeltype {
+public enum ChannelType {
     QUEUE, TOPIC
 }

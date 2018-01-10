@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Scheduletype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExtImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -62,23 +62,23 @@ public class SchedulerManagerUnitTest {
     }
 
     private TaskDTO createTaskFixedDelay(Long delay, Instant startDate, Instant endDate) {
-        return createTask(Scheduletype.FIXED_DELAY, delay, null, startDate, endDate);
+        return createTask(ScheduleType.FIXED_DELAY, delay, null, startDate, endDate);
     }
 
     private TaskDTO createTaskFixedRate(Long delay, Instant startDate, Instant endDate) {
-        return createTask(Scheduletype.FIXED_RATE, delay, null, startDate, endDate);
+        return createTask(ScheduleType.FIXED_RATE, delay, null, startDate, endDate);
     }
 
     private TaskDTO createTaskByCron(String cron, Instant startDate, Instant endDate) {
-        return createTask(Scheduletype.CRON, null, cron, startDate, endDate);
+        return createTask(ScheduleType.CRON, null, cron, startDate, endDate);
     }
 
-    private TaskDTO createTask(Scheduletype type, Long delay, String cron, Instant startDate, Instant endDate) {
+    private TaskDTO createTask(ScheduleType type, Long delay, String cron, Instant startDate, Instant endDate) {
         TaskDTO dto = new TaskDTO();
         dto.setId(aLong.incrementAndGet());
-        dto.setScheduletype(type);
+        dto.setScheduleType(type);
         dto.setDelay(delay);
-        dto.setClonExpression(cron);
+        dto.setCronExpression(cron);
         dto.setStartDate(startDate);
         dto.setEndDate(endDate);
         return dto;

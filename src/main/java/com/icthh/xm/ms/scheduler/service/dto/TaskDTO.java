@@ -5,8 +5,8 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Scheduletype;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Channeltype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 
 /**
  * A DTO for the Task entity.
@@ -31,13 +31,13 @@ public class TaskDTO implements Serializable {
 
     private Instant endDate;
 
-    private Scheduletype scheduletype;
+    private ScheduleType scheduleType;
 
     private Long delay;
 
-    private String clonExpression;
+    private String cronExpression;
 
-    private Channeltype channelType;
+    private ChannelType channelType;
 
     private String description;
 
@@ -107,12 +107,12 @@ public class TaskDTO implements Serializable {
         this.endDate = endDate;
     }
 
-    public Scheduletype getScheduletype() {
-        return scheduletype;
+    public ScheduleType getScheduleType() {
+        return scheduleType;
     }
 
-    public void setScheduletype(Scheduletype scheduletype) {
-        this.scheduletype = scheduletype;
+    public void setScheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
     public Long getDelay() {
@@ -123,19 +123,19 @@ public class TaskDTO implements Serializable {
         this.delay = delay;
     }
 
-    public String getClonExpression() {
-        return clonExpression;
+    public String getCronExpression() {
+        return cronExpression;
     }
 
-    public void setClonExpression(String clonExpression) {
-        this.clonExpression = clonExpression;
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
     }
 
-    public Channeltype getChannelType() {
+    public ChannelType getChannelType() {
         return channelType;
     }
 
-    public void setChannelType(Channeltype channelType) {
+    public void setChannelType(ChannelType channelType) {
         this.channelType = channelType;
     }
 
@@ -187,9 +187,9 @@ public class TaskDTO implements Serializable {
             ", createdBy='" + getCreatedBy() + "'" +
             ", startDate='" + getStartDate() + "'" +
             ", endDate='" + getEndDate() + "'" +
-            ", scheduletype='" + getScheduletype() + "'" +
+            ", scheduleType='" + getScheduleType() + "'" +
             ", delay=" + getDelay() +
-            ", clonExpression='" + getClonExpression() + "'" +
+            ", cronExpression='" + getCronExpression() + "'" +
             ", channelType='" + getChannelType() + "'" +
             ", description='" + getDescription() + "'" +
             ", data='" + getData() + "'" +

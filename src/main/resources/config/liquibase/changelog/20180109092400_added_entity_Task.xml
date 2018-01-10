@@ -49,7 +49,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="scheduletype" type="varchar(255)">
+            <column name="schedule_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
 
@@ -57,7 +57,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="clon_expression" type="varchar(255)">
+            <column name="cron_expression" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
 

@@ -10,9 +10,9 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
-import com.icthh.xm.ms.scheduler.domain.enumeration.Scheduletype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 
-import com.icthh.xm.ms.scheduler.domain.enumeration.Channeltype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 
 /**
  * A Task.
@@ -53,18 +53,18 @@ public class Task implements Serializable {
     private Instant endDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "scheduletype")
-    private Scheduletype scheduletype;
+    @Column(name = "schedule_type")
+    private ScheduleType scheduleType;
 
     @Column(name = "delay")
     private Long delay;
 
-    @Column(name = "clon_expression")
-    private String clonExpression;
+    @Column(name = "cron_expression")
+    private String cronExpression;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "channel_type")
-    private Channeltype channelType;
+    private ChannelType channelType;
 
     @Column(name = "description")
     private String description;
@@ -172,17 +172,17 @@ public class Task implements Serializable {
         this.endDate = endDate;
     }
 
-    public Scheduletype getScheduletype() {
-        return scheduletype;
+    public ScheduleType getScheduleType() {
+        return scheduleType;
     }
 
-    public Task scheduletype(Scheduletype scheduletype) {
-        this.scheduletype = scheduletype;
+    public Task scheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
         return this;
     }
 
-    public void setScheduletype(Scheduletype scheduletype) {
-        this.scheduletype = scheduletype;
+    public void setScheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
     public Long getDelay() {
@@ -198,29 +198,29 @@ public class Task implements Serializable {
         this.delay = delay;
     }
 
-    public String getClonExpression() {
-        return clonExpression;
+    public String getCronExpression() {
+        return cronExpression;
     }
 
-    public Task clonExpression(String clonExpression) {
-        this.clonExpression = clonExpression;
+    public Task cronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
         return this;
     }
 
-    public void setClonExpression(String clonExpression) {
-        this.clonExpression = clonExpression;
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
     }
 
-    public Channeltype getChannelType() {
+    public ChannelType getChannelType() {
         return channelType;
     }
 
-    public Task channelType(Channeltype channelType) {
+    public Task channelType(ChannelType channelType) {
         this.channelType = channelType;
         return this;
     }
 
-    public void setChannelType(Channeltype channelType) {
+    public void setChannelType(ChannelType channelType) {
         this.channelType = channelType;
     }
 
@@ -282,9 +282,9 @@ public class Task implements Serializable {
             ", createdBy='" + getCreatedBy() + "'" +
             ", startDate='" + getStartDate() + "'" +
             ", endDate='" + getEndDate() + "'" +
-            ", scheduletype='" + getScheduletype() + "'" +
+            ", scheduleType='" + getScheduleType() + "'" +
             ", delay=" + getDelay() +
-            ", clonExpression='" + getClonExpression() + "'" +
+            ", cronExpression='" + getCronExpression() + "'" +
             ", channelType='" + getChannelType() + "'" +
             ", description='" + getDescription() + "'" +
             ", data='" + getData() + "'" +

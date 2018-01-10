@@ -20,8 +20,8 @@ import com.icthh.xm.ms.scheduler.service.dto.TaskCriteria;
 
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Scheduletype;
-import com.icthh.xm.ms.scheduler.domain.enumeration.Channeltype;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 
 /**
  * Service for executing complex queries for Task entities in the database.
@@ -101,14 +101,14 @@ public class TaskQueryService extends QueryService<Task> {
             if (criteria.getEndDate() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getEndDate(), Task_.endDate));
             }
-            if (criteria.getScheduletype() != null) {
-                specification = specification.and(buildSpecification(criteria.getScheduletype(), Task_.scheduletype));
+            if (criteria.getScheduleType() != null) {
+                specification = specification.and(buildSpecification(criteria.getScheduleType(), Task_.scheduleType));
             }
             if (criteria.getDelay() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getDelay(), Task_.delay));
             }
-            if (criteria.getClonExpression() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getClonExpression(), Task_.clonExpression));
+            if (criteria.getCronExpression() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getCronExpression(), Task_.cronExpression));
             }
             if (criteria.getChannelType() != null) {
                 specification = specification.and(buildSpecification(criteria.getChannelType(), Task_.channelType));
