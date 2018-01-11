@@ -4,19 +4,16 @@ import static java.util.stream.Collectors.toList;
 
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
-import com.icthh.xm.ms.scheduler.service.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *

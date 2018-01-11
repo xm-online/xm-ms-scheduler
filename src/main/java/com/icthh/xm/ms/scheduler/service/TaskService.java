@@ -1,6 +1,6 @@
 package com.icthh.xm.ms.scheduler.service;
 
-import com.icthh.xm.ms.scheduler.service.SchedulingManager;
+import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;

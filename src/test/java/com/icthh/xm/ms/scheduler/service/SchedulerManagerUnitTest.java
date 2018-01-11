@@ -6,9 +6,8 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-import com.icthh.xm.ms.scheduler.repository.TaskRepository;
+import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,6 +50,8 @@ public class SchedulerManagerUnitTest {
 //    @Mock
 //    private TaskRepository taskRepository;
 //
+
+    // TODO - FIXME - task mapper does not autowired from IDE... need to configure Ampstruct annotation processors!
 //    @Autowired
 //    private TaskMapper taskMapper;
 
@@ -249,6 +250,8 @@ public class SchedulerManagerUnitTest {
     }
 
     private void initScheduling(TaskDTO... tasks) {
+        // TODO - fixme - mock on Repository level instead of service ti test service logic (impossible due to IDE
+        // does not recognise Mapstruct generated code)
         when(taskServiceExt.findAllNotFinishedTasks()).thenReturn(asList(tasks));
         schedulingManager.init();
     }
