@@ -67,7 +67,7 @@
     "entityTableName": "task",
     "dto": "mapstruct",
     "pagination": "pagination",
-    "service": "serviceImpl",
+    "service": "serviceClass",
     "jpaMetamodelFiltering": true,
     "microserviceName": "scheduler"
 }
