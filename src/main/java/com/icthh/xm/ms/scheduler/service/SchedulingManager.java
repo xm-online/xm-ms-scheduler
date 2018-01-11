@@ -117,7 +117,7 @@ public class SchedulingManager {
     }
 
     private static String getTaskKey(TaskDTO task) {
-        return String.valueOf(task.getId());
+        return Optional.ofNullable(task.getId()).map(String::valueOf).orElse(task.getKey());
     }
 
     private static Date getStartDate(TaskDTO task) {

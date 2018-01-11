@@ -2,6 +2,7 @@ package com.icthh.xm.ms.scheduler.service;
 
 import static java.util.stream.Collectors.toList;
 
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,8 +39,24 @@ public class TaskServiceExt {
     @Transactional(readOnly = true)
     public List<TaskDTO> findAllNotFinishedTasks() {
         log.debug("Request to get all Tasks without paging");
-        return taskRepository.findByEndDateGreaterThanEqual(Instant.now())
-                             .stream().map(taskMapper::toDto).collect(toList());
+
+        List<TaskDTO> tasks = taskRepository.findByEndDateGreaterThanEqual(Instant.now())
+                                            .stream().map(taskMapper::toDto).collect(toList());
+
+        tasks.addAll(findAllNotFinishedTaskFromConfig());
+
+        return tasks;
     }
 
+    // TODO use RefreshableConfig instead of this mock
+    List<TaskDTO> findAllNotFinishedTaskFromConfig() {
+
+        TaskDTO task = new TaskDTO();
+        task.setKey("systask1");
+        task.setScheduleType(ScheduleType.FIXED_DELAY);
+        task.setDelay(1000L);
+        task.setTypeKey("SYSTEM.TASK1");
+
+        return Arrays.asList(task);
+    }
 }

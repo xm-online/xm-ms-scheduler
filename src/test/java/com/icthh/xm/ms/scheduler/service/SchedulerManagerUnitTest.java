@@ -6,7 +6,9 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,6 +48,12 @@ public class SchedulerManagerUnitTest {
     @Mock
     private TaskServiceExt taskServiceExt;
 
+//    @Mock
+//    private TaskRepository taskRepository;
+//
+//    @Autowired
+//    private TaskMapper taskMapper;
+
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
 
@@ -53,6 +61,8 @@ public class SchedulerManagerUnitTest {
     public void init() {
 
         MockitoAnnotations.initMocks(this);
+
+//        taskServiceExt = new TaskServiceExt(taskRepository, taskMapper);
 
         schedulingManager = new SchedulingManager(taskScheduler,
                                                   taskServiceExt,
@@ -164,6 +174,22 @@ public class SchedulerManagerUnitTest {
         expectRunAndExpiryCounts(task2, 4, 1);
 
     }
+
+//    @Test
+//    public void testInitFixedDelayTasksFromConfig() {
+//
+//        when(taskServiceExt.findAllNotFinishedTasks()).thenReturn(asList());
+//        when(taskServiceExt.findAllNotFinishedTasks()).thenReturn(asList());
+//
+//        schedulingManager.init();
+//
+//        waitAndDeleteTask(3000);
+//
+//        TaskDTO task = taskServiceExt.findAllNotFinishedTaskFromConfig().get(0);
+//
+//        expectRunAndExpiryCounts(task, 3, 0);
+//
+//    }
 
     @Test
     public void testCreateTask() {
