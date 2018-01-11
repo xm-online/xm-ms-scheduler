@@ -1,13 +1,39 @@
 package com.icthh.xm.ms.scheduler.service;
 
+import com.icthh.xm.ms.scheduler.service.SchedulingManager;
+
+import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 /**
- * Service Interface for managing Task.
+ * Service Implementation for managing Task.
  */
-public interface TaskService {
+@Service
+@Transactional
+public class TaskService {
+
+    private final Logger log = LoggerFactory.getLogger(TaskService.class);
+
+    final TaskRepository taskRepository;
+
+    final TaskMapper taskMapper;
+
+    final SchedulingManager schedulingManager;
+
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, SchedulingManager schedulingManager) {
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+        this.schedulingManager = schedulingManager;
+    }
 
     /**
      * Save a task.
@@ -15,7 +41,14 @@ public interface TaskService {
      * @param taskDTO the entity to save
      * @return the persisted entity
      */
-    TaskDTO save(TaskDTO taskDTO);
+    public TaskDTO save(TaskDTO taskDTO) {
+        log.debug("Request to save Task : {}", taskDTO);
+        Task task = taskMapper.toEntity(taskDTO);
+        task = taskRepository.save(task);
+        TaskDTO dto = taskMapper.toDto(task);
+        schedulingManager.updateActiveTask(dto);
+        return dto;
+    }
 
     /**
      * Get all the tasks.
@@ -23,20 +56,34 @@ public interface TaskService {
      * @param pageable the pagination information
      * @return the list of entities
      */
-    Page<TaskDTO> findAll(Pageable pageable);
+    @Transactional(readOnly = true)
+    public Page<TaskDTO> findAll(Pageable pageable) {
+        log.debug("Request to get all Tasks");
+        return taskRepository.findAll(pageable)
+            .map(taskMapper::toDto);
+    }
 
     /**
-     * Get the "id" task.
+     * Get one task by id.
      *
      * @param id the id of the entity
      * @return the entity
      */
-    TaskDTO findOne(Long id);
+    @Transactional(readOnly = true)
+    public TaskDTO findOne(Long id) {
+        log.debug("Request to get Task : {}", id);
+        Task task = taskRepository.findOne(id);
+        return taskMapper.toDto(task);
+    }
 
     /**
-     * Delete the "id" task.
+     * Delete the task by id.
      *
      * @param id the id of the entity
      */
-    void delete(Long id);
+    public void delete(Long id) {
+        log.debug("Request to delete Task : {}", id);
+        schedulingManager.deleteActiveTask(String.valueOf(id));
+        taskRepository.delete(id);
+    }
 }

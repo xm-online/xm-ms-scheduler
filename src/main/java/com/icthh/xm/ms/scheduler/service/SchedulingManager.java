@@ -1,7 +1,6 @@
 package com.icthh.xm.ms.scheduler.service;
 
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;

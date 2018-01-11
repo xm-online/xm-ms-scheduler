@@ -1,9 +1,7 @@
 package com.icthh.xm.ms.scheduler.config;
 
-import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SchedulingManager;
-import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExt;
-import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
+import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;

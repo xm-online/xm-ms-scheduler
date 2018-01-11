@@ -29,7 +29,7 @@ paginate Task with pagination
 
 dto Task with mapstruct
 
-service all with serviceImpl
+service all with serviceClass
 
 filter Task
 

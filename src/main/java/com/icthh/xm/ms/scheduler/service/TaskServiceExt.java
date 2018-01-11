@@ -1,4 +1,4 @@
-package com.icthh.xm.ms.scheduler.service.impl;
+package com.icthh.xm.ms.scheduler.service;
 
 import static java.util.stream.Collectors.toList;
 
