@@ -2,10 +2,8 @@ package com.icthh.xm.ms.scheduler.config;
 
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SchedulingManager;
-import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExtImpl;
-import com.icthh.xm.ms.scheduler.service.impl.TaskServiceImpl;
+import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -18,7 +16,7 @@ public class SchedulingConfiguration {
 
     @Bean(initMethod = "init")
     public SchedulingManager schedulingManager(ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                                               TaskServiceExtImpl taskServiceExt) {
+                                               TaskServiceExt taskServiceExt) {
         return new SchedulingManager(threadPoolTaskScheduler, taskServiceExt, t -> {
         }, t -> {
         });
@@ -33,9 +31,9 @@ public class SchedulingConfiguration {
         return threadPoolTaskScheduler;
     }
 
-    @Bean
-    public TaskServiceExtImpl taskServiceExt(TaskRepository taskRepository, TaskMapper taskMapper) {
-        return new TaskServiceExtImpl(taskRepository, taskMapper);
-    }
+//    @Bean
+//    public TaskServiceExt taskServiceExt(TaskRepository taskRepository, TaskMapper taskMapper) {
+//        return new TaskServiceExt(taskRepository, taskMapper);
+//    }
 
 }

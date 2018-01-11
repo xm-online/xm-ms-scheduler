@@ -1,7 +1,7 @@
 package com.icthh.xm.ms.scheduler.service;
 
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExtImpl;
+import com.icthh.xm.ms.scheduler.service.impl.TaskServiceExt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 public class SchedulingManager {
 
     final ThreadPoolTaskScheduler taskScheduler;
-    final TaskServiceExtImpl taskService;
+    final TaskServiceExt taskService;
     final Consumer<TaskDTO> afterRun;
     final Consumer<TaskDTO> afterExpiration;
 
@@ -169,6 +169,7 @@ public class SchedulingManager {
 
         @Override
         public boolean isExpired() {
+            log.info("task.getEndDate() = {}, now = {}", task.getEndDate(), Instant.now());
             return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().plusMillis(task.getDelay()));
         }
     }

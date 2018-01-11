@@ -3,8 +3,10 @@ package com.icthh.xm.ms.scheduler.service.impl;
 import static java.util.stream.Collectors.toList;
 
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
+import com.icthh.xm.ms.scheduler.service.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,12 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Slf4j
-@Primary
-public class TaskServiceExtImpl extends TaskServiceImpl {
+@RequiredArgsConstructor
+public class TaskServiceExt {
 
-    public TaskServiceExtImpl(final TaskRepository taskRepository,
-                              final TaskMapper taskMapper) {
-        super(taskRepository, taskMapper);
-    }
+    final TaskRepository taskRepository;
+
+    final TaskMapper taskMapper;
 
     /**
      * Get all the tasks.

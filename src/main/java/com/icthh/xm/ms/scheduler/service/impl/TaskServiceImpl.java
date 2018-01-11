@@ -1,5 +1,6 @@
 package com.icthh.xm.ms.scheduler.service.impl;
 
+import com.icthh.xm.ms.scheduler.service.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.TaskService;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
@@ -26,9 +27,12 @@ public class TaskServiceImpl implements TaskService {
 
     final TaskMapper taskMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
+    final SchedulingManager schedulingManager;
+
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, SchedulingManager schedulingManager) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+        this.schedulingManager = schedulingManager;
     }
 
     /**
@@ -42,7 +46,9 @@ public class TaskServiceImpl implements TaskService {
         log.debug("Request to save Task : {}", taskDTO);
         Task task = taskMapper.toEntity(taskDTO);
         task = taskRepository.save(task);
-        return taskMapper.toDto(task);
+        TaskDTO dto = taskMapper.toDto(task);
+        schedulingManager.updateActiveTask(dto);
+        return dto;
     }
 
     /**
@@ -81,6 +87,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Task : {}", id);
+        schedulingManager.deleteActiveTask(String.valueOf(id));
         taskRepository.delete(id);
     }
 }
