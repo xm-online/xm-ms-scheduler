@@ -3,6 +3,8 @@ package com.icthh.xm.ms.scheduler.manager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
+import org.springframework.messaging.support.MessageBuilder;
 
 import java.time.Instant;
 import java.util.function.Consumer;
@@ -23,7 +25,7 @@ public class DefaultExpirable implements Expirable {
     public void run() {
         log.info("execute scheduled task: {}", task);
 
-        // TODO - implement sending to event queue here (try to use Spring Cloud Streams)
+        manager.handleTask(task);
 
         if (afterRun != null) {
             afterRun.accept(task);
@@ -43,5 +45,10 @@ public class DefaultExpirable implements Expirable {
     public boolean isExpired() {
         log.info("task.getEndDate() = {}, now = {}", task.getEndDate(), Instant.now());
         return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().plusMillis(task.getDelay()));
+    }
+
+    @Override
+    public TaskDTO getTask() {
+        return task;
     }
 }

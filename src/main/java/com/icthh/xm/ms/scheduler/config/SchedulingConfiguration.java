@@ -1,7 +1,9 @@
 package com.icthh.xm.ms.scheduler.config;
 
+import com.icthh.xm.ms.scheduler.manager.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -14,8 +16,9 @@ public class SchedulingConfiguration {
 
     @Bean(initMethod = "init", destroyMethod = "destroy")
     public SchedulingManager schedulingManager(ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                                               TaskServiceExt taskServiceExt) {
-        return new SchedulingManager(threadPoolTaskScheduler, taskServiceExt);
+                                               TaskServiceExt taskServiceExt,
+                                               ScheduledTaskHandler handler) {
+        return new SchedulingManager(threadPoolTaskScheduler, taskServiceExt, handler);
     }
 
     @Bean

@@ -3,6 +3,7 @@ package com.icthh.xm.ms.scheduler.manager;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
@@ -25,26 +26,31 @@ public class SchedulingManager {
 
     final ThreadPoolTaskScheduler taskScheduler;
     final TaskServiceExt taskService;
+    final ScheduledTaskHandler handler;
+
     Consumer<TaskDTO> afterRun;
     Consumer<TaskDTO> afterExpiration;
 
+    // TODO - make multi-tenant
+    private Map<String, ScheduledFuture> activeSchedulers = new ConcurrentHashMap<>();
+
     public SchedulingManager(final ThreadPoolTaskScheduler taskScheduler,
-                             final TaskServiceExt taskService) {
+                             final TaskServiceExt taskService,
+                             final ScheduledTaskHandler handler) {
         this.taskScheduler = taskScheduler;
         this.taskService = taskService;
+        this.handler = handler;
     }
 
     public SchedulingManager(final ThreadPoolTaskScheduler taskScheduler,
                              final TaskServiceExt taskService,
+                             final ScheduledTaskHandler handler,
                              final Consumer<TaskDTO> afterRun,
                              final Consumer<TaskDTO> afterExpiration) {
-        this(taskScheduler, taskService);
+        this(taskScheduler, taskService, handler);
         this.afterRun = afterRun;
         this.afterExpiration = afterExpiration;
     }
-
-    // TODO - make multi-tenant
-    private Map<String, ScheduledFuture> activeSchedulers = new ConcurrentHashMap<>();
 
     public void init() {
 
@@ -56,7 +62,7 @@ public class SchedulingManager {
 
             if (v == null || v.isCancelled()) {
                 // TODO - FIXME - how to inject DefaultExpirable properly with spring?
-                return schedule(taskDTO, () -> new DefaultExpirable(taskDTO, this, afterRun, afterExpiration));
+                return schedule(new DefaultExpirable(taskDTO, this, afterRun, afterExpiration));
             }
 
             return null;
@@ -89,7 +95,7 @@ public class SchedulingManager {
             }
 
             // TODO - FIXME - how to inject DefaultExpirable properly with spring?
-            return schedule(task, () -> new DefaultExpirable(task, this, afterRun, afterExpiration));
+            return schedule(new DefaultExpirable(task, this, afterRun, afterExpiration));
 
         });
 
@@ -103,6 +109,10 @@ public class SchedulingManager {
 
     }
 
+    void handleTask(TaskDTO task) {
+        handler.handle(task);
+    }
+
     private boolean cancelTask(ScheduledFuture future) {
         boolean cancelled = false;
         if (future != null) {
@@ -111,24 +121,26 @@ public class SchedulingManager {
         return cancelled;
     }
 
-    private ScheduledFuture schedule(TaskDTO task, Supplier<Expirable> supplier) {
+    private ScheduledFuture schedule(Expirable expirable) {
 
         ScheduledFuture future;
 
+        TaskDTO task = expirable.getTask();
+
         switch (task.getScheduleType()) {
             case FIXED_DELAY:
-                future = taskScheduler.scheduleWithFixedDelay(supplier.get(),
+                future = taskScheduler.scheduleWithFixedDelay(expirable,
                                                               getStartDate(task),
                                                               task.getDelay());
 
                 break;
             case FIXED_RATE:
-                future = taskScheduler.scheduleAtFixedRate(supplier.get(),
+                future = taskScheduler.scheduleAtFixedRate(expirable,
                                                            getStartDate(task),
                                                            task.getDelay());
                 break;
             case CRON:
-                future = taskScheduler.schedule(supplier.get(),
+                future = taskScheduler.schedule(expirable,
                                                 new CronTrigger(task.getCronExpression()));
                 break;
             default:

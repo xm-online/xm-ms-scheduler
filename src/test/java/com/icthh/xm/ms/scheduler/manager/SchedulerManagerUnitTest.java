@@ -1,48 +1,48 @@
-package com.icthh.xm.ms.scheduler.service;
+package com.icthh.xm.ms.scheduler.manager;
 
+import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskByCron;
+import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskFixedDelay;
+import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskFixedRate;
+import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.waitFor;
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
+import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {
-//    SchedulingConfiguration.class,
-    SchedulerManagerUnitTest.TestConfiguration.class
+    TestSchedulingManagerConfiguration.class
 })
 @Slf4j
 public class SchedulerManagerUnitTest {
-
-    private AtomicLong aLong = new AtomicLong();
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
     private Multiset<Long> executedTasks = HashMultiset.create();
 
     private SchedulingManager schedulingManager;
+
+    @Autowired
+    private ScheduledTaskHandler handler;
 
     @Mock
     private TaskServiceExt taskServiceExt;
@@ -67,31 +67,9 @@ public class SchedulerManagerUnitTest {
 
         schedulingManager = new SchedulingManager(taskScheduler,
                                                   taskServiceExt,
+                                                  handler,
                                                   executed -> executedTasks.add(executed.getId()),
                                                   expired -> expiredTasks.add(expired.getId()));
-    }
-
-    private TaskDTO createTaskFixedDelay(Long delay, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.FIXED_DELAY, delay, null, startDate, endDate);
-    }
-
-    private TaskDTO createTaskFixedRate(Long delay, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.FIXED_RATE, delay, null, startDate, endDate);
-    }
-
-    private TaskDTO createTaskByCron(String cron, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.CRON, null, cron, startDate, endDate);
-    }
-
-    private TaskDTO createTask(ScheduleType type, Long delay, String cron, Instant startDate, Instant endDate) {
-        TaskDTO dto = new TaskDTO();
-        dto.setId(aLong.incrementAndGet());
-        dto.setScheduleType(type);
-        dto.setDelay(delay);
-        dto.setCronExpression(cron);
-        dto.setStartDate(startDate);
-        dto.setEndDate(endDate);
-        return dto;
     }
 
     @Test
@@ -217,7 +195,7 @@ public class SchedulerManagerUnitTest {
         // create task
         schedulingManager.updateActiveTask(task1);
 
-        waitFor(2000);
+        waitFor(1995);
         expectRunAndExpiryCounts(task1, 4, 0);
 
         // update existing task
@@ -227,16 +205,6 @@ public class SchedulerManagerUnitTest {
 
         waitFor(2000);
         expectRunAndExpiryCounts(task1, 4 + 8, 1);
-
-    }
-
-    private void waitFor(long wait) {
-        try {
-            System.out.println("##### wait for " + wait + " ms...");
-            Thread.sleep(wait);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
     }
 
@@ -257,43 +225,8 @@ public class SchedulerManagerUnitTest {
     }
 
     private void expectRunAndExpiryCounts(TaskDTO task, int runCount, int expirycount) {
-        Assert.assertEquals(runCount, executedTasks.count(task.getId()));
-        Assert.assertEquals(expirycount, expiredTasks.count(task.getId()));
-    }
-
-    @Configuration
-//    @ComponentScan(basePackages = {"com.icthh.xm.ms.scheduler.repository"})
-//    @EnableAutoConfiguration
-    public static class TestConfiguration {
-
-//        @Autowired
-//        TaskMapper taskMapper = Mappers.getMapper(TaskMapper.class);
-
-//        @Bean(initMethod = "init")
-//        public SchedulingManager schedulingManager(ThreadPoolTaskScheduler threadPoolTaskScheduler,
-//                                                   @Qualifier("taskSrv") TaskServiceExtImpl taskServiceExt) {
-//            return new SchedulingManager(threadPoolTaskScheduler, taskServiceExt);
-//        }
-
-        @Bean
-        public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
-            ThreadPoolTaskScheduler threadPoolTaskScheduler
-                = new ThreadPoolTaskScheduler();
-            threadPoolTaskScheduler.setPoolSize(5);
-            threadPoolTaskScheduler.setThreadNamePrefix("xm-sc-thread");
-            return threadPoolTaskScheduler;
-        }
-
-//        @Bean
-//        public TaskMapper taskMapper() {
-//            return Mappers.getMapper(TaskMapper.class);
-//        }
-//
-//        @Bean(name = "taskSrv")
-//        public TaskServiceExtImpl taskServiceExt(TaskMapper taskMapper) {
-//            return new TaskServiceExtImpl(null, taskMapper);
-//        }
-
+        assertEquals(runCount, executedTasks.count(task.getId()));
+        assertEquals(expirycount, expiredTasks.count(task.getId()));
     }
 
 }

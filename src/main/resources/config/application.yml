@@ -50,6 +50,9 @@ spring:
             discovery:
                 healthCheckPath: /management/health
                 instanceId: ${spring.application.name}:${spring.application.instance-id:${random.value}}
+        stream:
+            default:
+                contentType: application/json
     jackson:
         serialization.write_dates_as_timestamps: false
     jpa:
