@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
+import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -35,7 +35,7 @@ import java.util.Arrays;
 @SpringBootTest(classes = {
     TestSupportBinderAutoConfiguration.class,
     TestSchedulingManagerConfiguration.class,
-    MessagingConfiguration.class
+    SchedulingHandlerConfiguration.class
 })
 //@ContextHierarchy({
 //    @ContextConfiguration(classes = TestSupportBinderAutoConfiguration.class),

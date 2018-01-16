@@ -12,3 +12,4 @@ tenant related scheduler.yml)
 7. Add jenkins job
 8. Include to compose file
 9. Fix IDE code assist for generated classes such as Task_ in TaskQueryService and TaskMapperImpl
+10. Implement conditional connection to kafka mased on properties (application.stream-binding-enabled) - DONE
