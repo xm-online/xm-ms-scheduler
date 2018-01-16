@@ -17,7 +17,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
+ * Default implementation for scheduled task handler. Sends messages to spring cloud stream (kafka binding)
  *
+ * Receives {@link ChannelNameResolver} for tenant based resolver name creation
+ *
+ * and {@link BinderAwareChannelResolver} for actual message sending into the channel.
  */
 @RequiredArgsConstructor
 @Slf4j

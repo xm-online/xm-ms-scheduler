@@ -11,7 +11,7 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 /**
- *
+ * Scheduled event model to be send to stream.
  */
 @Getter
 @Setter
