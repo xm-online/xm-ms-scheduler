@@ -49,7 +49,7 @@ public class SystemTaskResourceTest {
     private static final String DEFAULT_CRON_EXPRESSION = null;
     private static final ChannelType DEFAULT_CHANNEL_TYPE = null;
     private static final String DEFAULT_DESCRIPTION = null;
-    private static final String DEFAULT_DATA = null;
+    private static final String DEFAULT_DATA = "{\"key\": \"value\"}";
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;

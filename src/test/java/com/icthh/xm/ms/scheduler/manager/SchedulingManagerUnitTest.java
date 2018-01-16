@@ -149,7 +149,7 @@ public class SchedulingManagerUnitTest {
 
         initScheduling(task1, task2);
 
-        waitAndDeleteTask(3000, task1, task2);
+        waitAndDeleteTask(3005, task1, task2);
 
         expectRunAndExpiryCounts(task1, 4, 1);
         expectRunAndExpiryCounts(task2, 4, 1);

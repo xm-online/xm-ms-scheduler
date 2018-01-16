@@ -58,6 +58,7 @@ public class TaskServiceExt {
         task.setScheduleType(ScheduleType.FIXED_DELAY);
         task.setDelay(1000L);
         task.setTypeKey("SYSTEM.TASK1");
+        task.setData("{\"key\": \"value\"}");
 
         return Arrays.asList(task);
     }
