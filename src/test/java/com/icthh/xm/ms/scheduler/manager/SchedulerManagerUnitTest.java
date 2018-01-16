@@ -1,9 +1,9 @@
 package com.icthh.xm.ms.scheduler.manager;
 
-import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskByCron;
-import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskFixedDelay;
-import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskFixedRate;
-import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.waitFor;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -11,11 +11,9 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
-import com.icthh.xm.ms.scheduler.config.SchedulingConfiguration;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,11 +21,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
@@ -60,10 +55,6 @@ public class SchedulerManagerUnitTest {
     @Mock
     private TaskServiceExt taskServiceExt;
 
-//    @Mock
-//    private TaskRepository taskRepository;
-//
-
     // TODO - FIXME - task mapper does not autowired from IDE... need to configure Mapstruct annotation processors!
 //    @Autowired
 //    private TaskMapper taskMapper;
@@ -75,8 +66,6 @@ public class SchedulerManagerUnitTest {
     public void init() {
 
         MockitoAnnotations.initMocks(this);
-
-//        taskServiceExt = new TaskServiceExt(taskRepository, taskMapper);
 
         schedulingManager = new SchedulingManager(taskScheduler,
                                                   taskServiceExt,
@@ -167,6 +156,7 @@ public class SchedulerManagerUnitTest {
 
     }
 
+    // FIXME - can not autowire service
 //    @Test
 //    public void testInitFixedDelayTasksFromConfig() {
 //

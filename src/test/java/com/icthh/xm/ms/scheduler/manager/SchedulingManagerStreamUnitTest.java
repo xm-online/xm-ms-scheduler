@@ -1,7 +1,7 @@
 package com.icthh.xm.ms.scheduler.manager;
 
-import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskFixedDelay;
-import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.waitFor;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -41,7 +41,7 @@ import java.util.List;
 //    @ContextConfiguration(classes = MessagingConfiguration.class),
 //    @ContextConfiguration(classes = TestSchedulingManagerConfiguration.class)
 //})
-public class SchedulingManagerCloudUnitTest {
+public class SchedulingManagerStreamUnitTest {
 
     private SchedulingManager schedulingManager;
 
@@ -78,7 +78,7 @@ public class SchedulingManagerCloudUnitTest {
     }
 
     @Test
-    public void test() {
+    public void testMessagesSentToChannel() {
 
         TaskDTO task = createTaskFixedDelay(1000L, Instant.now(), null);
 
@@ -93,8 +93,6 @@ public class SchedulingManagerCloudUnitTest {
         messageCollector
             .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
             .drainTo(messages);
-
-        System.out.println("MESSAGES: " + messages);
 
         assertEquals(3, messages.size());
         assertTrue(messages.stream().allMatch(m -> ((TaskDTO) m.getPayload()).getId().equals(task.getId())));
