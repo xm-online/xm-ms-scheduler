@@ -14,7 +14,24 @@ To start your application in the dev profile, simply run:
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
 
+### Development with kafka
 
+By default when you start this micro service with dev profile it uses property
+`application.stream-binding-enabled = false` and does not connect to messaging system.
+
+In case you need to send scheduled messages to real kafka destination do the following: 
+
+1. Turn on stream binding in application properties: `application.stream-binding-enabled = true`
+2. Run kafka. the easies way to do it is: 
+   ```
+   docker run --name kafka -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 spotify/kafka
+   ```
+3. Start the micro service
+4. login to kafka docker and consume events:
+    ```
+    docker exec -it kafka bash
+    /opt/kafka_2.11-0.10.1.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic scheduler_queue
+    ```
 
 ## Building for production
 
