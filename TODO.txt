@@ -1,10 +1,11 @@
 
 Global tasks to be done before production use:
 
+0. Implement SchedulerEvent model
 1. Add and setup xm-commons-logging library
 2. Add and setup xm-commons-exception library
 3. Add xm-commons-config library and implement system schedulers initialization and update form config server (create
 tenant related scheduler.yml)
 4. Move ScheduledEvent to xm-commons-messaging project model
-5. Add REST api for system schedulers CRUD
-
+5. Add REST api for system schedulers only for GET - DONE
+6. Add permissions annotations

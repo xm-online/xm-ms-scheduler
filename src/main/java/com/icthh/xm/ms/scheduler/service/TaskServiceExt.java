@@ -47,6 +47,11 @@ public class TaskServiceExt {
 
     // TODO use RefreshableConfig instead of this mock
     List<TaskDTO> findAllNotFinishedTaskFromConfig() {
+        return findAllTaskFromConfig();
+    }
+
+    // TODO use RefreshableConfig instead of this mock
+    public List<TaskDTO> findAllTaskFromConfig() {
 
         TaskDTO task = new TaskDTO();
         task.setKey("systask1");
@@ -55,5 +60,9 @@ public class TaskServiceExt {
         task.setTypeKey("SYSTEM.TASK1");
 
         return Arrays.asList(task);
+    }
+
+    public TaskDTO findOneTaskFromConfigByKey(final String key) {
+        return findAllTaskFromConfig().stream().filter(dto -> key.equals(dto.getKey())).findFirst().orElse(null);
     }
 }
