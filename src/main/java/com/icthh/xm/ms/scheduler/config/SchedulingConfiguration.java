@@ -31,9 +31,4 @@ public class SchedulingConfiguration {
         return threadPoolTaskScheduler;
     }
 
-//    @Bean
-//    public TaskServiceExt taskServiceExt(TaskRepository taskRepository, TaskMapper taskMapper) {
-//        return new TaskServiceExt(taskRepository, taskMapper);
-//    }
-
 }

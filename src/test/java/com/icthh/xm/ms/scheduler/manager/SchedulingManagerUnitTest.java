@@ -42,7 +42,7 @@ import java.util.Arrays;
 //    @ContextConfiguration(classes = MessagingConfiguration.class),
 //    @ContextConfiguration(classes = TestSchedulingManagerConfiguration.class)
 //})
-public class SchedulerManagerUnitTest {
+public class SchedulingManagerUnitTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
     private Multiset<Long> executedTasks = HashMultiset.create();

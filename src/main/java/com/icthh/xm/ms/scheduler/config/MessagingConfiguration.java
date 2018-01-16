@@ -14,8 +14,6 @@ import org.springframework.context.annotation.Bean;
  * See http://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/
  * for more information.
  */
-// TODO - uncoment to test kafka messages
-//@EnableBinding(value = {Source.class})
 @EnableBinding
 public class MessagingConfiguration {
 
