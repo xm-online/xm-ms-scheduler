@@ -1,9 +1,9 @@
 package com.icthh.xm.ms.scheduler.manager;
 
+import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Scheduling manager component is designed to handle all active schedulers.

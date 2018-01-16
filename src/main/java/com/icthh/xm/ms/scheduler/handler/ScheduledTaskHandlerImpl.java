@@ -1,5 +1,6 @@
-package com.icthh.xm.ms.scheduler.manager;
+package com.icthh.xm.ms.scheduler.handler;
 
+import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Component;
 /**
  *
  */
-@Component
 @RequiredArgsConstructor
 public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
 

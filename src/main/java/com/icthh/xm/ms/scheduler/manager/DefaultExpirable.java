@@ -43,7 +43,6 @@ public class DefaultExpirable implements Expirable {
 
     @Override
     public boolean isExpired() {
-        log.info("task.getEndDate() = {}, now = {}", task.getEndDate(), Instant.now());
         return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().plusMillis(task.getDelay()));
     }
 

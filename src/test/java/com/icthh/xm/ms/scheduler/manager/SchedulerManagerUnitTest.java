@@ -10,6 +10,9 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
+import com.icthh.xm.ms.scheduler.config.SchedulingConfiguration;
+import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +22,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.test.binder.MessageCollector;
+import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
@@ -30,10 +37,16 @@ import java.util.Arrays;
  *
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {
-    TestSchedulingManagerConfiguration.class
+@SpringBootTest(classes = {
+    TestSupportBinderAutoConfiguration.class,
+    TestSchedulingManagerConfiguration.class,
+    MessagingConfiguration.class
 })
-@Slf4j
+//@ContextHierarchy({
+//    @ContextConfiguration(classes = TestSupportBinderAutoConfiguration.class),
+//    @ContextConfiguration(classes = MessagingConfiguration.class),
+//    @ContextConfiguration(classes = TestSchedulingManagerConfiguration.class)
+//})
 public class SchedulerManagerUnitTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
@@ -51,7 +64,7 @@ public class SchedulerManagerUnitTest {
 //    private TaskRepository taskRepository;
 //
 
-    // TODO - FIXME - task mapper does not autowired from IDE... need to configure Ampstruct annotation processors!
+    // TODO - FIXME - task mapper does not autowired from IDE... need to configure Mapstruct annotation processors!
 //    @Autowired
 //    private TaskMapper taskMapper;
 

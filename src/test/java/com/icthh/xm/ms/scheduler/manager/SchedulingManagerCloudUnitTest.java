@@ -2,8 +2,11 @@ package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.manager.TaskTestUtil.waitFor;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
+import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
@@ -12,12 +15,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.messaging.Message;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
@@ -28,16 +31,16 @@ import java.util.List;
  *
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {
+@SpringBootTest(classes = {
     TestSupportBinderAutoConfiguration.class,
-    TestSchedulingManagerConfiguration.class
+    TestSchedulingManagerConfiguration.class,
+    MessagingConfiguration.class
 })
 //@ContextHierarchy({
 //    @ContextConfiguration(classes = TestSupportBinderAutoConfiguration.class),
+//    @ContextConfiguration(classes = MessagingConfiguration.class),
 //    @ContextConfiguration(classes = TestSchedulingManagerConfiguration.class)
-//}
-//)
-
+//})
 public class SchedulingManagerCloudUnitTest {
 
     private SchedulingManager schedulingManager;
@@ -49,7 +52,7 @@ public class SchedulingManagerCloudUnitTest {
     private BinderAwareChannelResolver channelResolver;
 
     @Autowired
-    private ChannelNameResolver nameResolver;
+    private TestChannelNameResolver nameResolver;
 
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
@@ -65,7 +68,9 @@ public class SchedulingManagerCloudUnitTest {
 
         MockitoAnnotations.initMocks(this);
 
-//        taskServiceExt = new TaskServiceExt(taskRepository, taskMapper);
+        // clear messages
+        nameResolver.getResolvedChannels()
+                    .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
 
         schedulingManager = new SchedulingManager(taskScheduler,
                                                   taskServiceExt,

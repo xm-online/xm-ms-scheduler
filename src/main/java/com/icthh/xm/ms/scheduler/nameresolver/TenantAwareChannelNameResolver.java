@@ -1,4 +1,4 @@
-package com.icthh.xm.ms.scheduler.manager;
+package com.icthh.xm.ms.scheduler.nameresolver;
 
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;

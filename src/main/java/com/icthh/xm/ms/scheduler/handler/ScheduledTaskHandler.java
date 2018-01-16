@@ -1,4 +1,4 @@
-package com.icthh.xm.ms.scheduler.manager;
+package com.icthh.xm.ms.scheduler.handler;
 
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.springframework.stereotype.Component;
