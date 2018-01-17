@@ -3,7 +3,7 @@ package com.icthh.xm.ms.scheduler.nameresolver;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static org.junit.Assert.assertEquals;
 
-import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
+import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {MessagingConfiguration.class})
+@SpringBootTest(classes = {SchedulingHandlerConfiguration.class})
 public class TenantAwareChannelNameResolverTest {
 
     @Autowired

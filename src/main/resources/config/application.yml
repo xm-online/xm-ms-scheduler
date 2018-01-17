@@ -130,3 +130,4 @@ jhipster:
 # ===================================================================
 
 application:
+    stream-binding-enabled: true

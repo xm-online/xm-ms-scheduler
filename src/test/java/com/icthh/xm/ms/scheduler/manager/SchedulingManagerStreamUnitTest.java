@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
+import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
+import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -34,8 +36,9 @@ import java.util.List;
 @SpringBootTest(classes = {
     TestSupportBinderAutoConfiguration.class,
     TestSchedulingManagerConfiguration.class,
-    MessagingConfiguration.class
-})
+    MessagingConfiguration.class,
+    SchedulingHandlerConfiguration.class
+}, properties = {"application.stream-binding-enabled=true"})
 //@ContextHierarchy({
 //    @ContextConfiguration(classes = TestSupportBinderAutoConfiguration.class),
 //    @ContextConfiguration(classes = MessagingConfiguration.class),
@@ -95,7 +98,7 @@ public class SchedulingManagerStreamUnitTest {
             .drainTo(messages);
 
         assertEquals(3, messages.size());
-        assertTrue(messages.stream().allMatch(m -> ((TaskDTO) m.getPayload()).getId().equals(task.getId())));
+        assertTrue(messages.stream().allMatch(m -> ((ScheduledEvent) m.getPayload()).getId().equals(task.getId())));
 
     }
 

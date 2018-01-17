@@ -14,6 +14,7 @@ import com.icthh.xm.ms.scheduler.service.dto.TaskCriteria;
 import com.icthh.xm.ms.scheduler.service.TaskQueryService;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -792,6 +793,7 @@ public class TaskResourceIntTest {
         defaultTaskShouldNotBeFound("description.specified=false");
     }
 
+    @Ignore("ignore test for not supported filtering by 'data' field")
     @Test
     @Transactional
     public void getAllTasksByDataIsEqualToSomething() throws Exception {
@@ -805,6 +807,7 @@ public class TaskResourceIntTest {
         defaultTaskShouldNotBeFound("data.equals=" + UPDATED_DATA);
     }
 
+    @Ignore("ignore test for not supported filtering by 'data' field")
     @Test
     @Transactional
     public void getAllTasksByDataIsInShouldWork() throws Exception {

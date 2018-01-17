@@ -3,8 +3,6 @@ package com.icthh.xm.ms.scheduler.manager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
-import org.springframework.messaging.support.MessageBuilder;
 
 import java.time.Instant;
 import java.util.function.Consumer;
@@ -14,7 +12,7 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class DefaultExpirable implements Expirable {
+public class DefaultRunnableTask implements RunnableTask {
 
     final TaskDTO task;
     final SchedulingManager manager;
@@ -41,8 +39,7 @@ public class DefaultExpirable implements Expirable {
         }
     }
 
-    @Override
-    public boolean isExpired() {
+    private boolean isExpired() {
         return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().plusMillis(task.getDelay()));
     }
 

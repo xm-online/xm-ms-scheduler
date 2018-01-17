@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 /**
- * Scheduling manager component is designed to handle all active schedulers.
+ * Scheduling manager component is designed to handle all active scheduled tasks.
  */
 @Component
 @Slf4j
@@ -60,8 +60,7 @@ public class SchedulingManager {
         tasks.forEach(taskDTO -> activeSchedulers.compute(getTaskKey(taskDTO), (k, v) -> {
 
             if (v == null || v.isCancelled()) {
-                // TODO - FIXME - how to inject DefaultExpirable properly with spring?
-                return schedule(new DefaultExpirable(taskDTO, this, afterRun, afterExpiration));
+                return schedule(new DefaultRunnableTask(taskDTO, this, afterRun, afterExpiration));
             }
 
             return null;
@@ -92,9 +91,7 @@ public class SchedulingManager {
             } else {
                 log.info("create new scheduler: {}", getTaskKey(task));
             }
-
-            // TODO - FIXME - how to inject DefaultExpirable properly with spring?
-            return schedule(new DefaultExpirable(task, this, afterRun, afterExpiration));
+            return schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration));
 
         });
 
@@ -120,7 +117,7 @@ public class SchedulingManager {
         return cancelled;
     }
 
-    private ScheduledFuture schedule(Expirable expirable) {
+    private ScheduledFuture schedule(RunnableTask expirable) {
 
         ScheduledFuture future;
 

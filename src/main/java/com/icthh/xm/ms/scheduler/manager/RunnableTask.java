@@ -5,9 +5,7 @@ import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 /**
  *
  */ // TODO - to think if we really need this interface
-public interface Expirable extends Runnable {
-
-    boolean isExpired();
+public interface RunnableTask extends Runnable {
 
     TaskDTO getTask();
 
