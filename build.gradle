@@ -248,6 +248,12 @@ task wrapper(type: Wrapper) {
 task stage(dependsOn: 'bootRepackage') {
 }
 
+sourceSets {
+    generated {
+        java.srcDir "${buildDir}/generated/source/apt/main"
+    }
+}
+
 compileJava.dependsOn processResources
 processResources.dependsOn cleanResources,bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources
