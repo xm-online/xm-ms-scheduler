@@ -17,6 +17,8 @@ buildscript {
 
 plugins {
     id "org.sonarqube" version "2.5"
+    id "net.ltgt.apt-eclipse" version "0.13"
+    id "net.ltgt.apt-idea" version "0.13"
     id "net.ltgt.apt" version "0.13"
     id "io.spring.dependency-management" version "1.0.3.RELEASE"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
@@ -246,12 +248,6 @@ task wrapper(type: Wrapper) {
 }
 
 task stage(dependsOn: 'bootRepackage') {
-}
-
-sourceSets {
-    generated {
-        java.srcDir "${buildDir}/generated/source/apt/main"
-    }
 }
 
 compileJava.dependsOn processResources
