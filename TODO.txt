@@ -1,15 +1,24 @@
 
 Global tasks to be done before production use:
 
+DONE:
+
 0. Implement SchedulerEvent model - DONE
+1. Add REST api for system schedulers only for GET - DONE
+2. Implement conditional connection to kafka mased on properties (application.stream-binding-enabled) - DONE
+3. Fix IDE code assist for generated classes such as Task_ in TaskQueryService and TaskMapperImpl - DONE (check)
+
+TODO:
+
 1. Add and setup xm-commons-logging library
-2. Add and setup xm-commons-exception library
-3. Add xm-commons-config library and implement system schedulers initialization and update form config server (create
+2. Add xm-commons-config library and implement system schedulers initialization and update form config server (create
 tenant related scheduler.yml)
-4. Move ScheduledEvent to xm-commons-messaging project model
-5. Add REST api for system schedulers only for GET - DONE
-6. Add permissions annotations
-7. Add jenkins job
-8. Include to compose file
-9. Fix IDE code assist for generated classes such as Task_ in TaskQueryService and TaskMapperImpl
-10. Implement conditional connection to kafka mased on properties (application.stream-binding-enabled) - DONE
+3. Fix all TODO statements in code and tests
+4. Add permissions annotations
+5. Add jenkins job
+6. Include to compose file
+
+Optional (need review/discuss)
+
+1. Move ScheduledEvent to xm-commons-messaging project model
+2. Add and setup xm-commons-exception library
