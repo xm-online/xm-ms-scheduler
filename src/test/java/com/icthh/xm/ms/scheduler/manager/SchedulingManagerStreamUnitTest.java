@@ -1,15 +1,21 @@
 package com.icthh.xm.ms.scheduler.manager;
 
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
+import com.icthh.xm.commons.config.client.repository.TenantListRepository;
+import com.icthh.xm.commons.tenant.TenantContext;
+import com.icthh.xm.commons.tenant.TenantContextHolder;
+import com.icthh.xm.commons.tenant.TenantKey;
 import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
 import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
 import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -64,7 +71,16 @@ public class SchedulingManagerStreamUnitTest {
     private MessageCollector messageCollector;
 
     @Mock
-    private TaskServiceExt taskServiceExt;
+    private TenantContextHolder tenantContextHolder;
+
+    @Mock
+    private TenantContext tenantContext;
+
+    @Mock
+    private TenantListRepository tenantListRepository;
+
+    @Mock
+    private ConfigTaskService configTaskService;
 
     @Before
     public void init() {
@@ -75,9 +91,10 @@ public class SchedulingManagerStreamUnitTest {
         nameResolver.getResolvedChannels()
                     .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
 
-        schedulingManager = new SchedulingManager(taskScheduler,
-                                                  taskServiceExt,
-                                                  handler);
+        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, configTaskService, handler, tenantListRepository);
+
+        when(tenantContext.getTenantKey()).thenReturn(Optional.of(TenantKey.valueOf(TEST_TENANT)));
+        when(tenantContextHolder.getContext()).thenReturn(tenantContext);
     }
 
     @Test

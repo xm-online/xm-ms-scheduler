@@ -117,4 +117,7 @@ jhipster:
 # http://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
+xm-config:
+    enabled: false
+
 application:

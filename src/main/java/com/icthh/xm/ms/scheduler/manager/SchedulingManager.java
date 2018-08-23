@@ -1,17 +1,17 @@
 package com.icthh.xm.ms.scheduler.manager;
 
+import com.icthh.xm.commons.config.client.repository.TenantListRepository;
+import com.icthh.xm.commons.tenant.PrivilegedTenantContext;
+import com.icthh.xm.commons.tenant.TenantContextHolder;
+import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
@@ -19,90 +19,127 @@ import java.util.function.Consumer;
 /**
  * Scheduling manager component is designed to handle all active scheduled tasks.
  */
-@Component
 @Slf4j
 public class SchedulingManager {
 
+    final TenantContextHolder tenantContextHolder;
     final ThreadPoolTaskScheduler taskScheduler;
-    final TaskServiceExt taskService;
+    final ConfigTaskService taskService;
     final ScheduledTaskHandler handler;
+    final TenantListRepository tenantListRepository;
 
-    Consumer<TaskDTO> afterRun;
-    Consumer<TaskDTO> afterExpiration;
+    private Consumer<TaskDTO> afterRun;
+    private Consumer<TaskDTO> afterExpiration;
 
-    // TODO - make multi-tenant
-    private Map<String, ScheduledFuture> activeSchedulers = new ConcurrentHashMap<>();
+    private Map<String, Map<String, ScheduledFuture>> activeSchedulers = new ConcurrentHashMap<>();
 
-    public SchedulingManager(final ThreadPoolTaskScheduler taskScheduler,
-                             final TaskServiceExt taskService,
-                             final ScheduledTaskHandler handler) {
+    public SchedulingManager(final TenantContextHolder tenantContextHolder,
+                             final ThreadPoolTaskScheduler taskScheduler,
+                             final ConfigTaskService taskService,
+                             final ScheduledTaskHandler handler,
+                             final TenantListRepository tenantListRepository) {
+        this.tenantContextHolder = tenantContextHolder;
         this.taskScheduler = taskScheduler;
         this.taskService = taskService;
         this.handler = handler;
+        this.tenantListRepository = tenantListRepository;
     }
 
-    public SchedulingManager(final ThreadPoolTaskScheduler taskScheduler,
-                             final TaskServiceExt taskService,
+    public SchedulingManager(final TenantContextHolder tenantContextHolder,
+                             final ThreadPoolTaskScheduler taskScheduler,
+                             final ConfigTaskService taskService,
                              final ScheduledTaskHandler handler,
                              final Consumer<TaskDTO> afterRun,
-                             final Consumer<TaskDTO> afterExpiration) {
-        this(taskScheduler, taskService, handler);
+                             final Consumer<TaskDTO> afterExpiration,
+                             final TenantListRepository tenantListRepository) {
+        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository);
         this.afterRun = afterRun;
         this.afterExpiration = afterExpiration;
     }
 
     public void init() {
+        String defaultTenantName = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
 
-        List<TaskDTO> tasks = taskService.findAllNotFinishedTasks();
+        int countOfTasks = 0;
 
-        log.info("start init Scheduler component with [{}] active tasks...", tasks.size());
+        log.info("Before init scheduler tasks, defaultTenant = {}", defaultTenantName);
 
-        tasks.forEach(taskDTO -> activeSchedulers.compute(getTaskKey(taskDTO), (k, v) -> {
+        for (String tenantName : tenantListRepository.getTenants()) {
 
-            if (v == null || v.isCancelled()) {
-                return schedule(new DefaultRunnableTask(taskDTO, this, afterRun, afterExpiration));
-            }
+            PrivilegedTenantContext ptc = tenantContextHolder.getPrivilegedContext();
 
-            return null;
-        }));
+            int processed = ptc.execute(TenantContextUtils.buildTenant(tenantName), () -> {
+                log.info("Start initialization of tasks for tenant [{}]", tenantName);
 
-        log.info("stop init Scheduler component with [{}] active tasks.", tasks.size());
+                List<TaskDTO> tasks = taskService.findAllNotFinishedTasks();
 
+                tasks.forEach(task -> activeSchedulers.compute(tenantName, (k, v) -> {
+                    if (v == null) {
+                        v = new HashMap();
+                    }
+                    task.setTenant(tenantName);
+                    v.put(getTaskKey(task), schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration)));
+                    return v;
+                }));
+
+                return tasks.size();
+
+            });
+
+
+            countOfTasks += processed;
+
+            log.info("Count of inited tasks for tenant [{}]: {}", tenantName, processed);
+        }
+
+        log.info("SchedulingManager was started with [{}] active tasks. defaultTenant = {}", countOfTasks, defaultTenantName);
     }
 
     public void destroy() {
         log.info("destroy task scheduler...");
-        long cnt = activeSchedulers.values().stream().map(this::cancelTask).count();
+        long cnt = activeSchedulers.values().stream().flatMap(m -> m.values().stream()).map(this::cancelTask).count();
         log.info("tasks cancelled count: {}", cnt);
         activeSchedulers.clear();
     }
 
     public ScheduledFuture getActiveTask(String taskKey) {
-        return activeSchedulers.get(taskKey);
+        return Optional.ofNullable(activeSchedulers.get(TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder))).orElse(new HashMap<>()).get(taskKey);
     }
 
     public void updateActiveTask(TaskDTO task) {
 
-        activeSchedulers.compute(getTaskKey(task), (k, future) -> {
+        String currentTenant = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
 
-            if (future != null) {
-                boolean cancelled = cancelTask(future);
+        activeSchedulers.compute(currentTenant, (k, v) -> {
+            if (v == null) {
+                v = new HashMap();
+            }
+            if (v.get(getTaskKey(task)) != null) {
+                boolean cancelled = cancelTask(v.get(getTaskKey(task)));
                 log.info("cancel active scheduler: {} for update. cancelled result: {}", getTaskKey(task), cancelled);
             } else {
                 log.info("create new scheduler: {}", getTaskKey(task));
             }
-            return schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration));
-
+            task.setTenant(currentTenant);
+            v.put(getTaskKey(task), schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration)));
+            return v;
         });
+    }
 
+    public void deleteActiveTask(TaskDTO task) {
+        String currentTenant = task.getTenant() != null ? task.getTenant() : TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
+        deleteActiveTask(currentTenant, getTaskKey(task));
     }
 
     public void deleteActiveTask(String taskKey) {
+        deleteActiveTask(TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder), taskKey);
+    }
 
-        ScheduledFuture future = activeSchedulers.remove(taskKey);
+    private void deleteActiveTask(String tenant, String taskKey) {
+        Map<String, ScheduledFuture> taskMap = Optional.ofNullable(activeSchedulers.get(tenant)).orElse(new HashMap<>());
+        ScheduledFuture future = taskMap.remove(taskKey);
         boolean cancelled = cancelTask(future);
         log.info("task {} removed, cancelled result: {}", taskKey, cancelled);
-
     }
 
     void handleTask(TaskDTO task) {

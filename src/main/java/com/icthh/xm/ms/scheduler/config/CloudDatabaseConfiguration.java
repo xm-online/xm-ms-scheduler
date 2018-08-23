@@ -17,7 +17,7 @@ public class CloudDatabaseConfiguration extends AbstractCloudConfig {
     private final Logger log = LoggerFactory.getLogger(CloudDatabaseConfiguration.class);
 
     @Bean
-    public DataSource dataSource(CacheManager cacheManager) {
+    public DataSource dataSource() {
         log.info("Configuring JDBC datasource from a cloud provider");
         return connectionFactory().dataSource();
     }

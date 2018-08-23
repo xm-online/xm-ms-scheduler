@@ -17,6 +17,8 @@ public class TaskDTO implements Serializable {
 
     private String key;
 
+    private String tenant;
+
     private String name;
 
     @NotNull
@@ -57,6 +59,14 @@ public class TaskDTO implements Serializable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public String getName() {

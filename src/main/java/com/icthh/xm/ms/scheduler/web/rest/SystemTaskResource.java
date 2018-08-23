@@ -1,7 +1,7 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 public class SystemTaskResource {
 
-    private final TaskServiceExt taskServiceExt;
+    private final ConfigTaskService configTaskService;
 
     /**
      * GET  /systasks : get all the tasks.
@@ -35,7 +35,7 @@ public class SystemTaskResource {
     @GetMapping("/systasks")
     @Timed
     public ResponseEntity<List<TaskDTO>> getAllTasks() {
-        List<TaskDTO> list = taskServiceExt.findAllTaskFromConfig();
+        List<TaskDTO> list = configTaskService.getTasksFromConfig();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -48,7 +48,7 @@ public class SystemTaskResource {
     @GetMapping("/systasks/{key}")
     @Timed
     public ResponseEntity<TaskDTO> getTask(@PathVariable String key) {
-        TaskDTO taskDTO = taskServiceExt.findOneTaskFromConfigByKey(key);
+        TaskDTO taskDTO = configTaskService.findOneTaskFromConfigByKey(key);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(taskDTO));
     }
 

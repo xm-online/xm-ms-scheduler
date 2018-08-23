@@ -1,8 +1,9 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.icthh.xm.commons.exceptions.BusinessException;
+import com.icthh.xm.commons.exceptions.ErrorConstants;
 import com.icthh.xm.ms.scheduler.service.TaskService;
-import com.icthh.xm.ms.scheduler.web.rest.errors.BadRequestAlertException;
 import com.icthh.xm.ms.scheduler.web.rest.util.HeaderUtil;
 import com.icthh.xm.ms.scheduler.web.rest.util.PaginationUtil;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -57,7 +58,7 @@ public class TaskResource {
     public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO taskDTO) throws URISyntaxException {
         log.debug("REST request to save Task : {}", taskDTO);
         if (taskDTO.getId() != null) {
-            throw new BadRequestAlertException("A new task cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BusinessException(ErrorConstants.ERR_BUSINESS_IDEXISTS, "A new task cannot already have an ID");
         }
         TaskDTO result = taskService.save(taskDTO);
         return ResponseEntity.created(new URI("/api/tasks/" + result.getId()))

@@ -1,18 +1,19 @@
 package com.icthh.xm.ms.scheduler.manager;
 
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
+import com.icthh.xm.commons.config.client.repository.TenantListRepository;
+import com.icthh.xm.commons.tenant.TenantContextHolder;
+import com.icthh.xm.commons.tenant.TenantContextUtils;
+import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
+import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -32,17 +32,8 @@ import java.util.Arrays;
  *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {
-    TestSupportBinderAutoConfiguration.class,
-    TestSchedulingManagerConfiguration.class,
-    SchedulingHandlerConfiguration.class
-})
-//@ContextHierarchy({
-//    @ContextConfiguration(classes = TestSupportBinderAutoConfiguration.class),
-//    @ContextConfiguration(classes = MessagingConfiguration.class),
-//    @ContextConfiguration(classes = TestSchedulingManagerConfiguration.class)
-//})
-public class SchedulingManagerUnitTest {
+@SpringBootTest
+public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
     private Multiset<Long> executedTasks = HashMultiset.create();
@@ -53,7 +44,15 @@ public class SchedulingManagerUnitTest {
     private ScheduledTaskHandler handler;
 
     @Mock
-    private TaskServiceExt taskServiceExt;
+    private ConfigTaskService configTaskService;
+
+    private TenantContextHolder tenantContextHolder;
+
+//    @Autowired
+//    private PrivilegedTenantContext privilegedTenantContext;
+
+    @Autowired
+    private TenantListRepository tenantListRepository;
 
     // TODO - FIXME - task mapper does not autowired from IDE... need to configure Mapstruct annotation processors!
 //    @Autowired
@@ -64,14 +63,15 @@ public class SchedulingManagerUnitTest {
 
     @Before
     public void init() {
-
         MockitoAnnotations.initMocks(this);
 
-        schedulingManager = new SchedulingManager(taskScheduler,
-                                                  taskServiceExt,
-                                                  handler,
+        tenantContextHolder = new DefaultTenantContextHolder();
+        TenantContextUtils.setTenant(tenantContextHolder, TEST_TENANT);
+
+        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, configTaskService, handler,
                                                   executed -> executedTasks.add(executed.getId()),
-                                                  expired -> expiredTasks.add(expired.getId()));
+                                                  expired -> expiredTasks.add(expired.getId()),
+                                                  tenantListRepository);
     }
 
     @Test
@@ -223,7 +223,7 @@ public class SchedulingManagerUnitTest {
     private void initScheduling(TaskDTO... tasks) {
         // TODO - fixme - mock on Repository level instead of service ti test service logic (impossible due to IDE
         // does not recognise Mapstruct generated code)
-        when(taskServiceExt.findAllNotFinishedTasks()).thenReturn(asList(tasks));
+        when(configTaskService.findAllNotFinishedTasks()).thenReturn(asList(tasks));
         schedulingManager.init();
     }
 

@@ -32,7 +32,7 @@ public class DefaultRunnableTask implements RunnableTask {
         if (isExpired()) {
             // time to delete
             log.info("remove active scheduled task {} due to end date: {}", task.getId(), task.getEndDate());
-            manager.deleteActiveTask(SchedulingManager.getTaskKey(task));
+            manager.deleteActiveTask(task);
             if (afterExpiry != null) {
                 afterExpiry.accept(task);
             }

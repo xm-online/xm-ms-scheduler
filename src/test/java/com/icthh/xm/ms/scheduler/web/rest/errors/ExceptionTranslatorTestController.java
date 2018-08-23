@@ -1,5 +1,6 @@
 package com.icthh.xm.ms.scheduler.web.rest.errors;
 
+import com.icthh.xm.commons.exceptions.BusinessException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,15 +28,15 @@ public class ExceptionTranslatorTestController {
 
     @GetMapping("/test/parameterized-error")
     public void parameterizedError() {
-        throw new CustomParameterizedException("test parameterized error", "param0_value", "param1_value");
+        throw new BusinessException("test parameterized error").withParams("param0_value", "param1_value");
     }
 
     @GetMapping("/test/parameterized-error2")
     public void parameterizedError2() {
-        Map<String, Object> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put("foo", "foo_value");
         params.put("bar", "bar_value");
-        throw new CustomParameterizedException("test parameterized error", params);
+        throw new BusinessException("test parameterized error", params);
     }
 
     @GetMapping("/test/missing-servlet-request-part")

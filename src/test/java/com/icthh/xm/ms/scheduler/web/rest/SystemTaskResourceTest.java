@@ -3,21 +3,22 @@ package com.icthh.xm.ms.scheduler.web.rest;
 import static com.icthh.xm.ms.scheduler.web.rest.TestUtil.createFormattingConversionService;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.icthh.xm.ms.scheduler.SchedulerApp;
-import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
+import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import com.icthh.xm.ms.scheduler.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,13 +30,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Arrays;
 
 /**
  *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SchedulerApp.class, SecurityBeanOverrideConfiguration.class})
-public class SystemTaskResourceTest {
+@SpringBootTest
+public class SystemTaskResourceTest extends AbstractSpringContextTest {
 
     private static final String DEFAULT_KEY = "systask1";
     private static final String DEFAULT_NAME = null;
@@ -57,15 +59,18 @@ public class SystemTaskResourceTest {
     @Autowired
     private ExceptionTranslator exceptionTranslator;
 
-    @Autowired
-    private TaskServiceExt taskServiceExt;
+    @Mock
+    private ConfigTaskService configTaskService;
 
     private MockMvc restTaskMockMvc;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final SystemTaskResource taskResource = new SystemTaskResource(taskServiceExt);
+        final SystemTaskResource taskResource = new SystemTaskResource(configTaskService);
+
+        when(configTaskService.getTasksFromConfig()).thenReturn(Arrays.asList(createTask()));
+        when(configTaskService.findOneTaskFromConfigByKey("systask1")).thenReturn(createTask());
 
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
                                               .setControllerAdvice(exceptionTranslator)
@@ -73,11 +78,29 @@ public class SystemTaskResourceTest {
                                               .setMessageConverters(jacksonMessageConverter).build();
     }
 
+    private TaskDTO createTask() {
+        TaskDTO taskDTO = new TaskDTO();
+        taskDTO.setKey(DEFAULT_KEY);
+        taskDTO.setName(DEFAULT_NAME);
+        taskDTO.setTypeKey(DEFAULT_TYPE_KEY);
+        taskDTO.setStateKey(DEFAULT_STATE_KEY);
+        taskDTO.setCreatedBy(DEFAULT_CREATED_BY);
+        taskDTO.setStartDate(DEFAULT_START_DATE);
+        taskDTO.setEndDate(DEFAULT_END_DATE);
+        taskDTO.setScheduleType(DEFAULT_SCHEDULE_TYPE);
+        taskDTO.setDelay(DEFAULT_DELAY);
+        taskDTO.setCronExpression(DEFAULT_CRON_EXPRESSION);
+        taskDTO.setChannelType(DEFAULT_CHANNEL_TYPE);
+        taskDTO.setDescription(DEFAULT_DESCRIPTION);
+        taskDTO.setData(DEFAULT_DATA);
+
+        return taskDTO;
+    }
+
     @Test
     @Transactional
     public void getTask() throws Exception {
-
-        TaskDTO task = taskServiceExt.findOneTaskFromConfigByKey("systask1");
+        TaskDTO task = configTaskService.findOneTaskFromConfigByKey("systask1");
 
         // Get the task
         restTaskMockMvc.perform(get("/api/systasks/{key}", task.getKey()))

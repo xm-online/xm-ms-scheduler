@@ -5,9 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.jwt.crypto.sign.SignatureVerifier;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.icthh.xm.ms.scheduler.config.Constants.*;
 
 /**
  * Improved JwtAccessTokenConverter that can handle lazy fetching of public verifier keys.
@@ -52,6 +56,25 @@ public class OAuth2JwtAccessTokenConverter extends JwtAccessTokenConverter {
             }
             throw ex;
         }
+    }
+
+
+    @Override
+    public OAuth2Authentication extractAuthentication(Map<String, ?> map) {
+        final OAuth2Authentication authentication = super.extractAuthentication(map);
+        final Map<String, String> details = new HashMap<>();
+        details.put(AUTH_TENANT_KEY, (String) map.get(AUTH_TENANT_KEY));
+        details.put(AUTH_USER_KEY, (String) map.get(AUTH_USER_KEY));
+        details.put(AUTH_XM_TOKEN_KEY, (String) map.get(AUTH_XM_TOKEN_KEY));
+        details.put(AUTH_XM_COOKIE_KEY, (String) map.get(AUTH_XM_COOKIE_KEY));
+        details.put(AUTH_XM_USER_ID_KEY, (String) map.get(AUTH_XM_USER_ID_KEY));
+        details.put(AUTH_XM_USER_LOGIN_KEY, (String) map.get(AUTH_XM_USER_LOGIN_KEY));
+        details.put(AUTH_XM_LOCALE_KEY, (String) map.get(AUTH_XM_LOCALE_KEY));
+        details.put(AUTH_AE_API_TOKEN_KEY, (String) map.get(AUTH_AE_API_TOKEN_KEY));
+        details.put(AUTH_CHARGE_API_TOKEN_KEY, (String) map.get(AUTH_CHARGE_API_TOKEN_KEY));
+        authentication.setDetails(details);
+
+        return authentication;
     }
 
     /**

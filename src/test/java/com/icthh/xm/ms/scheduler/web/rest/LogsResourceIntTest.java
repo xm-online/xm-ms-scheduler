@@ -1,7 +1,7 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
-import com.icthh.xm.ms.scheduler.SchedulerApp;
-import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.commons.logging.web.rest.LogsResource;
+import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.web.rest.vm.LoggerVM;
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.LoggerContext;
@@ -28,8 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see LogsResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SchedulerApp.class, SecurityBeanOverrideConfiguration.class})
-public class LogsResourceIntTest {
+@SpringBootTest
+public class LogsResourceIntTest extends AbstractSpringContextTest {
 
     private MockMvc restLogsMockMvc;
 

@@ -1,5 +1,6 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
+import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import io.github.jhipster.config.JHipsterProperties;
 import com.icthh.xm.ms.scheduler.SchedulerApp;
 import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
@@ -26,8 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see ProfileInfoResource
  **/
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SchedulerApp.class, SecurityBeanOverrideConfiguration.class})
-public class ProfileInfoResourceIntTest {
+@SpringBootTest
+public class ProfileInfoResourceIntTest extends AbstractSpringContextTest {
 
     @Mock
     private Environment environment;
