@@ -50,18 +50,10 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     @Autowired
     private ScheduledTaskHandler handler;
 
+    @Autowired
     private ConfigTaskService configTaskService;
 
-    @Mock
-    private ConfigTaskRepository configTaskRepository;
-
     private TenantContextHolder tenantContextHolder;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private TaskMapper taskMapper;
 
 //    @Autowired
 //    private PrivilegedTenantContext privilegedTenantContext;
@@ -82,8 +74,6 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         tenantContextHolder = new DefaultTenantContextHolder();
         TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
-
-        ConfigTaskService configTaskService = new ConfigTaskService(configTaskRepository, taskRepository, taskMapper, tenantContextHolder, tenantListRepository);
 
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, configTaskService, handler,
                                                   executed -> executedTasks.add(executed.getId()),
@@ -240,14 +230,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     private void initScheduling(TaskDTO... tasks) {
         // TODO - fixme - mock on Repository level instead of service ti test service logic (impossible due to IDE
         // does not recognise Mapstruct generated code)
-
-        ConcurrentHashMap<String, Map<String, TaskDTO>> configTasks = new ConcurrentHashMap<>();
-        Map<String, TaskDTO> map = new HashMap();
-        Arrays.stream(tasks).forEach(taskDTO -> map.put(taskDTO.getId().toString(), taskDTO));
-        configTasks.put(TEST_TENANT, map);
-        when(configTaskRepository.getConfigTasks()).thenReturn(configTasks);
-
-        schedulingManager.init();
+        Arrays.stream(tasks).forEach(schedulingManager::updateActiveTask);
     }
 
     private void expectRunAndExpiryCounts(TaskDTO task, int runCount, int expirycount) {
