@@ -23,6 +23,7 @@ public class TenantConfigMockConfiguration {
         TenantListRepository mockTenantListRepository = mock(TenantListRepository.class);
         Set set = new HashSet();
         set.add(TaskTestUtil.TEST_TENANT);
+        set.add(TaskTestUtil.XM_TENANT);
         when(mockTenantListRepository.getTenants()).thenReturn(set);
         return mockTenantListRepository;
     }

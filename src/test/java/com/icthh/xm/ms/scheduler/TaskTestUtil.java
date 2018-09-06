@@ -14,6 +14,7 @@ public class TaskTestUtil {
     private static AtomicLong aLong = new AtomicLong();
 
     public static final String TEST_TENANT = "test";
+    public static final String XM_TENANT = "xm";
 
     private TaskTestUtil() {
 

@@ -13,12 +13,16 @@ import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
+import com.icthh.xm.ms.scheduler.repository.ConfigTaskRepository;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +31,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -43,10 +50,18 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     @Autowired
     private ScheduledTaskHandler handler;
 
-    @Mock
     private ConfigTaskService configTaskService;
 
+    @Mock
+    private ConfigTaskRepository configTaskRepository;
+
     private TenantContextHolder tenantContextHolder;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
 //    @Autowired
 //    private PrivilegedTenantContext privilegedTenantContext;
@@ -66,7 +81,9 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         MockitoAnnotations.initMocks(this);
 
         tenantContextHolder = new DefaultTenantContextHolder();
-        TenantContextUtils.setTenant(tenantContextHolder, TEST_TENANT);
+        TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
+
+        ConfigTaskService configTaskService = new ConfigTaskService(configTaskRepository, taskRepository, taskMapper, tenantContextHolder, tenantListRepository);
 
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, configTaskService, handler,
                                                   executed -> executedTasks.add(executed.getId()),
@@ -223,7 +240,13 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     private void initScheduling(TaskDTO... tasks) {
         // TODO - fixme - mock on Repository level instead of service ti test service logic (impossible due to IDE
         // does not recognise Mapstruct generated code)
-        when(configTaskService.findAllNotFinishedTasks()).thenReturn(asList(tasks));
+
+        ConcurrentHashMap<String, Map<String, TaskDTO>> configTasks = new ConcurrentHashMap<>();
+        Map<String, TaskDTO> map = new HashMap();
+        Arrays.stream(tasks).forEach(taskDTO -> map.put(taskDTO.getId().toString(), taskDTO));
+        configTasks.put(TEST_TENANT, map);
+        when(configTaskRepository.getConfigTasks()).thenReturn(configTasks);
+
         schedulingManager.init();
     }
 
