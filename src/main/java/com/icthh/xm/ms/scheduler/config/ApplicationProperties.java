@@ -22,11 +22,13 @@ public class ApplicationProperties {
 
     private List<String> tenantIgnoredPathList = Collections.emptyList();
     private boolean streamBindingEnabled = true;
+    // TODO - think how to name these properties
     private String taskPathPattern;
     private int threadPoolSize = 5;
     private boolean kafkaEnabled;
     private String kafkaSystemQueue;
 
+    // TODO - do we need this properties?
     @Getter
     @Setter
     private static class Retry {

@@ -17,11 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.springframework.util.CollectionUtils.isEmpty;
-
 @Slf4j
 @Component
-public class ConfigTaskRepository implements RefreshableConfiguration {
+public class SystemTaskRepository implements RefreshableConfiguration {
 
     private static final String TENANT_NAME = "tenantName";
 
@@ -29,12 +27,12 @@ public class ConfigTaskRepository implements RefreshableConfiguration {
     private ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
     @Getter
-    private ConcurrentHashMap<String, Map<String, TaskDTO>> configTasks = new ConcurrentHashMap();
+    private Map<String, Map<String, TaskDTO>> configTasks = new ConcurrentHashMap<>();
 
     private ApplicationProperties applicationProperties;
 
-    public ConfigTaskRepository(ApplicationProperties applicationProperties) {
-        log.info("Init of ConfigTaskRepository");
+    public SystemTaskRepository(ApplicationProperties applicationProperties) {
+        log.info("Init of SystemTaskRepository");
         this.applicationProperties = applicationProperties;
     }
 
@@ -45,14 +43,14 @@ public class ConfigTaskRepository implements RefreshableConfiguration {
             String tenant = matcher.extractUriTemplateVariables(pathPattern, updatedKey).get(TENANT_NAME).toLowerCase();
             if (StringUtils.isBlank(config)) {
                 configTasks.remove(tenant);
-                log.info("Tasks for tenant '{}' were removed", tenant);
+                log.info("Tasks for tenant '{}' were removed: {}", tenant, updatedKey);
             } else {
                 TasksSpec spec = mapper.readValue(config, TasksSpec.class);
                 configTasks.put(tenant, toTypeSpecsMap(spec));
-                log.info("Tasks for tenant '{}' were updated", tenant);
+                log.info("Tasks for tenant '{}' were updated: {}", tenant, updatedKey);
             }
         } catch (Exception e) {
-            log.error("Error read xm specification from path " + updatedKey, e);
+            log.error("Error read Scheduler specification from path: {}", updatedKey, e);
         }
     }
 
@@ -70,18 +68,6 @@ public class ConfigTaskRepository implements RefreshableConfiguration {
     }
 
     private Map<String, TaskDTO> toTypeSpecsMap(TasksSpec spec) {
-        List<TaskDTO> tasks = spec.getTasks();
-        if (isEmpty(tasks)) {
-            return Collections.emptyMap();
-        } else {
-            // Convert List<TaskDTO> to Map<key, TaskDTO>
-            Map<String, TaskDTO> result = tasks.stream()
-                .collect(Collectors.toMap(TaskDTO::getKey, Function.identity(),
-                    (u, v) -> {
-                        throw new IllegalStateException(String.format("Duplicate key %s", u));
-                    }, HashMap::new));
-
-            return result;
-        }
+        return spec.getTasks().stream().collect(Collectors.toMap(TaskDTO::getKey, Function.identity()));
     }
 }

@@ -5,7 +5,7 @@ import com.icthh.xm.commons.tenant.PrivilegedTenantContext;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -24,7 +24,7 @@ public class SchedulingManager {
 
     final TenantContextHolder tenantContextHolder;
     final ThreadPoolTaskScheduler taskScheduler;
-    final ConfigTaskService taskService;
+    final SystemTaskService taskService;
     final ScheduledTaskHandler handler;
     final TenantListRepository tenantListRepository;
 
@@ -35,7 +35,7 @@ public class SchedulingManager {
 
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
                              final ThreadPoolTaskScheduler taskScheduler,
-                             final ConfigTaskService taskService,
+                             final SystemTaskService taskService,
                              final ScheduledTaskHandler handler,
                              final TenantListRepository tenantListRepository) {
         this.tenantContextHolder = tenantContextHolder;
@@ -47,7 +47,7 @@ public class SchedulingManager {
 
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
                              final ThreadPoolTaskScheduler taskScheduler,
-                             final ConfigTaskService taskService,
+                             final SystemTaskService taskService,
                              final ScheduledTaskHandler handler,
                              final Consumer<TaskDTO> afterRun,
                              final Consumer<TaskDTO> afterExpiration,
@@ -58,6 +58,7 @@ public class SchedulingManager {
     }
 
     public void init() {
+        //TODO - review logic
         String defaultTenantName = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
 
         int countOfTasks = 0;

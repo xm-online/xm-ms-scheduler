@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
-import com.icthh.xm.ms.scheduler.repository.ConfigTaskRepository;
+import com.icthh.xm.ms.scheduler.repository.SystemTaskRepository;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class ConfigTaskService {
+public class SystemTaskService {
 
-    private final ConfigTaskRepository configTaskRepository;
+    private final SystemTaskRepository systemTaskRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final TenantContextHolder tenantContextHolder;
@@ -77,8 +77,8 @@ public class ConfigTaskService {
     }
 
     public List<TaskDTO> getTasksFromConfigForAllTenants() {
-        return configTaskRepository.getConfigTasks().values().stream()
-            .flatMap(m -> m.values().stream()).collect(Collectors.toList());
+        return systemTaskRepository.getConfigTasks().values().stream()
+                                   .flatMap(m -> m.values().stream()).collect(Collectors.toList());
     }
 
     public TaskDTO findOneTaskFromConfigByKey(final String key) {
@@ -87,6 +87,6 @@ public class ConfigTaskService {
 
     public List<TaskDTO> getTasksFromConfig() {
         String tenantKeyValue = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
-        return Optional.ofNullable(configTaskRepository.getConfigTasks().get(tenantKeyValue)).orElse(new HashMap<>()).values().stream().collect(Collectors.toList());
+        return Optional.ofNullable(systemTaskRepository.getConfigTasks().get(tenantKeyValue)).orElse(new HashMap<>()).values().stream().collect(Collectors.toList());
     }
 }
