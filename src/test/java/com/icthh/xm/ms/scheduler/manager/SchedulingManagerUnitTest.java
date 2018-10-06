@@ -1,9 +1,7 @@
 package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.*;
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -13,16 +11,11 @@ import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.repository.ConfigTaskRepository;
-import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,9 +24,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -205,7 +195,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         // create task
         schedulingManager.updateActiveTask(task1);
 
-        waitFor(1995);
+        waitFor(1990);
         expectRunAndExpiryCounts(task1, 4, 0);
 
         // update existing task
