@@ -18,9 +18,7 @@ public final class Constants {
     public static final String AUTH_XM_COOKIE_KEY = "xmCookie";
     public static final String AUTH_XM_USER_ID_KEY = "xmUserId";
     public static final String AUTH_XM_LOCALE_KEY = "xmLocale";
-    public static final String AUTH_AE_API_TOKEN_KEY = "aeApiToken";
     public static final String AUTH_XM_USER_LOGIN_KEY = "xmUserLogin";
-    public static final String AUTH_CHARGE_API_TOKEN_KEY = "chargeApiToken";
 
     public static final String HEADER_TENANT = "x-tenant";
 

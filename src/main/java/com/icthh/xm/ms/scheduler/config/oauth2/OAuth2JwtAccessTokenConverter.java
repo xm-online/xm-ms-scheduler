@@ -70,8 +70,6 @@ public class OAuth2JwtAccessTokenConverter extends JwtAccessTokenConverter {
         details.put(AUTH_XM_USER_ID_KEY, (String) map.get(AUTH_XM_USER_ID_KEY));
         details.put(AUTH_XM_USER_LOGIN_KEY, (String) map.get(AUTH_XM_USER_LOGIN_KEY));
         details.put(AUTH_XM_LOCALE_KEY, (String) map.get(AUTH_XM_LOCALE_KEY));
-        details.put(AUTH_AE_API_TOKEN_KEY, (String) map.get(AUTH_AE_API_TOKEN_KEY));
-        details.put(AUTH_CHARGE_API_TOKEN_KEY, (String) map.get(AUTH_CHARGE_API_TOKEN_KEY));
         authentication.setDetails(details);
 
         return authentication;
