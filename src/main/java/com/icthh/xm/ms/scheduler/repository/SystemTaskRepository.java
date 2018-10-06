@@ -3,20 +3,13 @@ package com.icthh.xm.ms.scheduler.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.icthh.xm.commons.config.client.api.RefreshableConfiguration;
-import com.icthh.xm.commons.config.client.repository.TenantConfigRepository;
-import com.icthh.xm.commons.tenant.TenantContextHolder;
-import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
-import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.domain.spec.TasksSpec;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.*;
@@ -27,7 +20,6 @@ import java.util.stream.Collectors;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
-//@RequiredArgsConstructor
 @Component
 public class ConfigTaskRepository implements RefreshableConfiguration {
 

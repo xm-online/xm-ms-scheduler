@@ -4,7 +4,7 @@ import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
-import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -18,10 +18,11 @@ public class SchedulingConfiguration {
     @Bean(destroyMethod = "destroy")
     public SchedulingManager schedulingManager(TenantContextHolder tenantContextHolder,
                                                ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                                               ConfigTaskService configTaskService,
+                                               SystemTaskService systemTaskService,
                                                ScheduledTaskHandler handler,
                                                TenantListRepository tenantListRepository) {
-        return new SchedulingManager(tenantContextHolder, threadPoolTaskScheduler, configTaskService, handler, tenantListRepository);
+        return new SchedulingManager(tenantContextHolder, threadPoolTaskScheduler,
+                                     systemTaskService, handler, tenantListRepository);
     }
 
     @Bean

@@ -11,7 +11,13 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.icthh.xm.ms.scheduler.config.Constants.*;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_TENANT_KEY;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_USER_KEY;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_XM_COOKIE_KEY;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_XM_LOCALE_KEY;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_XM_TOKEN_KEY;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_XM_USER_ID_KEY;
+import static com.icthh.xm.ms.scheduler.config.Constants.AUTH_XM_USER_LOGIN_KEY;
 
 /**
  * Improved JwtAccessTokenConverter that can handle lazy fetching of public verifier keys.

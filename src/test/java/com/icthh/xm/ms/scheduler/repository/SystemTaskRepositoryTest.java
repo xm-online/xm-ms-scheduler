@@ -5,8 +5,6 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantKey;
 import com.icthh.xm.ms.scheduler.TaskTestUtil;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
-import lombok.Cleanup;
-import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigTaskRepositoryTest {
+public class SystemTaskRepositoryTest {
 
     private static final String PATH_PATTERN = "/config/tenants/{tenantName}/scheduler/tasks.yml";
     private static final String TEST_YAML = "config/tasks/tasks.yml";
@@ -35,7 +33,7 @@ public class ConfigTaskRepositoryTest {
     @Mock
     private TenantContext tenantContext;
 
-    private ConfigTaskRepository configTaskRepository;
+    private SystemTaskRepository systemTaskRepository;
     private String key;
     private String config;
 
@@ -47,7 +45,7 @@ public class ConfigTaskRepositoryTest {
         ApplicationProperties applicationProperties = new ApplicationProperties();
         applicationProperties.setTaskPathPattern(PATH_PATTERN);
 
-        configTaskRepository = new ConfigTaskRepository(applicationProperties);
+        systemTaskRepository = new SystemTaskRepository(applicationProperties);
         String tenantName = getRequiredTenantKeyValue(tenantContextHolder);
         InputStream cfgInputStream = new ClassPathResource(TEST_YAML).getInputStream();
         config = IOUtils.toString(cfgInputStream, UTF_8);
@@ -56,11 +54,11 @@ public class ConfigTaskRepositoryTest {
 
     @Test
     public void onRefresh() {
-        configTaskRepository.onRefresh(key, config);
-        assertThat(configTaskRepository.getConfigTasks().size()).isEqualTo(1);
-        assertThat(configTaskRepository.getConfigTasks().get(getRequiredTenantKeyValue(tenantContextHolder)).size()).isEqualTo(2);
-        assertThat(configTaskRepository.getConfigTasks().get(getRequiredTenantKeyValue(tenantContextHolder)).get("task-1").getData()).contains("\"subkey\": \"test subkey\"");
-        configTaskRepository.onRefresh(key, null);
-        assertThat(configTaskRepository.getConfigTasks().size()).isEqualTo(0);
+        systemTaskRepository.onRefresh(key, config);
+        assertThat(systemTaskRepository.getConfigTasks().size()).isEqualTo(1);
+        assertThat(systemTaskRepository.getConfigTasks().get(getRequiredTenantKeyValue(tenantContextHolder)).size()).isEqualTo(2);
+        assertThat(systemTaskRepository.getConfigTasks().get(getRequiredTenantKeyValue(tenantContextHolder)).get("task-1").getData()).contains("\"subkey\": \"test subkey\"");
+        systemTaskRepository.onRefresh(key, null);
+        assertThat(systemTaskRepository.getConfigTasks().size()).isEqualTo(0);
     }
 }

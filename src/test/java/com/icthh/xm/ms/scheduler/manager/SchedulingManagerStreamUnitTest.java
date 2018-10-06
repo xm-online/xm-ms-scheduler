@@ -15,7 +15,7 @@ import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
 import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
 import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,11 +46,6 @@ import java.util.Optional;
     MessagingConfiguration.class,
     SchedulingHandlerConfiguration.class
 }, properties = {"application.stream-binding-enabled=true"})
-//@ContextHierarchy({
-//    @ContextConfiguration(classes = TestSupportBinderAutoConfiguration.class),
-//    @ContextConfiguration(classes = MessagingConfiguration.class),
-//    @ContextConfiguration(classes = TestSchedulingManagerConfiguration.class)
-//})
 public class SchedulingManagerStreamUnitTest {
 
     private SchedulingManager schedulingManager;
@@ -80,7 +75,7 @@ public class SchedulingManagerStreamUnitTest {
     private TenantListRepository tenantListRepository;
 
     @Mock
-    private ConfigTaskService configTaskService;
+    private SystemTaskService systemTaskService;
 
     @Before
     public void init() {
@@ -91,7 +86,8 @@ public class SchedulingManagerStreamUnitTest {
         nameResolver.getResolvedChannels()
                     .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
 
-        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, configTaskService, handler, tenantListRepository);
+        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler,
+                                                  systemTaskService, handler, tenantListRepository);
 
         when(tenantContext.getTenantKey()).thenReturn(Optional.of(TenantKey.valueOf(TEST_TENANT)));
         when(tenantContextHolder.getContext()).thenReturn(tenantContext);

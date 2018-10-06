@@ -13,7 +13,7 @@ import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,17 +60,17 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
     private ExceptionTranslator exceptionTranslator;
 
     @Mock
-    private ConfigTaskService configTaskService;
+    private SystemTaskService systemTaskService;
 
     private MockMvc restTaskMockMvc;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final SystemTaskResource taskResource = new SystemTaskResource(configTaskService);
+        final SystemTaskResource taskResource = new SystemTaskResource(systemTaskService);
 
-        when(configTaskService.getTasksFromConfig()).thenReturn(Arrays.asList(createTask()));
-        when(configTaskService.findOneTaskFromConfigByKey("systask1")).thenReturn(createTask());
+        when(systemTaskService.getTasksFromConfig()).thenReturn(Arrays.asList(createTask()));
+        when(systemTaskService.findOneTaskFromConfigByKey("systask1")).thenReturn(createTask());
 
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
                                               .setControllerAdvice(exceptionTranslator)
@@ -100,7 +100,7 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
     @Test
     @Transactional
     public void getTask() throws Exception {
-        TaskDTO task = configTaskService.findOneTaskFromConfigByKey("systask1");
+        TaskDTO task = systemTaskService.findOneTaskFromConfigByKey("systask1");
 
         // Get the task
         restTaskMockMvc.perform(get("/api/systasks/{key}", task.getKey()))

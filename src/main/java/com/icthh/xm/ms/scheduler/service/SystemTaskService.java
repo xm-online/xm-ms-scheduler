@@ -50,6 +50,7 @@ public class ConfigTaskService {
         return tasks;
     }
 
+    // TODO - do we ned this method?
     @Transactional(readOnly = true)
     public List<TaskDTO> findNotFinishedTasksForAllTenants() {
         log.debug("Request to get all Tasks without paging");

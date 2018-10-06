@@ -11,7 +11,7 @@ import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
-import com.icthh.xm.ms.scheduler.service.ConfigTaskService;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     private ScheduledTaskHandler handler;
 
     @Autowired
-    private ConfigTaskService configTaskService;
+    private SystemTaskService systemTaskService;
 
     private TenantContextHolder tenantContextHolder;
 
@@ -65,7 +65,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         tenantContextHolder = new DefaultTenantContextHolder();
         TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
 
-        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, configTaskService, handler,
+        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
                                                   executed -> executedTasks.add(executed.getId()),
                                                   expired -> expiredTasks.add(expired.getId()),
                                                   tenantListRepository);
