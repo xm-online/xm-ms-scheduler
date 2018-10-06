@@ -76,9 +76,11 @@ public class SystemTaskService {
         return getTasksFromConfig().stream().filter(t -> t.getEndDate() == null || t.getEndDate().isAfter(Instant.now())).collect(Collectors.toList());
     }
 
+
     public List<TaskDTO> getTasksFromConfigForAllTenants() {
         return systemTaskRepository.getConfigTasks().values().stream()
-                                   .flatMap(m -> m.values().stream()).collect(Collectors.toList());
+                                   .flatMap(m -> m.values().stream())
+                                   .collect(Collectors.toList());
     }
 
     public TaskDTO findOneTaskFromConfigByKey(final String key) {

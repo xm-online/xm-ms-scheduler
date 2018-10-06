@@ -27,7 +27,7 @@ import java.util.UUID;
 @Slf4j
 public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
 
-    public static final String DEFAULT_KEY = "value";
+    private static final String DEFAULT_KEY = "value";
     private final BinderAwareChannelResolver channelResolver;
     private final ChannelNameResolver nameResolver;
 
@@ -59,18 +59,18 @@ public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
             channelResolver.resolveDestination(channel).send(MessageBuilder.withPayload(event).build());
 
         } catch (Exception e) {
-            log.error("unable to send task into channel [{}], task: {}", channel, task);
+            log.error("unable to send task into channel [{}], task: {}, error: {}", channel, task, e.getMessage());
             throw new RuntimeException(e);
         }
 
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Object> parseDataSilent(String data) {
         try {
             if (data.startsWith("{") || data.startsWith("[")) {
                 return mapper.readValue(data, Map.class);
             } else {
-
                 Map<String, Object> map = new HashMap<>();
                 map.put(DEFAULT_KEY, data);
                 return map;

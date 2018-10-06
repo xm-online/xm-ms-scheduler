@@ -31,8 +31,8 @@ public class DefaultRunnableTask implements RunnableTask {
 
         if (isExpired()) {
             // time to delete
-            log.info("remove active scheduled task {} due to end date: {}", task.getId(), task.getEndDate());
-            manager.deleteActiveTask(task);
+            log.info("remove expired scheduled task {} due to end date: {}", task.getId(), task.getEndDate());
+            manager.deleteExpiredTask(task);
             if (afterExpiry != null) {
                 afterExpiry.accept(task);
             }
@@ -40,6 +40,7 @@ public class DefaultRunnableTask implements RunnableTask {
     }
 
     private boolean isExpired() {
+        // TODO - what will happen in case for cron task when there is no delay?
         return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().plusMillis(task.getDelay()));
     }
 

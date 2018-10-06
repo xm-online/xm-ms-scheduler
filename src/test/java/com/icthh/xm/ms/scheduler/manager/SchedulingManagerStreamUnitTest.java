@@ -98,7 +98,7 @@ public class SchedulingManagerStreamUnitTest {
 
         TaskDTO task = createTaskFixedDelay(1000L, Instant.now(), null);
 
-        schedulingManager.updateActiveTask(task);
+        schedulingManager.updateOrUpdateActiveTask(task);
 
         waitFor(3000);
 

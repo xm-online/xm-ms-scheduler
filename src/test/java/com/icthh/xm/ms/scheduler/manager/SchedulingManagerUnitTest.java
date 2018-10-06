@@ -14,6 +14,7 @@ import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -23,6 +24,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 /**
@@ -138,6 +140,23 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     }
 
+    @Ignore
+    @Test
+    // TODO - fix test !!!
+    public void testInitCronTasksWithInitialDelayAndExpiration() {
+
+        Instant nearestSecond = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+
+        TaskDTO task = createTaskByCron("0/1 * * * * ?", nearestSecond.plusSeconds(1), nearestSecond.plusSeconds(2));
+
+        initScheduling(task);
+
+        waitAndDeleteTask(4000, task);
+
+        expectRunAndExpiryCounts(task, 2, 1);
+
+    }
+
     @Test
     public void testInitConcurrentTasksWithExpiration() {
 
@@ -177,7 +196,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         initScheduling();
 
-        schedulingManager.updateActiveTask(task1);
+        schedulingManager.updateOrUpdateActiveTask(task1);
 
         waitAndDeleteTask(3000, task1);
 
@@ -193,7 +212,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         initScheduling();
 
         // create task
-        schedulingManager.updateActiveTask(task1);
+        schedulingManager.updateOrUpdateActiveTask(task1);
 
         waitFor(1990);
         expectRunAndExpiryCounts(task1, 4, 0);
@@ -201,7 +220,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         // update existing task
         task1.setDelay(250L);
         task1.setEndDate(Instant.now().plusSeconds(2));
-        schedulingManager.updateActiveTask(task1);
+        schedulingManager.updateOrUpdateActiveTask(task1);
 
         waitFor(2000);
         expectRunAndExpiryCounts(task1, 4 + 8, 1);
@@ -220,7 +239,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     private void initScheduling(TaskDTO... tasks) {
         // TODO - fixme - mock on Repository level instead of service ti test service logic (impossible due to IDE
         // does not recognise Mapstruct generated code)
-        Arrays.stream(tasks).forEach(schedulingManager::updateActiveTask);
+        Arrays.stream(tasks).forEach(schedulingManager::updateOrUpdateActiveTask);
     }
 
     private void expectRunAndExpiryCounts(TaskDTO task, int runCount, int expirycount) {
