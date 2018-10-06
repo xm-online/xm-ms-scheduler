@@ -32,6 +32,11 @@ In case you need to send scheduled messages to real kafka destination do the fol
     docker exec -it kafka bash
     /opt/kafka_2.11-0.10.1.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic scheduler_queue
     ```
+   useful kafka commands:
+   ```
+    /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh --list --zookeeper localhost:2181
+    /opt/kafka_2.11-0.10.1.0/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+   ```
 
 ## Building for production
 
