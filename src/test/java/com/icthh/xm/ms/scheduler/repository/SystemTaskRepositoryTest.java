@@ -43,13 +43,13 @@ public class SystemTaskRepositoryTest {
         when(tenantContextHolder.getContext()).thenReturn(tenantContext);
 
         ApplicationProperties applicationProperties = new ApplicationProperties();
-        applicationProperties.setTaskPathPattern(PATH_PATTERN);
+        applicationProperties.getScheduler().setTaskPathPattern(PATH_PATTERN);
 
         systemTaskRepository = new SystemTaskRepository(applicationProperties);
         String tenantName = getRequiredTenantKeyValue(tenantContextHolder);
         InputStream cfgInputStream = new ClassPathResource(TEST_YAML).getInputStream();
         config = IOUtils.toString(cfgInputStream, UTF_8);
-        key = applicationProperties.getTaskPathPattern().replace("{tenantName}", tenantName);
+        key = applicationProperties.getScheduler().getTaskPathPattern().replace("{tenantName}", tenantName);
     }
 
     @Test

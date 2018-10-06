@@ -28,7 +28,7 @@ public class SchedulingConfiguration {
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler(ApplicationProperties applicationProperties) {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(applicationProperties.getThreadPoolSize());
+        threadPoolTaskScheduler.setPoolSize(applicationProperties.getScheduler().getThreadPoolSize());
         threadPoolTaskScheduler.setThreadNamePrefix("xm-sc-thread");
         return threadPoolTaskScheduler;
     }

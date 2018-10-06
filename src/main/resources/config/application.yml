@@ -140,10 +140,11 @@ xm-config:
 application:
     tenant-ignored-path-list: /v2/api-docs, /api/profile-info, /swagger-resources/configuration/ui, /management/health
     stream-binding-enabled: true
-    task-path-pattern: /config/tenants/{tenantName}/scheduler/tasks.yml
-    thread-pool-size: 5
     kafka-enabled: true
     kafka-system-queue: system_queue
+    scheduler:
+        task-path-pattern: /config/tenants/{tenantName}/scheduler/tasks.yml
+        thread-pool-size: 5
     retry:
         max-attempts: 3
         delay: 1000 #in milliseconds

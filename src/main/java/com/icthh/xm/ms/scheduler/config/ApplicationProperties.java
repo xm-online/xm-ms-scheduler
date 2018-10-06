@@ -19,14 +19,20 @@ import java.util.List;
 public class ApplicationProperties {
 
     private final Retry retry = new Retry();
+    private final Scheduler scheduler = new Scheduler();
 
     private List<String> tenantIgnoredPathList = Collections.emptyList();
+    // TODO - why do we need this property?
     private boolean streamBindingEnabled = true;
-    // TODO - think how to name these properties
-    private String taskPathPattern;
-    private int threadPoolSize = 5;
     private boolean kafkaEnabled;
     private String kafkaSystemQueue;
+
+    @Getter
+    @Setter
+    public static class Scheduler {
+        private int threadPoolSize = 5;
+        private String taskPathPattern;
+    }
 
     // TODO - do we need this properties?
     @Getter

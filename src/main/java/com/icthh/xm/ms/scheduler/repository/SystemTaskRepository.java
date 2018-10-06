@@ -38,7 +38,7 @@ public class SystemTaskRepository implements RefreshableConfiguration {
 
     @Override
     public void onRefresh(String updatedKey, String config) {
-        String pathPattern = applicationProperties.getTaskPathPattern();
+        String pathPattern = applicationProperties.getScheduler().getTaskPathPattern();
         try {
             String tenant = matcher.extractUriTemplateVariables(pathPattern, updatedKey).get(TENANT_NAME).toLowerCase();
             if (StringUtils.isBlank(config)) {
@@ -56,7 +56,7 @@ public class SystemTaskRepository implements RefreshableConfiguration {
 
     @Override
     public boolean isListeningConfiguration(String updatedKey) {
-        String taskPathPattern = applicationProperties.getTaskPathPattern();
+        String taskPathPattern = applicationProperties.getScheduler().getTaskPathPattern();
         return matcher.match(taskPathPattern, updatedKey);
     }
 
