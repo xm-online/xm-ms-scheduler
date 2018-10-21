@@ -44,21 +44,8 @@ public class SystemTaskRepository implements RefreshableConfiguration {
 
     @Override
     public void onRefresh(String updatedKey, String config) {
-        String pathPattern = applicationProperties.getScheduler().getTaskPathPattern();
-        try {
-            String tenant = matcher.extractUriTemplateVariables(pathPattern, updatedKey).get(TENANT_NAME).toLowerCase();
-            if (StringUtils.isBlank(config)) {
-                configTasks.remove(tenant);
-                log.info("Tasks for tenant '{}' were removed: {}", tenant, updatedKey);
-            } else {
-                TasksSpec spec = mapper.readValue(config, TasksSpec.class);
-                configTasks.put(tenant, toTypeSpecsMap(spec));
-                log.info("Tasks for tenant '{}' were updated: {}", tenant, updatedKey);
-            }
-            schedulingManager.mergeSystemTasksFromConfig(tenant);
-        } catch (Exception e) {
-            log.error("Error read Scheduler specification from path: {}", updatedKey, e);
-        }
+        refreshConfig(updatedKey, config);
+        schedulingManager.mergeSystemTasksFromConfig(extractTenant(updatedKey));
     }
 
     @Override
@@ -70,11 +57,32 @@ public class SystemTaskRepository implements RefreshableConfiguration {
     @Override
     public void onInit(String key, String config) {
         if (isListeningConfiguration(key)) {
-            onRefresh(key, config);
+            refreshConfig(key, config);
         }
     }
 
     private Map<String, TaskDTO> toTypeSpecsMap(TasksSpec spec) {
         return spec.getTasks().stream().collect(Collectors.toMap(TaskDTO::getKey, Function.identity()));
+    }
+
+    private void refreshConfig(String updatedKey, String config){
+        try {
+            String tenant = extractTenant(updatedKey);
+            if (StringUtils.isBlank(config)) {
+                configTasks.remove(tenant);
+                log.info("Tasks for tenant '{}' were removed: {}", tenant, updatedKey);
+            } else {
+                TasksSpec spec = mapper.readValue(config, TasksSpec.class);
+                configTasks.put(tenant, toTypeSpecsMap(spec));
+                log.info("Tasks for tenant '{}' were updated: {}", tenant, updatedKey);
+            }
+        } catch (Exception e) {
+            log.error("Error read Scheduler specification from path: {}", updatedKey, e);
+        }
+    }
+
+    private String extractTenant(final String updatedKey) {
+        String pathPattern = applicationProperties.getScheduler().getTaskPathPattern();
+        return matcher.extractUriTemplateVariables(pathPattern, updatedKey).get(TENANT_NAME);
     }
 }

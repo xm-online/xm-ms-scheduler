@@ -2,6 +2,7 @@ package com.icthh.xm.ms.scheduler.nameresolver;
 
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ public class TenantAwareChannelNameResolver implements ChannelNameResolver {
     @Override
     public String resolve(final TaskDTO task) {
         return Optional.ofNullable(task.getTenant())
-                       .map(tenant -> PREFIX + tenant + DELIMITER + getScheduleType(task.getChannelType()))
+                       .map(tenant -> PREFIX + StringUtils.lowerCase(tenant) + DELIMITER + getScheduleType(task.getChannelType()))
                        .orElseThrow(() -> new RuntimeException("Tenant can not be empty"));
     }
 

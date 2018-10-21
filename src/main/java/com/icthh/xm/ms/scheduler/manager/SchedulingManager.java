@@ -8,6 +8,7 @@ import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 
@@ -67,8 +68,10 @@ public class SchedulingManager {
         log.info("Start init scheduled tasks");
 
         for (String tenantName : tenantListRepository.getTenants()) {
+            // Translate tenant to uppercase as only tenant list repo contains lowercase value
+            String tenant = StringUtils.upperCase(tenantName);
             PrivilegedTenantContext ptc = tenantContextHolder.getPrivilegedContext();
-            taskCount += ptc.execute(TenantContextUtils.buildTenant(tenantName), () -> initInsideTenant(tenantName));
+            taskCount += ptc.execute(TenantContextUtils.buildTenant(tenant), () -> initInsideTenant(tenant));
         }
 
         log.info("Finish Scheduler initialization with [{}] tenants and [{}] active tasks",
@@ -102,13 +105,13 @@ public class SchedulingManager {
     private Integer initInsideTenant(final String tenantName) {
         log.info("Start initialization tasks on behalf of tenant [{}]", tenantName);
 
-        Integer tasksCnt = initInsideTenant(tenantName, taskService.findSystemNotFinishedTasks(), systemSchedulers);
-        log.info("Finish tenant [{}] initialization with [{}] system active tasks", tenantName, tasksCnt);
+        Integer sysTasks = initInsideTenant(tenantName, taskService.findSystemNotFinishedTasks(), systemSchedulers);
+        log.info("Finish tenant [{}] initialization with [{}] system active tasks", tenantName, sysTasks);
 
-        tasksCnt += initInsideTenant(tenantName, taskService.findUserNotFinishedTasks(), userSchedulers);
-        log.info("Finish tenant [{}] initialization with [{}] user active tasks", tenantName, tasksCnt);
+        Integer userTasks = initInsideTenant(tenantName, taskService.findUserNotFinishedTasks(), userSchedulers);
+        log.info("Finish tenant [{}] initialization with [{}] user active tasks", tenantName, userTasks);
 
-        return tasksCnt;
+        return sysTasks + userTasks;
     }
 
     private Integer initInsideTenant(final String tenantName, List<TaskDTO> tasks,

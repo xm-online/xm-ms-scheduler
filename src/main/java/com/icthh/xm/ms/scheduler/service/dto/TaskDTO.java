@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A DTO for the Task entity.
@@ -189,20 +190,20 @@ public class TaskDTO implements Serializable {
     @Override
     public String toString() {
         return "TaskDTO{" +
-            "id=" + getId() +
-            ", key='" + getKey() + "'" +
-            ", name='" + getName() + "'" +
-            ", typeKey='" + getTypeKey() + "'" +
-            ", stateKey='" + getStateKey() + "'" +
-            ", createdBy='" + getCreatedBy() + "'" +
-            ", startDate='" + getStartDate() + "'" +
-            ", endDate='" + getEndDate() + "'" +
-            ", scheduleType='" + getScheduleType() + "'" +
-            ", delay=" + getDelay() +
-            ", cronExpression='" + getCronExpression() + "'" +
-            ", channelType='" + getChannelType() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", data='" + getData() + "'" +
-            "}";
+               "id=" + getId() +
+               ", key='" + getKey() + "'" +
+               ", name='" + getName() + "'" +
+               ", typeKey='" + getTypeKey() + "'" +
+               ", stateKey='" + getStateKey() + "'" +
+               ", createdBy='" + getCreatedBy() + "'" +
+               ", startDate='" + getStartDate() + "'" +
+               ", endDate='" + getEndDate() + "'" +
+               ", scheduleType='" + getScheduleType() + "'" +
+               ", delay=" + getDelay() +
+               ", cronExpression='" + getCronExpression() + "'" +
+               ", channelType='" + getChannelType() + "'" +
+               ", description='" + getDescription() + "'" +
+               ", data.size='" + StringUtils.length(getData()) + "'" +
+               "}";
     }
 }

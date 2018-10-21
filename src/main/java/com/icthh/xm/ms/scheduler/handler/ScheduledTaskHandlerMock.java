@@ -30,7 +30,7 @@ public class ScheduledTaskHandlerMock implements ScheduledTaskHandler {
 
         String channel = nameResolver.resolve(task);
 
-        log.info("MOCK_HANDLER: skip sending to [{}], task = {}", channel, task);
+        log.info("MOCK_HANDLER: skip sending to [{}], task.id = {}, task.key = {}", channel, task.getId(), task.getKey());
 
     }
 }
