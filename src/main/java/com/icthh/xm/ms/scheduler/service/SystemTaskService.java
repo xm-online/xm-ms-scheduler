@@ -39,13 +39,11 @@ public class SystemTaskService {
      * @return the list of entities
      */
     @Transactional(readOnly = true)
-    public List<TaskDTO> findAllNotFinishedTasks() {
+    public List<TaskDTO> findUserNotFinishedTasks() {
         log.debug("Request to get all Tasks without paging");
 
         List<TaskDTO> tasks = taskRepository.findByEndDateGreaterThanEqual(Instant.now())
                                             .stream().map(taskMapper::toDto).collect(toList());
-
-        tasks.addAll(findNotFinishedTasksFromConfig());
 
         return tasks;
     }
@@ -73,7 +71,9 @@ public class SystemTaskService {
     }
 
     public List<TaskDTO> findNotFinishedTasksFromConfig() {
-        return getTasksFromConfig().stream().filter(t -> t.getEndDate() == null || t.getEndDate().isAfter(Instant.now())).collect(Collectors.toList());
+        return getTasksFromConfig().stream()
+                                   .filter(t -> t.getEndDate() == null || t.getEndDate().isAfter(Instant.now()))
+                                   .collect(Collectors.toList());
     }
 
 

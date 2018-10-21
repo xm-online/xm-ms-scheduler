@@ -121,3 +121,6 @@ xm-config:
     enabled: false
 
 application:
+    scheduler:
+        task-path-pattern: /config/tenants/{tenantName}/scheduler/tasks.yml
+        thread-pool-size: 5

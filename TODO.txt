@@ -10,10 +10,11 @@ DONE:
 4. Add and setup xm-commons-logging library - DONE
 5. Add xm-commons-config library and implement system schedulers initialization and update form config server (create
 tenant related scheduler.yml) - DONE
-6. Add and setup xm-commons-exception library
+6. Add and setup xm-commons-exception library - DONE
+7. Implement active System task synchronization when RefreshableConfiguration is changed - DONE
+
 TODO:
 
-0. Implement active System task synchronization when RefreshableConfiguration is changed
 1. Fix all TODO statements in code and tests
 2. Implement Tenant API for creating tenant in scheduler
 2.1 Implement tenant provisioning for scheduler on entity side

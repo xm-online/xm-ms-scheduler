@@ -46,7 +46,7 @@ public class TaskService {
         Task task = taskMapper.toEntity(taskDTO);
         task = taskRepository.save(task);
         TaskDTO dto = taskMapper.toDto(task);
-        schedulingManager.createOrUpdateActiveTask(dto);
+        schedulingManager.createOrUpdateActiveUserTask(dto);
         return dto;
     }
 

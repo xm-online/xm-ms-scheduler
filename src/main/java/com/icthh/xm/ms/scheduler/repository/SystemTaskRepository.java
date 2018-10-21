@@ -5,10 +5,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.icthh.xm.commons.config.client.api.RefreshableConfiguration;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
 import com.icthh.xm.ms.scheduler.domain.spec.TasksSpec;
+import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
@@ -29,11 +31,15 @@ public class SystemTaskRepository implements RefreshableConfiguration {
     @Getter
     private Map<String, Map<String, TaskDTO>> configTasks = new ConcurrentHashMap<>();
 
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
 
-    public SystemTaskRepository(ApplicationProperties applicationProperties) {
+    private final SchedulingManager schedulingManager;
+
+    // TODO - avoid @Lazy initialization
+    public SystemTaskRepository(ApplicationProperties applicationProperties, @Lazy SchedulingManager schedulingManager) {
         log.info("Init of SystemTaskRepository");
         this.applicationProperties = applicationProperties;
+        this.schedulingManager = schedulingManager;
     }
 
     @Override
@@ -50,6 +56,7 @@ public class SystemTaskRepository implements RefreshableConfiguration {
                 configTasks.put(tenant, toTypeSpecsMap(spec));
                 log.info("Tasks for tenant '{}' were updated: {}", tenant, updatedKey);
             }
+            schedulingManager.mergeSystemTasksFromConfig(tenant);
         } catch (Exception e) {
             log.error("Error read Scheduler specification from path: {}", updatedKey, e);
         }
