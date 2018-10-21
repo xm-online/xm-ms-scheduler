@@ -46,7 +46,7 @@ public class SchedulingManager {
         this.tenantListRepository = tenantListRepository;
     }
 
-    SchedulingManager(final TenantContextHolder tenantContextHolder,
+    public SchedulingManager(final TenantContextHolder tenantContextHolder,
                       final ThreadPoolTaskScheduler taskScheduler,
                       final SystemTaskService taskService,
                       final ScheduledTaskHandler handler,
@@ -97,7 +97,7 @@ public class SchedulingManager {
         activeSchedulers.clear();
     }
 
-    public void updateOrUpdateActiveTask(TaskDTO task) {
+    public void createOrUpdateActiveTask(TaskDTO task) {
 
         String currentTenant = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
         activeSchedulers.computeIfAbsent(currentTenant, tenant -> new HashMap<>());
@@ -111,8 +111,13 @@ public class SchedulingManager {
 
 
     public void deleteActiveTask(String taskKey) {
-        deleteTaskFromTenant(TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder), taskKey);
+        deleteTaskFromTenant(getTenant(), taskKey);
     }
+
+    public Set<String> getActiveTaskKeys() {
+        return Collections.unmodifiableSet(activeSchedulers.getOrDefault(getTenant(), Collections.emptyMap()).keySet());
+    }
+
 
     void deleteExpiredTask(TaskDTO task) {
         deleteTaskFromTenant(task.getTenant(), getTaskKey(task));
@@ -121,6 +126,11 @@ public class SchedulingManager {
     void handleTask(TaskDTO task) {
         handler.handle(task);
     }
+
+    private String getTenant(){
+        return TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
+    }
+
 
     private void deleteTaskFromTenant(String tenant, String taskKey) {
         boolean cancelled = Optional.ofNullable(activeSchedulers.get(tenant))

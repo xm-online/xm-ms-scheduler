@@ -89,6 +89,8 @@ public class SystemTaskService {
 
     public List<TaskDTO> getTasksFromConfig() {
         String tenantKeyValue = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
-        return Optional.ofNullable(systemTaskRepository.getConfigTasks().get(tenantKeyValue)).orElse(new HashMap<>()).values().stream().collect(Collectors.toList());
+        return new ArrayList<>(Optional.ofNullable(systemTaskRepository.getConfigTasks().get(tenantKeyValue))
+                                       .orElse(new HashMap<>())
+                                       .values());
     }
 }

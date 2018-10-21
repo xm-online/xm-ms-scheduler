@@ -196,7 +196,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         initScheduling();
 
-        schedulingManager.updateOrUpdateActiveTask(task1);
+        schedulingManager.createOrUpdateActiveTask(task1);
 
         waitAndDeleteTask(3000, task1);
 
@@ -212,7 +212,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         initScheduling();
 
         // create task
-        schedulingManager.updateOrUpdateActiveTask(task1);
+        schedulingManager.createOrUpdateActiveTask(task1);
 
         waitFor(1990);
         expectRunAndExpiryCounts(task1, 4, 0);
@@ -220,7 +220,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         // update existing task
         task1.setDelay(250L);
         task1.setEndDate(Instant.now().plusSeconds(2));
-        schedulingManager.updateOrUpdateActiveTask(task1);
+        schedulingManager.createOrUpdateActiveTask(task1);
 
         waitFor(2000);
         expectRunAndExpiryCounts(task1, 4 + 8, 1);
@@ -239,7 +239,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     private void initScheduling(TaskDTO... tasks) {
         // TODO - fixme - mock on Repository level instead of service ti test service logic (impossible due to IDE
         // does not recognise Mapstruct generated code)
-        Arrays.stream(tasks).forEach(schedulingManager::updateOrUpdateActiveTask);
+        Arrays.stream(tasks).forEach(schedulingManager::createOrUpdateActiveTask);
     }
 
     private void expectRunAndExpiryCounts(TaskDTO task, int runCount, int expirycount) {
