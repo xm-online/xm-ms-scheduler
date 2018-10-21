@@ -1,5 +1,8 @@
 package com.icthh.xm.ms.scheduler.manager;
 
+import static com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType.CRON;
+
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +43,13 @@ public class DefaultRunnableTask implements RunnableTask {
     }
 
     private boolean isExpired() {
-        // TODO - what will happen in case for cron task when there is no delay?
-        return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().plusMillis(task.getDelay()));
+        switch (task.getScheduleType()) {
+            case CRON:
+                return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now());
+            default:
+                return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now()
+                                                                                      .plusMillis(task.getDelay()));
+        }
     }
 
     @Override

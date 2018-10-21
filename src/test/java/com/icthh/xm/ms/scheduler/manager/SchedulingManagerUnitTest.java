@@ -1,6 +1,10 @@
 package com.icthh.xm.ms.scheduler.manager;
 
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.*;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.XM_TENANT;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.HashMultiset;
@@ -14,10 +18,12 @@ import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -26,6 +32,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -42,20 +50,13 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     @Autowired
     private ScheduledTaskHandler handler;
 
-    @Autowired
+    @Mock
     private SystemTaskService systemTaskService;
 
     private TenantContextHolder tenantContextHolder;
 
-//    @Autowired
-//    private PrivilegedTenantContext privilegedTenantContext;
-
     @Autowired
     private TenantListRepository tenantListRepository;
-
-    // TODO - FIXME - task mapper does not autowired from IDE... need to configure Mapstruct annotation processors!
-//    @Autowired
-//    private TaskMapper taskMapper;
 
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
@@ -140,9 +141,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     }
 
-    @Ignore
     @Test
-    // TODO - fix test !!!
     public void testInitCronTasksWithInitialDelayAndExpiration() {
 
         Instant nearestSecond = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -172,22 +171,6 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     }
 
-    // FIXME - can not autowire service
-//    @Test
-//    public void testInitFixedDelayTasksFromConfig() {
-//
-//        when(taskServiceExt.findAllNotFinishedTasks()).thenReturn(asList());
-//        when(taskServiceExt.findAllNotFinishedTasks()).thenReturn(asList());
-//
-//        schedulingManager.init();
-//
-//        waitAndDeleteTask(3000);
-//
-//        TaskDTO task = taskServiceExt.findAllNotFinishedTaskFromConfig().get(0);
-//
-//        expectRunAndExpiryCounts(task, 3, 0);
-//
-//    }
 
     @Test
     public void testCreateTask() {
@@ -237,9 +220,18 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     }
 
     private void initScheduling(TaskDTO... tasks) {
-        // TODO - fixme - mock on Repository level instead of service to test service logic (impossible due to IDE
-        // does not recognise Mapstruct generated code)
-        Arrays.stream(tasks).forEach(schedulingManager::createOrUpdateActiveUserTask);
+        List taskList = Arrays.asList(tasks);
+
+        Answer<List<TaskDTO>> answer = invocation -> {
+            if (TenantContextUtils.getRequiredTenantKey(tenantContextHolder).getValue().equals(XM_TENANT)) {
+                return taskList;
+            }
+            return Collections.emptyList();
+        };
+
+        // There are two tenants in the Scope, so we need to init tasks only for XM tenant.
+        Mockito.when(systemTaskService.findUserNotFinishedTasks()).thenAnswer(answer);
+        schedulingManager.init();
     }
 
     private void expectRunAndExpiryCounts(TaskDTO task, int runCount, int expirycount) {

@@ -47,7 +47,6 @@ public class SystemTaskRepository implements RefreshableConfiguration {
         String pathPattern = applicationProperties.getScheduler().getTaskPathPattern();
         try {
             String tenant = matcher.extractUriTemplateVariables(pathPattern, updatedKey).get(TENANT_NAME).toLowerCase();
-            // TODO add logic to merge existing tenant tasks with new list
             if (StringUtils.isBlank(config)) {
                 configTasks.remove(tenant);
                 log.info("Tasks for tenant '{}' were removed: {}", tenant, updatedKey);

@@ -48,28 +48,6 @@ public class SystemTaskService {
         return tasks;
     }
 
-    // TODO - do we ned this method?
-    @Transactional(readOnly = true)
-    public List<TaskDTO> findNotFinishedTasksForAllTenants() {
-        log.debug("Request to get all Tasks without paging");
-
-        String currentTenantName = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
-
-        List<TaskDTO> tasks = new ArrayList<>();
-
-        tenantListRepository.getTenants().forEach(tenantName -> {
-            TenantContextUtils.setTenant(tenantContextHolder, tenantName);
-            tasks.addAll(taskRepository.findByEndDateGreaterThanEqual(Instant.now())
-                .stream().map(taskMapper::toDto).collect(toList()));
-        });
-
-        TenantContextUtils.setTenant(tenantContextHolder, currentTenantName);
-
-        tasks.addAll(getTasksFromConfigForAllTenants());
-
-        return tasks;
-    }
-
     public List<TaskDTO> findNotFinishedTasksFromConfig() {
         return getTasksFromConfig().stream()
                                    .filter(t -> t.getEndDate() == null || t.getEndDate().isAfter(Instant.now()))
