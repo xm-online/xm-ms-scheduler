@@ -4,7 +4,6 @@ import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.PrivilegedTenantContext;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
-import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -82,7 +81,7 @@ public class SchedulingManager {
 
         tenantContextHolder.getPrivilegedContext().execute(TenantContextUtils.buildTenant(tenant), () -> {
 
-            List<TaskDTO> newTasks = taskService.findNotFinishedTasksFromConfig();
+            List<TaskDTO> newTasks = taskService.findSystemNotFinishedTasks();
             Map<String, TaskDTO> remainingTasks = newTasks.stream()
                                                           .collect(Collectors.toMap(SchedulingManager::getTaskKey,
                                                                                     Function.identity()));
@@ -103,7 +102,7 @@ public class SchedulingManager {
     private Integer initInsideTenant(final String tenantName) {
         log.info("Start initialization tasks on behalf of tenant [{}]", tenantName);
 
-        Integer tasksCnt = initInsideTenant(tenantName, taskService.findNotFinishedTasksFromConfig(), systemSchedulers);
+        Integer tasksCnt = initInsideTenant(tenantName, taskService.findSystemNotFinishedTasks(), systemSchedulers);
         log.info("Finish tenant [{}] initialization with [{}] system active tasks", tenantName, tasksCnt);
 
         tasksCnt += initInsideTenant(tenantName, taskService.findUserNotFinishedTasks(), userSchedulers);

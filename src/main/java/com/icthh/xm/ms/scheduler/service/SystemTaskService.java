@@ -2,7 +2,6 @@ package com.icthh.xm.ms.scheduler.service;
 
 import static java.util.stream.Collectors.toList;
 
-import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.ms.scheduler.repository.SystemTaskRepository;
@@ -15,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -31,10 +32,9 @@ public class SystemTaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final TenantContextHolder tenantContextHolder;
-    private final TenantListRepository tenantListRepository;
 
     /**
-     * Get all the tasks.
+     * Get not finished User tasks.
      *
      * @return the list of entities
      */
@@ -42,33 +42,37 @@ public class SystemTaskService {
     public List<TaskDTO> findUserNotFinishedTasks() {
         log.debug("Request to get all Tasks without paging");
 
-        List<TaskDTO> tasks = taskRepository.findByEndDateGreaterThanEqual(Instant.now())
-                                            .stream().map(taskMapper::toDto).collect(toList());
-
-        return tasks;
+        return taskRepository.findByEndDateGreaterThanEqual(Instant.now())
+                             .stream().map(taskMapper::toDto).collect(toList());
     }
 
-    public List<TaskDTO> findNotFinishedTasksFromConfig() {
-        return getTasksFromConfig().stream()
-                                   .filter(t -> t.getEndDate() == null || t.getEndDate().isAfter(Instant.now()))
-                                   .collect(Collectors.toList());
+    /**
+     * Get not finished System tasks.
+     * @return List of entities
+     */
+    public List<TaskDTO> findSystemNotFinishedTasks() {
+        return getSystemTasks().stream()
+                               .filter(t -> t.getEndDate() == null || t.getEndDate().isAfter(Instant.now()))
+                               .collect(Collectors.toList());
     }
 
-
-    public List<TaskDTO> getTasksFromConfigForAllTenants() {
-        return systemTaskRepository.getConfigTasks().values().stream()
-                                   .flatMap(m -> m.values().stream())
-                                   .collect(Collectors.toList());
+    /**
+     * Get one system task
+     * @param key task key
+     * @return task
+     */
+    public TaskDTO findOneSystemTask(final String key) {
+        return getSystemTasks().stream().filter(dto -> key.equals(dto.getKey())).findFirst().orElse(null);
     }
 
-    public TaskDTO findOneTaskFromConfigByKey(final String key) {
-        return getTasksFromConfig().stream().filter(dto -> key.equals(dto.getKey())).findFirst().orElse(null);
-    }
-
-    public List<TaskDTO> getTasksFromConfig() {
+    /**
+     * Get all System tasks
+     * @return List of entites
+     */
+    public List<TaskDTO> getSystemTasks() {
         String tenantKeyValue = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
-        return new ArrayList<>(Optional.ofNullable(systemTaskRepository.getConfigTasks().get(tenantKeyValue))
-                                       .orElse(new HashMap<>())
-                                       .values());
+        return new ArrayList<>(systemTaskRepository.getConfigTasks()
+                                                   .getOrDefault(tenantKeyValue, Collections.emptyMap())
+                                                   .values());
     }
 }

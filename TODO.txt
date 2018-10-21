@@ -12,15 +12,16 @@ DONE:
 tenant related scheduler.yml) - DONE
 6. Add and setup xm-commons-exception library - DONE
 7. Implement active System task synchronization when RefreshableConfiguration is changed - DONE
+8. TODOs was partially fixed
 
 TODO:
 
-1. Fix all TODO statements in code and tests
 2. Implement Tenant API for creating tenant in scheduler
 2.1 Implement tenant provisioning for scheduler on entity side
 3. Add permissions annotations
 4. Add jenkins job
 5. Include to compose file
+6. Fix all TODO statements in code and tests
 
 Optional (need review/discuss)
 

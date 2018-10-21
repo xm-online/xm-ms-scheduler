@@ -69,8 +69,8 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
         MockitoAnnotations.initMocks(this);
         final SystemTaskResource taskResource = new SystemTaskResource(systemTaskService);
 
-        when(systemTaskService.getTasksFromConfig()).thenReturn(Arrays.asList(createTask()));
-        when(systemTaskService.findOneTaskFromConfigByKey("systask1")).thenReturn(createTask());
+        when(systemTaskService.getSystemTasks()).thenReturn(Arrays.asList(createTask()));
+        when(systemTaskService.findOneSystemTask("systask1")).thenReturn(createTask());
 
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
                                               .setControllerAdvice(exceptionTranslator)
@@ -100,7 +100,7 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
     @Test
     @Transactional
     public void getTask() throws Exception {
-        TaskDTO task = systemTaskService.findOneTaskFromConfigByKey("systask1");
+        TaskDTO task = systemTaskService.findOneSystemTask("systask1");
 
         // Get the task
         restTaskMockMvc.perform(get("/api/systasks/{key}", task.getKey()))

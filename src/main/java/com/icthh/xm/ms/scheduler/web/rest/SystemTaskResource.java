@@ -35,7 +35,7 @@ public class SystemTaskResource {
     @GetMapping("/systasks")
     @Timed
     public ResponseEntity<List<TaskDTO>> getAllTasks() {
-        List<TaskDTO> list = systemTaskService.getTasksFromConfig();
+        List<TaskDTO> list = systemTaskService.getSystemTasks();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -48,7 +48,7 @@ public class SystemTaskResource {
     @GetMapping("/systasks/{key}")
     @Timed
     public ResponseEntity<TaskDTO> getTask(@PathVariable String key) {
-        TaskDTO taskDTO = systemTaskService.findOneTaskFromConfigByKey(key);
+        TaskDTO taskDTO = systemTaskService.findOneSystemTask(key);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(taskDTO));
     }
 
