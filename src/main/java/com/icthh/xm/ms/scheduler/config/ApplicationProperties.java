@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Properties specific to Scheduler.
  * <p>
@@ -15,6 +18,29 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class ApplicationProperties {
 
-    private boolean streamBindingEnabled = true;
+    private final Retry retry = new Retry();
+    private final Scheduler scheduler = new Scheduler();
 
+    private List<String> tenantIgnoredPathList = Collections.emptyList();
+    // TODO - why do we need this property?
+    private boolean streamBindingEnabled = true;
+    private boolean kafkaEnabled;
+    private String kafkaSystemQueue;
+
+    @Getter
+    @Setter
+    public static class Scheduler {
+        private int threadPoolSize = 5;
+        private String taskPathPattern;
+    }
+
+    // TODO - do we need this properties?
+    @Getter
+    @Setter
+    private static class Retry {
+
+        private int maxAttempts;
+        private long delay;
+        private int multiplier;
+    }
 }

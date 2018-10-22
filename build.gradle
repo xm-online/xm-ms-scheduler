@@ -221,6 +221,11 @@ dependencies {
     compile "io.springfox:springfox-bean-validators"
     compile "org.postgresql:postgresql"
     compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+
+    compile "com.icthh.xm.commons:xm-commons-migration-db:${xm_commons_version}"
+    compile "com.icthh.xm.commons:xm-commons-ms-web:${xm_commons_version}"
+    compile "com.icthh.xm.commons:xm-commons-i18n:${xm_commons_version}"
+
     testCompile "com.jayway.jsonpath:json-path"
     testCompile ("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'

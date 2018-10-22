@@ -1,16 +1,12 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
-import com.icthh.xm.ms.scheduler.SchedulerApp;
-
-import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
-
+import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
+import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.TaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
-import com.icthh.xm.ms.scheduler.web.rest.errors.ExceptionTranslator;
-import com.icthh.xm.ms.scheduler.service.dto.TaskCriteria;
 import com.icthh.xm.ms.scheduler.service.TaskQueryService;
 
 import org.junit.Before;
@@ -47,8 +43,8 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
  * @see TaskResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SchedulerApp.class, SecurityBeanOverrideConfiguration.class})
-public class TaskResourceIntTest {
+@SpringBootTest
+public class TaskResourceIntTest extends AbstractSpringContextTest {
 
     private static final String DEFAULT_KEY = "AAAAAAAAAA";
     private static final String UPDATED_KEY = "BBBBBBBBBB";

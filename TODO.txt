@@ -6,19 +6,23 @@ DONE:
 0. Implement SchedulerEvent model - DONE
 1. Add REST api for system schedulers only for GET - DONE
 2. Implement conditional connection to kafka mased on properties (application.stream-binding-enabled) - DONE
-3. Fix IDE code assist for generated classes such as Task_ in TaskQueryService and TaskMapperImpl - DONE (check)
+3. Fix IDE code assist for generated classes such as Task_ in TaskQueryService and TaskMapperImpl - DONE
+4. Add and setup xm-commons-logging library - DONE
+5. Add xm-commons-config library and implement system schedulers initialization and update form config server (create
+tenant related scheduler.yml) - DONE
+6. Add and setup xm-commons-exception library - DONE
+7. Implement active System task synchronization when RefreshableConfiguration is changed - DONE
+8. TODOs was partially fixed
 
 TODO:
 
-1. Add and setup xm-commons-logging library
-2. Add xm-commons-config library and implement system schedulers initialization and update form config server (create
-tenant related scheduler.yml)
-3. Fix all TODO statements in code and tests
-4. Add permissions annotations
-5. Add jenkins job
-6. Include to compose file
+2. Implement Tenant API for creating tenant in scheduler
+2.1 Implement tenant provisioning for scheduler on entity side
+3. Add permissions annotations
+4. Add jenkins job
+5. Include to compose file
+6. Fix all TODO statements in code and tests
 
 Optional (need review/discuss)
 
 1. Move ScheduledEvent to xm-commons-messaging project model
-2. Add and setup xm-commons-exception library

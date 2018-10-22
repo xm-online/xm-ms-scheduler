@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration scan="true">
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <!--<include resource="org/springframework/boot/logging/logback/base.xml"/>-->
+
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>utf-8</charset>
+            <Pattern>%d %-5level [%thread] [%X{rid}] %logger{0}: %msg%n</Pattern>
+        </encoder>
+    </appender>
 
     <logger name="com.icthh.xm.ms.scheduler" level="INFO"/>
 
@@ -40,7 +48,7 @@
     <logger name="sun.net.www" level="INFO"/>
     <logger name="sun.rmi.transport" level="WARN"/>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 

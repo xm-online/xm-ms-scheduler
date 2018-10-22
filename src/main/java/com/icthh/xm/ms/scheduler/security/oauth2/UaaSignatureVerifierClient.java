@@ -1,5 +1,6 @@
 package com.icthh.xm.ms.scheduler.security.oauth2;
 
+import com.icthh.xm.ms.scheduler.config.Constants;
 import com.icthh.xm.ms.scheduler.config.oauth2.OAuth2Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -57,11 +58,10 @@ public class UaaSignatureVerifierClient implements OAuth2SignatureVerifierClient
                 throw new CertificateException("Received empty certificate from config.");
             }
             InputStream fin = new ByteArrayInputStream(key.getBytes());
-            CertificateFactory f = CertificateFactory.getInstance("X.509");
+            CertificateFactory f = CertificateFactory.getInstance(Constants.CERTIFICATE);
             X509Certificate certificate = (X509Certificate) f.generateCertificate(fin);
             PublicKey pk = certificate.getPublicKey();
-            key = String.format("-----BEGIN PUBLIC KEY-----%n%s%n-----END PUBLIC KEY-----",
-                                new String(Base64.encode(pk.getEncoded())));
+            key = String.format(Constants.PUBLIC_KEY, new String(Base64.encode(pk.getEncoded())));
 
             return new RsaVerifier(key);
         } catch (IllegalStateException ex) {

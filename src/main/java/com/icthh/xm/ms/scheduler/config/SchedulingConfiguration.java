@@ -1,8 +1,10 @@
 package com.icthh.xm.ms.scheduler.config;
 
+import com.icthh.xm.commons.config.client.repository.TenantListRepository;
+import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
-import com.icthh.xm.ms.scheduler.service.TaskServiceExt;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -13,20 +15,20 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 public class SchedulingConfiguration {
 
-    @Bean(initMethod = "init", destroyMethod = "destroy")
-    public SchedulingManager schedulingManager(ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                                               TaskServiceExt taskServiceExt,
-                                               ScheduledTaskHandler handler) {
-        return new SchedulingManager(threadPoolTaskScheduler, taskServiceExt, handler);
+    @Bean(destroyMethod = "destroy")
+    public SchedulingManager schedulingManager(TenantContextHolder tenantContextHolder,
+                                               ThreadPoolTaskScheduler threadPoolTaskScheduler,
+                                               SystemTaskService systemTaskService,
+                                               ScheduledTaskHandler handler,
+                                               TenantListRepository tenantListRepository) {
+        return new SchedulingManager(tenantContextHolder, threadPoolTaskScheduler,
+                                     systemTaskService, handler, tenantListRepository);
     }
 
     @Bean
-    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
-        ThreadPoolTaskScheduler threadPoolTaskScheduler
-            = new ThreadPoolTaskScheduler();
-
-        // TODO - move to parameters
-        threadPoolTaskScheduler.setPoolSize(5);
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(ApplicationProperties applicationProperties) {
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(applicationProperties.getScheduler().getThreadPoolSize());
         threadPoolTaskScheduler.setThreadNamePrefix("xm-sc-thread");
         return threadPoolTaskScheduler;
     }
