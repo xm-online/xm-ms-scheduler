@@ -16,6 +16,7 @@ tenant related scheduler.yml) - DONE
 
 TODO:
 
+1. Implement scheduler queue consuming on xm-entity using spring cloud approach
 2. Implement Tenant API for creating tenant in scheduler
 2.1 Implement tenant provisioning for scheduler on entity side
 3. Add permissions annotations
