@@ -16,14 +16,31 @@ tenant related scheduler.yml) - DONE
 
 TODO:
 
-1. Implement scheduler queue consuming on xm-entity using spring cloud approach
-2. Implement Tenant API for creating tenant in scheduler
-2.1 Implement tenant provisioning for scheduler on entity side
-3. Add permissions annotations
-4. Add jenkins job
-5. Include to compose file
-6. Fix all TODO statements in code and tests
+1. Implement scheduler queue consuming on xm-entity using spring cloud approach IN-PROGRESS ssenko
+    * event model
+    * commons event consumer
+    * integration xm-entity with commons-event-consumer
+2. Add permissions annotations IN-PROGRESS vkirichenko
+    * For TaskResource and SystemTaskResource
+3. Add jenkins job
+    * move project to the github, check port (port map) vkirichenko
+    * travis task ykruchko
+4. Include to compose file somelchuk
+5. Fix all TODO statements in code and tests
+    * investigate todo, prepare answers (in task) vkirichenko
+6. Implement ONE_TIME ScheduleType vkirichenko
+    * ttl (default 60 min) -1 = execute anyway
+7. Check configuration updating without hazelcast (ms-config refresh) vkirichenko
+    * remove hazelcast from project
+8. Extend TaskModel. add optional attribute - targetMs (TenantAwareChannelNameResolver tenant_ms_chanelType) vkirichenko
+9. Performance test vkirichenko
+    * Gatling test. Scenario: TaskResource.createTask , TaskResource.getTask
+    * Gatling test. 1 million: 5 hour delay
+    * Gatling test. 1 million: concurrent launch
+    * Run app, add 1 million/100 000 , run visual vm, record results (-xmx 1Gb)
+10. ChannelType QUEUE, TOPIC kafka research (queue support for kafka, consumer group)
+11. Implement Tenant API for creating tenant in scheduler vkirichenko
+    * db create schema per tenant, other - unsupported
+12.1 Implement tenant provisioning for scheduler on entity side
+    * add call for creating tenant in md scheduler
 
-Optional (need review/discuss)
-
-1. Move ScheduledEvent to xm-commons-messaging project model
