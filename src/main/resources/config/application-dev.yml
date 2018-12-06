@@ -140,15 +140,8 @@ jhipster:
         from: scheduler@localhost
         base-url: http://127.0.0.1:8081
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-        jmx.enabled: true
-        graphite: # Use the "graphite" Maven profile to have the Graphite dependencies
-            enabled: false
-            host: localhost
-            port: 2003
-            prefix: scheduler
-        prometheus: # Use the "prometheus" Maven profile to have the Prometheus dependencies
-            enabled: false
-            endpoint: /prometheusMetrics
+        jmx:
+            enabled: true
         logs: # Reports Dropwizard metrics in the logs
             enabled: false
             report-frequency: 60 # in seconds
@@ -158,17 +151,13 @@ jhipster:
             host: localhost
             port: 5000
             queue-size: 512
-        spectator-metrics: # Reports Spectator Circuit Breaker metrics in the logs
-            enabled: false
-            # edit spring.metrics.export.delay-millis to set report frequency
-
 oauth2:
     signature-verification:
-        public-key-endpoint-uri: http://config/api/token_key
-        #ttl for public keys to verify JWT tokens (in ms)
-        ttl: 3600000
-        #max. rate at which public keys will be fetched (in ms)
-        public-key-refresh-rate-limit: 10000
+         public-key-endpoint-uri: http://config/api/token_key
+         #ttl for public keys to verify JWT tokens (in ms)
+         ttl: 3600000
+         #max. rate at which public keys will be fetched (in ms)
+         public-key-refresh-rate-limit: 10000
     web-client-configuration:
         #keep in sync with UAA configuration
         client-id: web_app

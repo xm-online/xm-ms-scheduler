@@ -880,7 +880,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         int databaseSizeBeforeUpdate = taskRepository.findAll().size();
 
         // Update the task
-        Task updatedTask = taskRepository.findOne(task.getId());
+        Task updatedTask = taskRepository.findById(task.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Entity not found"));
         // Disconnect from session so that the updates on updatedTask are not directly saved in db
         em.detach(updatedTask);
         updatedTask

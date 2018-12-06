@@ -1,8 +1,8 @@
 package com.icthh.xm.ms.scheduler.config;
 
-import com.icthh.xm.ms.scheduler.config.oauth2.OAuth2JwtAccessTokenConverter;
-import com.icthh.xm.ms.scheduler.config.oauth2.OAuth2Properties;
-import com.icthh.xm.ms.scheduler.security.oauth2.OAuth2SignatureVerifierClient;
+import com.icthh.xm.commons.security.oauth2.OAuth2JwtAccessTokenConverter;
+import com.icthh.xm.commons.security.oauth2.OAuth2Properties;
+import com.icthh.xm.commons.security.oauth2.OAuth2SignatureVerifierClient;
 import com.icthh.xm.ms.scheduler.security.AuthoritiesConstants;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,16 +17,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerAdapter {
+public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
     private final OAuth2Properties oAuth2Properties;
 
-    public MicroserviceSecurityConfiguration(OAuth2Properties oAuth2Properties) {
+    public SecurityConfiguration(OAuth2Properties oAuth2Properties) {
         this.oAuth2Properties = oAuth2Properties;
     }
 
@@ -38,10 +37,10 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
             .headers()
             .frameOptions()
             .disable()
-        .and()
+            .and()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+            .and()
             .authorizeRequests()
             .antMatchers("/api/profile-info").permitAll()
             .antMatchers("/api/**").authenticated()
@@ -61,7 +60,7 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
     }
 
     @Bean
-	@Qualifier("loadBalancedRestTemplate")
+    @Qualifier("loadBalancedRestTemplate")
     public RestTemplate loadBalancedRestTemplate(RestTemplateCustomizer customizer) {
         RestTemplate restTemplate = new RestTemplate();
         customizer.customize(restTemplate);
