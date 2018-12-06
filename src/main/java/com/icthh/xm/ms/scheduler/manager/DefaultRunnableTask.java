@@ -1,13 +1,13 @@
 package com.icthh.xm.ms.scheduler.manager;
 
-
 import com.icthh.xm.commons.logging.util.MdcUtils;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.function.Consumer;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
@@ -55,7 +55,7 @@ public class DefaultRunnableTask implements RunnableTask {
                 return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now());
             default:
                 return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now()
-                                                                                      .plusMillis(task.getDelay()));
+                    .plusMillis(task.getDelay()));
         }
     }
 

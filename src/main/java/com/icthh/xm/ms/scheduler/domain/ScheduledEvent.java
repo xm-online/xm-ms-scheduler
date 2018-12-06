@@ -1,14 +1,15 @@
 package com.icthh.xm.ms.scheduler.domain;
 
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Scheduled event model to be send to stream.
@@ -46,19 +47,19 @@ public class ScheduledEvent {
 
     @Override
     public String toString() {
-        return "ScheduledEvent{" +
-               "id=" + id +
-               ", key='" + key + '\'' +
-               ", uuid='" + uuid + '\'' +
-               ", name='" + name + '\'' +
-               ", typeKey='" + typeKey + '\'' +
-               ", stateKey='" + stateKey + '\'' +
-               ", createdBy='" + createdBy + '\'' +
-               ", startDate=" + startDate +
-               ", handlingTime=" + handlingTime +
-               ", endDate=" + endDate +
-               ", channelType=" + channelType +
-               ", data.size=" + Optional.ofNullable(data).map(Map::size).orElse(0) +
-               '}';
+        return "ScheduledEvent{"
+            + "id=" + id
+            + ", key='" + key + '\''
+            + ", uuid='" + uuid + '\''
+            + ", name='" + name + '\''
+            + ", typeKey='" + typeKey + '\''
+            + ", stateKey='" + stateKey + '\''
+            + ", createdBy='" + createdBy + '\''
+            + ", startDate=" + startDate
+            + ", handlingTime=" + handlingTime
+            + ", endDate=" + endDate
+            + ", channelType=" + channelType
+            + ", data.size=" + Optional.ofNullable(data).map(Map::size).orElse(0)
+            + '}';
     }
 }

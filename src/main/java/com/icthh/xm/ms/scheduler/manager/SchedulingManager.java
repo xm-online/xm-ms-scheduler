@@ -7,17 +7,25 @@ import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
+
 
 /**
  * Scheduling manager component is designed to handle all active scheduled tasks.
@@ -75,7 +83,7 @@ public class SchedulingManager {
         }
 
         log.info("Finish Scheduler initialization with [{}] tenants and [{}] active tasks",
-                 tenantListRepository.getTenants().size(), taskCount);
+            tenantListRepository.getTenants().size(), taskCount);
     }
 
     public void mergeSystemTasksFromConfig(final String tenant) {
@@ -86,13 +94,13 @@ public class SchedulingManager {
 
             List<TaskDTO> newTasks = taskService.findSystemNotFinishedTasks();
             Map<String, TaskDTO> remainingTasks = newTasks.stream()
-                                                          .collect(Collectors.toMap(SchedulingManager::getTaskKey,
-                                                                                    Function.identity()));
+                .collect(Collectors.toMap(SchedulingManager::getTaskKey,
+                    Function.identity()));
 
             // delete redundant tasks
             Set<String> toDeleteKeys = getActiveSystemTaskKeys().stream()
-                                                                .filter(key -> !remainingTasks.containsKey(key))
-                                                                .collect(Collectors.toSet());
+                .filter(key -> !remainingTasks.containsKey(key))
+                .collect(Collectors.toSet());
             toDeleteKeys.forEach(key -> deleteTaskFromTenant(tenant, key, systemSchedulers));
 
             // update remaining tasks
@@ -157,7 +165,7 @@ public class SchedulingManager {
         task.setTenant(currentTenant);
 
         schedulers.get(currentTenant)
-                      .compute(getTaskKey(task), (taskKey, oldFuture) -> rescheduleTask(task, oldFuture));
+            .compute(getTaskKey(task), (taskKey, oldFuture) -> rescheduleTask(task, oldFuture));
     }
 
     public void deleteActiveTask(String taskKey) {
@@ -188,9 +196,9 @@ public class SchedulingManager {
     private boolean deleteTaskFromTenant(String tenant, String taskKey,
                                          Map<String, Map<String, ScheduledFuture>> schedulers) {
         boolean cancelled = Optional.ofNullable(schedulers.get(tenant))
-                                    .map(tenantMap -> tenantMap.remove(taskKey))
-                                    .map(this::cancelTask)
-                                    .orElse(false);
+            .map(tenantMap -> tenantMap.remove(taskKey))
+            .map(this::cancelTask)
+            .orElse(false);
         log.info("task [{}] removed, cancel result: {}", taskKey, cancelled);
         return cancelled;
     }

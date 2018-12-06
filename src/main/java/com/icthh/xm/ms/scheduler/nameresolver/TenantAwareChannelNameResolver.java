@@ -1,10 +1,12 @@
 package com.icthh.xm.ms.scheduler.nameresolver;
 
+import static org.apache.commons.lang3.StringUtils.lowerCase;
+
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
+
 
 /**
  * Tenant aware channel name resolver is used to dynamically calculate Spring cloud channel name (kafka topic) in
@@ -21,15 +23,19 @@ public class TenantAwareChannelNameResolver implements ChannelNameResolver {
     @Override
     public String resolve(final TaskDTO task) {
         return Optional.ofNullable(task.getTenant())
-                       .map(tenant -> PREFIX + StringUtils.lowerCase(tenant) + DELIMITER + getScheduleType(task.getChannelType()))
-                       .orElseThrow(() -> new RuntimeException("Tenant can not be empty"));
+            .map(tenant -> PREFIX
+                + lowerCase(tenant)
+                + DELIMITER
+                + getScheduleType(task.getChannelType()))
+
+            .orElseThrow(() -> new RuntimeException("Tenant can not be empty"));
     }
 
     private String getScheduleType(ChannelType type) {
         return Optional.ofNullable(type)
-                       .map(Enum::toString)
-                       .map(String::toLowerCase)
-                       .orElse(QUEUE);
+            .map(Enum::toString)
+            .map(String::toLowerCase)
+            .orElse(QUEUE);
     }
 
 }

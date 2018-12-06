@@ -1,18 +1,24 @@
 package com.icthh.xm.ms.scheduler.domain;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-
-import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * A Task.
@@ -273,21 +279,21 @@ public class Task implements Serializable {
 
     @Override
     public String toString() {
-        return "Task{" +
-            "id=" + getId() +
-            ", key='" + getKey() + "'" +
-            ", name='" + getName() + "'" +
-            ", typeKey='" + getTypeKey() + "'" +
-            ", stateKey='" + getStateKey() + "'" +
-            ", createdBy='" + getCreatedBy() + "'" +
-            ", startDate='" + getStartDate() + "'" +
-            ", endDate='" + getEndDate() + "'" +
-            ", scheduleType='" + getScheduleType() + "'" +
-            ", delay=" + getDelay() +
-            ", cronExpression='" + getCronExpression() + "'" +
-            ", channelType='" + getChannelType() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", data='" + getData() + "'" +
-            "}";
+        return "Task{"
+            + "id=" + getId()
+            + ", key='" + getKey() + "'"
+            + ", name='" + getName() + "'"
+            + ", typeKey='" + getTypeKey() + "'"
+            + ", stateKey='" + getStateKey() + "'"
+            + ", createdBy='" + getCreatedBy() + "'"
+            + ", startDate='" + getStartDate() + "'"
+            + ", endDate='" + getEndDate() + "'"
+            + ", scheduleType='" + getScheduleType() + "'"
+            + ", delay=" + getDelay()
+            + ", cronExpression='" + getCronExpression() + "'"
+            + ", channelType='" + getChannelType() + "'"
+            + ", description='" + getDescription() + "'"
+            + ", data='" + getData() + "'"
+            + "}";
     }
 }
