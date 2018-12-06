@@ -25,6 +25,7 @@ public class ApplicationProperties {
     // TODO - why do we need this property?
     private boolean streamBindingEnabled = true;
     private boolean kafkaEnabled;
+    private String kafkaSystemTopic;
     private String kafkaSystemQueue;
 
     @Getter

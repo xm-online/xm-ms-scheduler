@@ -80,6 +80,8 @@ spring:
         locator:
             discovery:
                 enabled: true
+    kafka:
+        bootstrap-servers: localhost:9093
 
 liquibase:
     contexts: dev

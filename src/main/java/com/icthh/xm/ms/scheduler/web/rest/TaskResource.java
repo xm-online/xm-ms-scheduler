@@ -10,6 +10,7 @@ import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.dto.TaskCriteria;
 import com.icthh.xm.ms.scheduler.service.TaskQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -29,11 +30,10 @@ import java.util.Optional;
 /**
  * REST controller for managing Task.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class TaskResource {
-
-    private final Logger log = LoggerFactory.getLogger(TaskResource.class);
 
     private static final String ENTITY_NAME = "task";
 
