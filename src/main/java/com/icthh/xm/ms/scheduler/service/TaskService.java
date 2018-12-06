@@ -72,7 +72,8 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskDTO findOne(Long id) {
         log.debug("Request to get Task : {}", id);
-        Task task = taskRepository.findOne(id);
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Entity not found"));
         return taskMapper.toDto(task);
     }
 
@@ -84,6 +85,6 @@ public class TaskService {
     public void delete(Long id) {
         log.debug("Request to delete Task : {}", id);
         schedulingManager.deleteActiveTask(String.valueOf(id));
-        taskRepository.delete(id);
+        taskRepository.deleteById(id);
     }
 }

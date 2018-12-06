@@ -3,30 +3,37 @@ import org.gradle.internal.os.OperatingSystem
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
         maven { url "http://repo.spring.io/plugins-release" }
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
-        classpath "io.spring.gradle:propdeps-plugin:0.0.9.RELEASE"
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17"
+        classpath "io.spring.gradle:propdeps-plugin:0.0.10.RELEASE"
+        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
 
 plugins {
-    id "org.sonarqube" version "2.5"
-    id "net.ltgt.apt-eclipse" version "0.13"
-    id "net.ltgt.apt-idea" version "0.13"
-    id "net.ltgt.apt" version "0.13"
-    id "io.spring.dependency-management" version "1.0.3.RELEASE"
+    id "org.sonarqube" version "2.6.2"
+    id "net.ltgt.apt-eclipse" version "0.18"
+    id "net.ltgt.apt-idea" version "0.18"
+    id "net.ltgt.apt" version "0.18"
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id 'org.liquibase.gradle' version '2.0.1'
+    id "com.github.spotbugs" version "1.6.3"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
+spotbugs {
+    toolVersion = '3.1.3'
+    ignoreFailures = true
+}
+
 apply plugin: 'java'
-sourceCompatibility=1.8
-targetCompatibility=1.8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 // Until JHipster supports JDK 9
 assert System.properties['java.specification.version'] == '1.8'
 
@@ -36,14 +43,27 @@ apply plugin: 'war'
 apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'idea'
-apply plugin: 'net.ltgt.apt'
-
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
 
 dependencyManagement {
-  imports {
-    mavenBom 'io.github.jhipster:jhipster-dependencies:' + jhipster_dependencies_version
-    //jhipster-needle-gradle-dependency-management - JHipster will add additional dependencies management here
-  }
+    imports {
+        mavenBom 'io.github.jhipster:jhipster-dependencies:' + jhipster_dependencies_version
+        //jhipster-needle-gradle-dependency-management - JHipster will add additional dependencies management here
+    }
+}
+
+pmd {
+    rulePriority = 3
+    toolVersion = '5.5.4'
+    ignoreFailures = true
+    ruleSetFiles = files("./qa/pmd.xml")
+}
+
+checkstyle {
+    toolVersion = "7.6.1"
+    ignoreFailures = true
+    configFile = rootProject.file('./qa/checkstyle.xml')
 }
 
 defaultTasks 'bootRun'
@@ -53,8 +73,8 @@ version = '0.0.1-SNAPSHOT'
 
 description = ''
 
-bootRepackage {
-   mainClass = 'com.icthh.xm.ms.scheduler.SchedulerApp'
+bootWar {
+    mainClassName = 'com.icthh.xm.ms.scheduler.SchedulerApp'
 }
 
 war {
@@ -62,8 +82,7 @@ war {
 }
 
 springBoot {
-    mainClass = 'com.icthh.xm.ms.scheduler.SchedulerApp'
-    executable = true
+    mainClassName = 'com.icthh.xm.ms.scheduler.SchedulerApp'
     buildInfo()
 }
 
@@ -82,15 +101,10 @@ if (OperatingSystem.current().isWindows()) {
     }
 
     bootRun {
-        addResources = false
         dependsOn pathingJar
         doFirst {
             classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
         }
-    }
-} else {
-    bootRun {
-        addResources = false
     }
 }
 
@@ -100,9 +114,10 @@ test {
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
-    reports.html.enabled = false
+    reports.html.enabled = true
     testLogging {
         exceptionFormat = 'full'
+        showStandardStreams = true
         events "passed", "skipped", "failed", "standardOut", "standardError"
     }
 }
@@ -112,10 +127,8 @@ task testReport(type: TestReport) {
     reportOn test
 }
 
-
 apply from: 'gradle/docker.gradle'
 apply from: 'gradle/sonar.gradle'
-apply from: 'gradle/liquibase.gradle'
 apply from: 'gradle/mapstruct.gradle'
 //jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
 
@@ -137,6 +150,40 @@ if (project.hasProperty('zipkin')) {
     apply from: 'gradle/zipkin.gradle'
 }
 
+if (!project.hasProperty('runList')) {
+    project.ext.runList = 'main'
+}
+
+project.ext.diffChangelogFile = 'src/main/resources/config/liquibase/changelog/' + new Date().format('yyyyMMddHHmmss') + '_changelog.xml'
+
+liquibase {
+    activities {
+        main {
+            driver ''
+            url ''
+            username 'scheduler'
+            password ''
+            changeLogFile 'src/main/resources/config/liquibase/master.xml'
+            defaultSchemaName ''
+            logLevel 'debug'
+            classpath 'src/main/resources/'
+        }
+        diffLog {
+            driver ''
+            url ''
+            username 'scheduler'
+            password ''
+            changeLogFile project.ext.diffChangelogFile
+            referenceUrl 'hibernate:spring:com.icthh.xm.ms.scheduler.domain?dialect=&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy'
+            defaultSchemaName ''
+            logLevel 'debug'
+            classpath 'src/main/resources/'
+        }
+    }
+
+    runList = project.ext.runList
+}
+
 configurations {
     providedRuntime
     compile.exclude module: "spring-boot-starter-tomcat"
@@ -144,16 +191,18 @@ configurations {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     jcenter()
+    //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
 
 dependencies {
 
-    provided "org.projectlombok:lombok:${lombok_version}"
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
     apt "org.projectlombok:lombok:${lombok_version}"
 
     compile "org.springframework.boot:spring-boot-starter-cache"
-    compile "io.github.jhipster:jhipster"
+    compile group: "io.github.jhipster", name: "jhipster-framework"
     compile "io.dropwizard.metrics:metrics-core"
     compile "io.dropwizard.metrics:metrics-json"
     compile "io.dropwizard.metrics:metrics-jvm"
@@ -179,7 +228,7 @@ dependencies {
     compile "javax.transaction:javax.transaction-api"
     compile "org.hibernate:hibernate-entitymanager"
     compile "org.hibernate:hibernate-envers"
-    compile "org.hibernate:hibernate-validator"
+    compile "org.hibernate.validator:hibernate-validator"
     compile "org.liquibase:liquibase-core"
     compile "com.mattbertolini:liquibase-slf4j"
     compile "org.springframework.boot:spring-boot-actuator"
@@ -193,21 +242,20 @@ dependencies {
     compile "org.springframework.cloud:spring-cloud-stream-binder-kafka"
     compile "org.springframework.kafka:spring-kafka"
     compile "org.springframework.boot:spring-boot-starter-security"
-    compile ("org.springframework.boot:spring-boot-starter-web") {
+    compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: 'spring-boot-starter-tomcat'
     }
     compile "org.springframework.boot:spring-boot-starter-undertow"
     compile "org.springframework.boot:spring-boot-starter-thymeleaf"
     compile "org.zalando:problem-spring-web"
     compile "org.springframework.cloud:spring-cloud-starter"
-    compile "org.springframework.cloud:spring-cloud-starter-ribbon"
-    compile "org.springframework.cloud:spring-cloud-starter-hystrix"
-    compile "org.springframework.cloud:spring-cloud-starter-spectator"
+    compile "org.springframework.cloud:spring-cloud-starter-netflix-ribbon"
+    compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
     compile "org.springframework.retry:spring-retry"
     compile "org.springframework.cloud:spring-cloud-starter-consul-discovery"
     compile "org.springframework.cloud:spring-cloud-starter-consul-config"
     compile "org.springframework.cloud:spring-cloud-security"
-    compile "org.springframework.cloud:spring-cloud-starter-feign"
+    compile "org.springframework.cloud:spring-cloud-starter-openfeign"
     compile "org.springframework.cloud:spring-cloud-spring-service-connector"
     compile "org.springframework:spring-context-support"
     compile "org.springframework.security:spring-security-config"
@@ -215,7 +263,7 @@ dependencies {
     compile "org.springframework.security:spring-security-web"
     compile "org.springframework.security.oauth:spring-security-oauth2"
     compile "org.springframework.security:spring-security-jwt"
-    compile ("io.springfox:springfox-swagger2") {
+    compile("io.springfox:springfox-swagger2") {
         exclude module: 'mapstruct'
     }
     compile "io.springfox:springfox-bean-validators"
@@ -225,9 +273,13 @@ dependencies {
     compile "com.icthh.xm.commons:xm-commons-migration-db:${xm_commons_version}"
     compile "com.icthh.xm.commons:xm-commons-ms-web:${xm_commons_version}"
     compile "com.icthh.xm.commons:xm-commons-i18n:${xm_commons_version}"
+    compile "com.icthh.xm.commons:xm-commons-security:${xm_commons_version}"
+    compile "com.icthh.xm.commons:xm-commons-logging-web:${xm_commons_version}"
+    compile "com.icthh.xm.commons:xm-commons-permission:${xm_commons_version}"
+    compile "com.icthh.xm.commons:xm-commons-timeline:${xm_commons_version}"
 
     testCompile "com.jayway.jsonpath:json-path"
-    testCompile ("org.springframework.boot:spring-boot-starter-test") {
+    testCompile("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
     testCompile "org.springframework.security:spring-security-test"
@@ -238,7 +290,8 @@ dependencies {
     testCompile "com.mattbertolini:liquibase-slf4j"
     testCompile "org.hamcrest:hamcrest-library"
     testCompile "org.springframework.cloud:spring-cloud-stream-test-support"
-    optional ("org.springframework.boot:spring-boot-configuration-processor") {
+    testCompileOnly "org.projectlombok:lombok:${lombok_version}"
+    optional("org.springframework.boot:spring-boot-configuration-processor") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
@@ -249,12 +302,12 @@ task cleanResources(type: Delete) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
+    gradleVersion = '4.9'
 }
 
 task stage(dependsOn: 'bootRepackage') {
 }
 
 compileJava.dependsOn processResources
-processResources.dependsOn cleanResources,bootBuildInfo
+processResources.dependsOn cleanResources, bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources
