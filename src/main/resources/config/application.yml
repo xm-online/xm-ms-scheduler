@@ -27,21 +27,36 @@ feign:
     hystrix:
         enabled: true
 
+# See https://github.com/Netflix/Hystrix/wiki/Configuration
 hystrix:
-    share-security-context: true
+    command:
+        default:
+            execution:
+                isolation:
+                    strategy: SEMAPHORE
+# See https://github.com/spring-cloud/spring-cloud-netflix/issues/1330
+#                    thread:
+#                        timeoutInMilliseconds: 10000
+    shareSecurityContext: true
 
 management:
-    security:
-        roles: ADMIN
-    context-path: /management
+    endpoints:
+        web:
+            base-path: /management
+            exposure:
+                include: ["configprops", "env", "health", "info", "threaddump", "logfile" ]
+    endpoint:
+        health:
+            show-details: when_authorized
     info:
         git:
             mode: full
     health:
         mail:
             enabled: false # When using the MailService, configure an SMTP server and set this to true
-        binders:
-            enabled: true
+    metrics:
+        enabled: false # http://micrometer.io/ is disabled by default, as we use http://metrics.dropwizard.io/ instead
+
 spring:
     application:
         name: scheduler
@@ -50,9 +65,9 @@ spring:
             discovery:
                 healthCheckPath: /management/health
                 instanceId: ${spring.application.name}:${spring.application.instance-id:${random.value}}
-        stream:
-            default:
-                contentType: application/json
+            config:
+                watch:
+                    enabled: false
     jackson:
         serialization.write_dates_as_timestamps: false
     jpa:
