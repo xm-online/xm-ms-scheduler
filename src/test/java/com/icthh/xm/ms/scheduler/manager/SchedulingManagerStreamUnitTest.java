@@ -13,10 +13,10 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantKey;
 import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
 import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
-import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,11 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
+import org.springframework.cloud.stream.test.binder.MessageCollectorAutoConfiguration;
 import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.messaging.Message;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +45,7 @@ import java.util.Optional;
 @SpringBootTest(classes = {
     TestSupportBinderAutoConfiguration.class,
     TestSchedulingManagerConfiguration.class,
+    MessageCollectorAutoConfiguration.class,
     MessagingConfiguration.class,
     SchedulingHandlerConfiguration.class
 }, properties = {"application.stream-binding-enabled=true"})
@@ -84,18 +87,17 @@ public class SchedulingManagerStreamUnitTest {
 
         // clear messages
         nameResolver.getResolvedChannels()
-                    .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
+            .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
 
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler,
-                                                  systemTaskService, handler, tenantListRepository);
+            systemTaskService, handler, tenantListRepository);
 
         when(tenantContext.getTenantKey()).thenReturn(Optional.of(TenantKey.valueOf(TEST_TENANT)));
         when(tenantContextHolder.getContext()).thenReturn(tenantContext);
     }
 
     @Test
-    public void testMessagesSentToChannel() {
-
+    public void testMessagesSentToChannel() throws IOException {
         TaskDTO task = createTaskFixedDelay(1000L, Instant.now(), null);
 
         schedulingManager.createOrUpdateActiveUserTask(task);
@@ -111,8 +113,9 @@ public class SchedulingManagerStreamUnitTest {
             .drainTo(messages);
 
         assertEquals(3, messages.size());
-        assertTrue(messages.stream().allMatch(m -> ((ScheduledEvent) m.getPayload()).getId().equals(task.getId())));
 
+        assertTrue(messages.stream().allMatch(m ->
+            JsonPath.read(m.getPayload().toString(), "$.id").toString()
+                .equals(task.getId().toString())));
     }
-
 }
