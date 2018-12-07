@@ -7,6 +7,7 @@ import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Tenant aware channel name resolver is used to dynamically calculate Spring cloud channel name (kafka topic) in
@@ -25,7 +26,7 @@ public class TenantAwareChannelNameResolver implements ChannelNameResolver {
         return Optional.ofNullable(task.getTenant())
             .map(tenant -> PREFIX
                 + lowerCase(tenant)
-                + DELIMITER
+                + appendTargetMs(task.getTargetMs())
                 + getScheduleType(task.getChannelType()))
 
             .orElseThrow(() -> new RuntimeException("Tenant can not be empty"));
@@ -38,4 +39,11 @@ public class TenantAwareChannelNameResolver implements ChannelNameResolver {
             .orElse(QUEUE);
     }
 
+    private String appendTargetMs(String targetMs) {
+        String appendStr = DELIMITER;
+        if (!StringUtils.isEmpty(targetMs)) {
+            appendStr += targetMs + DELIMITER;
+        }
+        return appendStr;
+    }
 }

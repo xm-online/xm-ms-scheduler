@@ -1,12 +1,13 @@
 package com.icthh.xm.ms.scheduler.service.dto;
 
-
-import java.time.Instant;
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.Objects;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -41,6 +42,8 @@ public class TaskDTO implements Serializable {
     private String cronExpression;
 
     private ChannelType channelType;
+
+    private String targetMs;
 
     private String description;
 
@@ -150,6 +153,14 @@ public class TaskDTO implements Serializable {
         this.channelType = channelType;
     }
 
+    public String getTargetMs() {
+        return targetMs;
+    }
+
+    public void setTargetMs(String targetMs) {
+        this.targetMs = targetMs;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -176,7 +187,7 @@ public class TaskDTO implements Serializable {
         }
 
         TaskDTO taskDTO = (TaskDTO) o;
-        if(taskDTO.getId() == null || getId() == null) {
+        if (taskDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), taskDTO.getId());
@@ -189,21 +200,21 @@ public class TaskDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskDTO{" +
-               "id=" + getId() +
-               ", key='" + getKey() + "'" +
-               ", name='" + getName() + "'" +
-               ", typeKey='" + getTypeKey() + "'" +
-               ", stateKey='" + getStateKey() + "'" +
-               ", createdBy='" + getCreatedBy() + "'" +
-               ", startDate='" + getStartDate() + "'" +
-               ", endDate='" + getEndDate() + "'" +
-               ", scheduleType='" + getScheduleType() + "'" +
-               ", delay=" + getDelay() +
-               ", cronExpression='" + getCronExpression() + "'" +
-               ", channelType='" + getChannelType() + "'" +
-               ", description='" + getDescription() + "'" +
-               ", data.size='" + StringUtils.length(getData()) + "'" +
-               "}";
+        return "TaskDTO{"
+            + "id=" + getId()
+            + ", key='" + getKey() + "'"
+            + ", name='" + getName() + "'"
+            + ", typeKey='" + getTypeKey() + "'"
+            + ", stateKey='" + getStateKey() + "'"
+            + ", createdBy='" + getCreatedBy() + "'"
+            + ", startDate='" + getStartDate() + "'"
+            + ", endDate='" + getEndDate() + "'"
+            + ", scheduleType='" + getScheduleType() + "'"
+            + ", delay=" + getDelay()
+            + ", cronExpression='" + getCronExpression() + "'"
+            + ", channelType='" + getChannelType() + "'"
+            + ", description='" + getDescription() + "'"
+            + ", data.size='" + StringUtils.length(getData()) + "'"
+            + "}";
     }
 }

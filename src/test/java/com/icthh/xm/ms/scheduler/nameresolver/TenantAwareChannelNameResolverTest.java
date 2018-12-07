@@ -38,6 +38,8 @@ public class TenantAwareChannelNameResolverTest extends AbstractSpringContextTes
         task.setChannelType(ChannelType.QUEUE);
         assertEquals("scheduler_test_queue", nameResolver.resolve(task));
 
+        task.setTargetMs("entity");
+        assertEquals("scheduler_test_entity_queue", nameResolver.resolve(task));
     }
 
 }
