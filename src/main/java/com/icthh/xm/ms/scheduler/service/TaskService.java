@@ -23,11 +23,11 @@ public class TaskService {
 
     private final Logger log = LoggerFactory.getLogger(TaskService.class);
 
-    final TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    final TaskMapper taskMapper;
+    private final TaskMapper taskMapper;
 
-    final SchedulingManager schedulingManager;
+    private final SchedulingManager schedulingManager;
 
     public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, SchedulingManager schedulingManager) {
         this.taskRepository = taskRepository;
@@ -72,8 +72,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskDTO findOne(Long id) {
         log.debug("Request to get Task : {}", id);
-        Task task = taskRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Entity not found"));
+        Task task = taskRepository.findById(id).orElse(null);
         return taskMapper.toDto(task);
     }
 

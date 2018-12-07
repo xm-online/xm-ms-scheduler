@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +54,7 @@ public class TaskQueryService extends QueryService<Task> {
     @Transactional(readOnly = true)
     public List<TaskDTO> findByCriteria(TaskCriteria criteria) {
         log.debug("find by criteria : {}", criteria);
-        final Specifications<Task> specification = createSpecification(criteria);
+        final Specification<Task> specification = createSpecification(criteria);
         return taskMapper.toDto(taskRepository.findAll(specification));
     }
 
@@ -66,16 +67,16 @@ public class TaskQueryService extends QueryService<Task> {
     @Transactional(readOnly = true)
     public Page<TaskDTO> findByCriteria(TaskCriteria criteria, Pageable page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
-        final Specifications<Task> specification = createSpecification(criteria);
+        final Specification<Task> specification = createSpecification(criteria);
         final Page<Task> result = taskRepository.findAll(specification, page);
         return result.map(taskMapper::toDto);
     }
 
     /**
-     * Function to convert TaskCriteria to a {@link Specifications}
+     * Function to convert TaskCriteria to a {@link Specification}
      */
-    private Specifications<Task> createSpecification(TaskCriteria criteria) {
-        Specifications<Task> specification = Specifications.where(null);
+    private Specification<Task> createSpecification(TaskCriteria criteria) {
+        Specification<Task> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
                 specification = specification.and(buildSpecification(criteria.getId(), Task_.id));
