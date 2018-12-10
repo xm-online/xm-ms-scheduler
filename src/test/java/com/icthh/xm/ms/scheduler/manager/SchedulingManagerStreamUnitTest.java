@@ -1,6 +1,7 @@
 package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByDate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
@@ -111,11 +112,79 @@ public class SchedulingManagerStreamUnitTest {
         messageCollector
             .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
             .drainTo(messages);
-
+        assertTrue(schedulingManager.getActiveUserTaskKeys().isEmpty());
+        assertTrue(schedulingManager.getActiveSystemTaskKeys().isEmpty());
         assertEquals(3, messages.size());
 
         assertTrue(messages.stream().allMatch(m ->
             JsonPath.read(m.getPayload().toString(), "$.id").toString()
                 .equals(task.getId().toString())));
     }
+
+    @Test
+    public void testOneTimeMessage() {
+        TaskDTO task = createTaskByDate(Instant.now().plusMillis(1000), 3);
+
+        schedulingManager.createOrUpdateActiveUserTask(task);
+
+        waitFor(2000);
+
+        List<Message> messages = new LinkedList<>();
+
+        messageCollector
+            .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
+            .drainTo(messages);
+
+        assertTrue(schedulingManager.getActiveUserTaskKeys().isEmpty());
+        assertTrue(schedulingManager.getActiveSystemTaskKeys().isEmpty());
+        assertEquals(1, messages.size());
+        assertTrue(messages.stream().allMatch(m ->
+            JsonPath.read(m.getPayload().toString(), "$.id").toString()
+                .equals(task.getId().toString())));
+    }
+
+    @Test
+    public void testOneTimeMessageOldDateCorrectTtl() {
+        TaskDTO task = createTaskByDate(Instant.now().minusMillis(1000), 3);
+
+        schedulingManager.createOrUpdateActiveUserTask(task);
+
+        waitFor(1000);
+
+        List<Message> messages = new LinkedList<>();
+
+        messageCollector
+            .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
+            .drainTo(messages);
+
+        assertEquals(1, messages.size());
+        assertTrue(schedulingManager.getActiveUserTaskKeys().isEmpty());
+        assertTrue(schedulingManager.getActiveSystemTaskKeys().isEmpty());
+        assertTrue(messages.stream().allMatch(m ->
+            JsonPath.read(m.getPayload().toString(), "$.id").toString()
+                .equals(task.getId().toString())));
+    }
+
+    @Test
+    public void testOneTimeMessageOldDateExpiredTtl() {
+        TaskDTO task = createTaskByDate(Instant.now().minusMillis(3000), 2);
+
+        schedulingManager.createOrUpdateActiveUserTask(task);
+
+        waitFor(1000);
+
+        List<Message> messages = new LinkedList<>();
+
+        messageCollector
+            .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
+            .drainTo(messages);
+
+        assertEquals(0, messages.size());
+        assertTrue(schedulingManager.getActiveUserTaskKeys().isEmpty());
+        assertTrue(schedulingManager.getActiveSystemTaskKeys().isEmpty());
+        assertTrue(messages.stream().allMatch(m ->
+            JsonPath.read(m.getPayload().toString(), "$.id").toString()
+                .equals(task.getId().toString())));
+    }
+
 }

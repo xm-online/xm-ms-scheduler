@@ -49,6 +49,8 @@ public class TaskDTO implements Serializable {
 
     private String data;
 
+    private Integer ttl;
+
     public Long getId() {
         return id;
     }
@@ -177,6 +179,14 @@ public class TaskDTO implements Serializable {
         this.data = data;
     }
 
+    public Integer getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(Integer ttl) {
+        this.ttl = ttl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -214,6 +224,7 @@ public class TaskDTO implements Serializable {
             + ", cronExpression='" + getCronExpression() + "'"
             + ", channelType='" + getChannelType() + "'"
             + ", description='" + getDescription() + "'"
+            + ", ttl='" + getTtl() + "'"
             + ", data.size='" + StringUtils.length(getData()) + "'"
             + "}";
     }

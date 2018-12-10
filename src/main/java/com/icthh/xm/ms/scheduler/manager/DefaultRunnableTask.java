@@ -27,20 +27,23 @@ public class DefaultRunnableTask implements RunnableTask {
         MdcUtils.putRid(MdcUtils.generateRid() + "::" + task.getTenant());
 
         try {
-            log.info("execute scheduled task: {}", task);
 
-            manager.handleTask(task);
-
-            if (afterRun != null) {
-                afterRun.accept(task);
-            }
-
-            if (isExpired()) {
-                // time to delete
-                log.info("remove expired scheduled task {} due to end date: {}", task.getId(), task.getEndDate());
+            if (isExpiredBeforeExecution()) {
                 manager.deleteExpiredTask(task);
-                if (afterExpiry != null) {
-                    afterExpiry.accept(task);
+            } else {
+                log.info("execute scheduled task: {}", task);
+                manager.handleTask(task);
+
+                if (afterRun != null) {
+                    afterRun.accept(task);
+                }
+
+                if (isExpiredAfterExecution()) {
+                    // time to delete
+                    manager.deleteExpiredTask(task);
+                    if (afterExpiry != null) {
+                        afterExpiry.accept(task);
+                    }
                 }
             }
         } finally {
@@ -49,13 +52,58 @@ public class DefaultRunnableTask implements RunnableTask {
 
     }
 
-    private boolean isExpired() {
+    /**
+     * Checks if task is expired according to its type.
+     *
+     * @return true if expired
+     */
+    private boolean isExpiredBeforeExecution() {
         switch (task.getScheduleType()) {
-            case CRON:
-                return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now());
+            case ONE_TIME:
+                if (task.getEndDate() != null
+                    && task.getEndDate().isBefore(Instant.now())) {
+                    log.info("remove expired scheduled task {} due to expired ttl: {}",
+                        task.getId(), task.getTtl());
+                    return true;
+                } else {
+                    return false;
+                }
             default:
-                return task.getEndDate() != null && task.getEndDate().isBefore(Instant.now()
-                    .plusMillis(task.getDelay()));
+                return false;
+        }
+    }
+
+    /**
+     * Checks if the task is expired according to its type.
+     *
+     * @return true if expired
+     */
+    private boolean isExpiredAfterExecution() {
+        switch (task.getScheduleType()) {
+            //if one time task was executed it is already expired
+            case ONE_TIME:
+                if (task.getStartDate() != null
+                    && task.getStartDate().isBefore(Instant.now())) {
+                    log.info("remove scheduled task {} due to finished execution", task.getId());
+                    return true;
+                } else {
+                    return false;
+                }
+            case CRON:
+                if (task.getEndDate() != null && task.getEndDate().isBefore(Instant.now())) {
+                    log.info("remove expired scheduled task {} due to end date: {}", task.getId(), task.getEndDate());
+                    return true;
+                } else {
+                    return false;
+                }
+            default:
+                if (task.getEndDate() != null && task.getEndDate().isBefore(Instant.now()
+                    .plusMillis(task.getDelay()))) {
+                    log.info("remove expired scheduled task {} due to end date: {}", task.getId(), task.getEndDate());
+                    return true;
+                } else {
+                    return false;
+                }
         }
     }
 
