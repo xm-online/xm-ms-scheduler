@@ -49,7 +49,7 @@ public class TaskTestUtil {
         return createTask(ScheduleType.CRON, null, cron, startDate, endDate, null);
     }
 
-    public static TaskDTO createTaskByDate(Instant startDate, Integer ttl) {
+    public static TaskDTO createTaskOneTime(Instant startDate, Integer ttl) {
         return createTask(ScheduleType.ONE_TIME, null, null, startDate, null, ttl);
     }
 

@@ -1,7 +1,7 @@
 package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByDate;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
@@ -124,7 +124,7 @@ public class SchedulingManagerStreamUnitTest {
 
     @Test
     public void testOneTimeMessage() {
-        TaskDTO task = createTaskByDate(Instant.now().plusMillis(1000), 3);
+        TaskDTO task = createTaskOneTime(Instant.now().plusMillis(1000), 3);
 
         schedulingManager.createOrUpdateActiveUserTask(task);
 
@@ -146,7 +146,7 @@ public class SchedulingManagerStreamUnitTest {
 
     @Test
     public void testOneTimeMessageOldDateCorrectTtl() {
-        TaskDTO task = createTaskByDate(Instant.now().minusMillis(1000), 5);
+        TaskDTO task = createTaskOneTime(Instant.now().minusMillis(1000), 5);
 
         schedulingManager.createOrUpdateActiveUserTask(task);
 
@@ -168,7 +168,7 @@ public class SchedulingManagerStreamUnitTest {
 
     @Test
     public void testOneTimeMessageOldDateExpiredTtl() {
-        TaskDTO task = createTaskByDate(Instant.now().minusMillis(3000), 2);
+        TaskDTO task = createTaskOneTime(Instant.now().minusMillis(3000), 2);
 
         schedulingManager.createOrUpdateActiveUserTask(task);
 
@@ -190,7 +190,7 @@ public class SchedulingManagerStreamUnitTest {
 
     @Test
     public void testOneTimeMessageNullTtl() {
-        TaskDTO task = createTaskByDate(Instant.now().minusMillis(3000), null);
+        TaskDTO task = createTaskOneTime(Instant.now().minusMillis(3000), null);
 
         schedulingManager.createOrUpdateActiveUserTask(task);
 
