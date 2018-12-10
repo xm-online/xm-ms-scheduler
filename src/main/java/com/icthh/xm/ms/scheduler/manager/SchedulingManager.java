@@ -176,6 +176,15 @@ public class SchedulingManager {
         return Collections.unmodifiableSet(systemSchedulers.getOrDefault(getTenant(), Collections.emptyMap()).keySet());
     }
 
+    /**
+     * Gets the user schedulers map.
+     *
+     * @return the user schedulers map
+     */
+    public Set<String> getActiveUserTaskKeys() {
+        return Collections.unmodifiableSet(userSchedulers.getOrDefault(getTenant(), Collections.emptyMap()).keySet());
+    }
+
     void deleteExpiredTask(TaskDTO task) {
         deleteTaskFromTenant(task.getTenant(), getTaskKey(task));
     }
@@ -241,12 +250,24 @@ public class SchedulingManager {
             case CRON:
                 future = taskScheduler.schedule(expirable, new CronTrigger(task.getCronExpression()));
                 break;
+            case ONE_TIME:
+                future = scheduleOneTimeTask(expirable, task);
+                break;
             default:
                 log.warn("Task was not scheduled for unknown type: {}", task.getScheduleType());
                 future = null;
         }
 
         return future;
+    }
+
+    private ScheduledFuture scheduleOneTimeTask(RunnableTask expirable, TaskDTO task) {
+        if (task.getTtl() != null) {
+            task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
+        } else {
+            task.setEndDate(task.getStartDate());
+        }
+        return taskScheduler.schedule(expirable, task.getStartDate());
     }
 
     private static String getTaskKey(TaskDTO task) {

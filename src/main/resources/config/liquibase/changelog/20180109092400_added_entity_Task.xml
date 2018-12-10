@@ -77,7 +77,7 @@
         </createTable>
         <dropDefaultValue tableName="task" columnName="start_date" columnDataType="datetime"/>
         <dropDefaultValue tableName="task" columnName="end_date" columnDataType="datetime"/>
-        
+
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->
 </databaseChangeLog>

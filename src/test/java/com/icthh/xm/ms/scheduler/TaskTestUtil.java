@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *
+ * Utility class necessary for testing.
  */
 public class TaskTestUtil {
 
@@ -20,7 +20,12 @@ public class TaskTestUtil {
 
     }
 
-    public static TaskDTO createTask(ScheduleType type, Long delay, String cron, Instant startDate, Instant endDate) {
+    public static TaskDTO createTask(ScheduleType type,
+                                     Long delay,
+                                     String cron,
+                                     Instant startDate,
+                                     Instant endDate,
+                                     Integer ttl) {
         TaskDTO dto = new TaskDTO();
         dto.setId(aLong.incrementAndGet());
         dto.setScheduleType(type);
@@ -28,19 +33,24 @@ public class TaskTestUtil {
         dto.setCronExpression(cron);
         dto.setStartDate(startDate);
         dto.setEndDate(endDate);
+        dto.setTtl(ttl);
         return dto;
     }
 
     public static TaskDTO createTaskFixedDelay(Long delay, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.FIXED_DELAY, delay, null, startDate, endDate);
+        return createTask(ScheduleType.FIXED_DELAY, delay, null, startDate, endDate, null);
     }
 
     public static TaskDTO createTaskFixedRate(Long delay, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.FIXED_RATE, delay, null, startDate, endDate);
+        return createTask(ScheduleType.FIXED_RATE, delay, null, startDate, endDate, null);
     }
 
     public static TaskDTO createTaskByCron(String cron, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.CRON, null, cron, startDate, endDate);
+        return createTask(ScheduleType.CRON, null, cron, startDate, endDate, null);
+    }
+
+    public static TaskDTO createTaskOneTime(Instant startDate, Integer ttl) {
+        return createTask(ScheduleType.ONE_TIME, null, null, startDate, null, ttl);
     }
 
     public static void waitFor(long wait) {
