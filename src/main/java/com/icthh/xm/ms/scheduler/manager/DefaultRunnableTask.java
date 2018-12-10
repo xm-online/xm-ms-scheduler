@@ -30,6 +30,10 @@ public class DefaultRunnableTask implements RunnableTask {
 
             if (isExpiredBeforeExecution()) {
                 manager.deleteExpiredTask(task);
+                if (afterExpiry != null) {
+                    afterExpiry.accept(task);
+                }
+
             } else {
                 log.info("execute scheduled task: {}", task);
                 manager.handleTask(task);

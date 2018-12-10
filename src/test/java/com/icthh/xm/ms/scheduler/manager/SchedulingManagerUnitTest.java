@@ -2,6 +2,7 @@ package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.XM_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByDate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
@@ -207,6 +208,48 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         waitFor(2000);
         expectRunAndExpiryCounts(task1, 4 + 8, 1);
+
+    }
+
+    @Test
+    public void testInitOneTimeTasks() {
+
+        TaskDTO task = createTaskByDate(Instant.now().plusMillis(1000), 3);
+
+        initScheduling(task);
+
+        // due to fixed rate we need to delete task little bit earlier
+        waitFor(2000);
+
+        expectRunAndExpiryCounts(task, 1, 1);
+
+    }
+
+    @Test
+    public void testInitOneTimeExpiredEndDateTasks() {
+
+        TaskDTO task = createTaskByDate(Instant.now().minusMillis(1000), 3);
+
+        initScheduling(task);
+
+        // due to fixed rate we need to delete task little bit earlier
+        waitFor(1000);
+
+        expectRunAndExpiryCounts(task, 1, 1);
+
+    }
+
+    @Test
+    public void testInitOneTimeExpiredasks() {
+
+        TaskDTO task = createTaskByDate(Instant.now().minusMillis(5000), 3);
+
+        initScheduling(task);
+
+        // due to fixed rate we need to delete task little bit earlier
+        waitFor(1000);
+
+        expectRunAndExpiryCounts(task, 0, 1);
 
     }
 
