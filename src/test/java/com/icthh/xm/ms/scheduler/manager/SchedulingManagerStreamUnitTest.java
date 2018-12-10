@@ -112,6 +112,7 @@ public class SchedulingManagerStreamUnitTest {
         messageCollector
             .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
             .drainTo(messages);
+
         assertTrue(schedulingManager.getActiveUserTaskKeys().isEmpty());
         assertTrue(schedulingManager.getActiveSystemTaskKeys().isEmpty());
         assertEquals(3, messages.size());
@@ -145,11 +146,11 @@ public class SchedulingManagerStreamUnitTest {
 
     @Test
     public void testOneTimeMessageOldDateCorrectTtl() {
-        TaskDTO task = createTaskByDate(Instant.now().minusMillis(1000), 3);
+        TaskDTO task = createTaskByDate(Instant.now().minusMillis(1000), 5);
 
         schedulingManager.createOrUpdateActiveUserTask(task);
 
-        waitFor(1000);
+        waitFor(2000);
 
         List<Message> messages = new LinkedList<>();
 
@@ -171,7 +172,29 @@ public class SchedulingManagerStreamUnitTest {
 
         schedulingManager.createOrUpdateActiveUserTask(task);
 
-        waitFor(1000);
+        waitFor(2000);
+
+        List<Message> messages = new LinkedList<>();
+
+        messageCollector
+            .forChannel(channelResolver.resolveDestination(nameResolver.resolve(task)))
+            .drainTo(messages);
+
+        assertEquals(0, messages.size());
+        assertTrue(schedulingManager.getActiveUserTaskKeys().isEmpty());
+        assertTrue(schedulingManager.getActiveSystemTaskKeys().isEmpty());
+        assertTrue(messages.stream().allMatch(m ->
+            JsonPath.read(m.getPayload().toString(), "$.id").toString()
+                .equals(task.getId().toString())));
+    }
+
+    @Test
+    public void testOneTimeMessageNullTtl() {
+        TaskDTO task = createTaskByDate(Instant.now().minusMillis(3000), null);
+
+        schedulingManager.createOrUpdateActiveUserTask(task);
+
+        waitFor(2000);
 
         List<Message> messages = new LinkedList<>();
 

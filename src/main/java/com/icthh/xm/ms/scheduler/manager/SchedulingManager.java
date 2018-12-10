@@ -22,6 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -250,7 +251,12 @@ public class SchedulingManager {
                 future = taskScheduler.schedule(expirable, new CronTrigger(task.getCronExpression()));
                 break;
             case ONE_TIME:
-                task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
+                if (task.getTtl() != null) {
+                    task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
+                } else {
+                    task.setEndDate(task.getStartDate());
+                }
+                System.out.println(task);
                 future = taskScheduler.schedule(expirable, task.getStartDate());
                 break;
             default:
