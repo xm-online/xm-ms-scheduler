@@ -65,6 +65,12 @@ public class Task implements Serializable {
     @Column(name = "delay")
     private Long delay;
 
+    @Column(name = "ttl")
+    private Integer ttl;
+
+    @Column(name = "target_ms")
+    private String targetMs;
+
     @Column(name = "cron_expression")
     private String cronExpression;
 
@@ -204,6 +210,14 @@ public class Task implements Serializable {
         this.delay = delay;
     }
 
+    public String getTargetMs() {
+        return targetMs;
+    }
+
+    public void setTargetMs(String targetMs) {
+        this.targetMs = targetMs;
+    }
+
     public String getCronExpression() {
         return cronExpression;
     }
@@ -257,6 +271,14 @@ public class Task implements Serializable {
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    public Integer getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(Integer ttl) {
+        this.ttl = ttl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -290,10 +312,12 @@ public class Task implements Serializable {
             + ", endDate='" + getEndDate() + "'"
             + ", scheduleType='" + getScheduleType() + "'"
             + ", delay=" + getDelay()
+            + ", targetMs=" + getTargetMs()
             + ", cronExpression='" + getCronExpression() + "'"
             + ", channelType='" + getChannelType() + "'"
             + ", description='" + getDescription() + "'"
             + ", data='" + getData() + "'"
+            + ", ttl='" + getTtl() + "'"
             + "}";
     }
 }
