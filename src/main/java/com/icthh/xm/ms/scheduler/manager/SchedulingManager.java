@@ -22,7 +22,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -179,6 +178,7 @@ public class SchedulingManager {
 
     /**
      * Gets the user schedulers map.
+     *
      * @return the user schedulers map
      */
     public Set<String> getActiveUserTaskKeys() {
@@ -251,13 +251,7 @@ public class SchedulingManager {
                 future = taskScheduler.schedule(expirable, new CronTrigger(task.getCronExpression()));
                 break;
             case ONE_TIME:
-                if (task.getTtl() != null) {
-                    task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
-                } else {
-                    task.setEndDate(task.getStartDate());
-                }
-                System.out.println(task);
-                future = taskScheduler.schedule(expirable, task.getStartDate());
+                future = scheduleOneTimeTask(expirable, task);
                 break;
             default:
                 log.warn("Task was not scheduled for unknown type: {}", task.getScheduleType());
@@ -265,6 +259,15 @@ public class SchedulingManager {
         }
 
         return future;
+    }
+
+    private ScheduledFuture scheduleOneTimeTask(RunnableTask expirable, TaskDTO task) {
+        if (task.getTtl() != null) {
+            task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
+        } else {
+            task.setEndDate(task.getStartDate());
+        }
+        return taskScheduler.schedule(expirable, task.getStartDate());
     }
 
     private static String getTaskKey(TaskDTO task) {

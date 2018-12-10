@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *
- */
+ * Default implementation of scheduler task
+ **/
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultRunnableTask implements RunnableTask {
@@ -29,18 +29,19 @@ public class DefaultRunnableTask implements RunnableTask {
         try {
             if (isExpiredBeforeExecution()) {
                 deleteExpired();
-            } else {
-                log.info("execute scheduled task: {}", task);
-                manager.handleTask(task);
+                return;
+            }
 
-                if (afterRun != null) {
-                    afterRun.accept(task);
-                }
+            log.info("execute scheduled task: {}", task);
+            manager.handleTask(task);
 
-                if (isExpiredAfterExecution()) {
-                    // time to delete
-                    deleteExpired();
-                }
+            if (afterRun != null) {
+                afterRun.accept(task);
+            }
+
+            if (isExpiredAfterExecution()) {
+                // time to delete
+                deleteExpired();
             }
         } finally {
             MdcUtils.clear();
