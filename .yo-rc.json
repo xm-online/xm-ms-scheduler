@@ -11,7 +11,6 @@
     "serverPort": "8081",
     "authenticationType": "uaa",
     "uaaBaseName": "uaa",
-    "cacheProvider": "hazelcast",
     "enableHibernateCache": true,
     "clusteredHttpSession": false,
     "websocket": false,
