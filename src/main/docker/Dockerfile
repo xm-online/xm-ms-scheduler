@@ -2,6 +2,8 @@ FROM jbsukraine/oracle-jre:8
 
 EXPOSE 8086
 
+ENTRYPOINT /entrypoint.sh
+
 ENV XMX=512m \
     SPRING_OUTPUT_ANSI_ENABLED=ALWAYS \
     JHIPSTER_SLEEP=0 \
@@ -11,7 +13,7 @@ ADD src/main/docker/entrypoint.sh /
 
 RUN chmod 750 /entrypoint.sh
 
-ENTRYPOINT /entrypoint.sh
+
 
 ADD build/libs/*.war /app.war
 
