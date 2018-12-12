@@ -2,6 +2,9 @@ package com.icthh.xm.ms.scheduler.web.rest;
 
 import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
+import com.icthh.xm.ms.scheduler.SchedulerApp;
+import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.ms.scheduler.config.tenant.WebappTenantOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.TaskService;
@@ -19,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -43,7 +47,12 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
  * @see TaskResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@WithMockUser(authorities = {"SUPER-ADMIN"})
+@SpringBootTest(classes = {
+    SecurityBeanOverrideConfiguration.class,
+    SchedulerApp.class,
+    WebappTenantOverrideConfiguration.class
+})
 public class TaskResourceIntTest extends AbstractSpringContextTest {
 
     private static final String DEFAULT_KEY = "AAAAAAAAAA";
