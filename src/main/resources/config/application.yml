@@ -91,6 +91,8 @@ spring:
             value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
         listener:
             concurrency: 16
+    liquibase:
+        default-schema: XM
 
 security:
     basic:
@@ -98,9 +100,6 @@ security:
     oauth2:
         resource:
             filter-order: 3
-
-liquibase:
-    default-schema: XM
 
 server:
     session:
