@@ -1,5 +1,7 @@
 package com.icthh.xm.ms.scheduler.manager;
 
+import static com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType.ONE_TIME;
+
 import com.icthh.xm.commons.logging.util.MdcUtils;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
@@ -57,6 +59,10 @@ public class DefaultRunnableTask implements RunnableTask {
         if (afterExpiry != null) {
             afterExpiry.accept(task);
         }
+        if (ONE_TIME == task.getScheduleType()) {
+            manager.setCompletion(task.getId());
+        }
+
     }
 
     /**

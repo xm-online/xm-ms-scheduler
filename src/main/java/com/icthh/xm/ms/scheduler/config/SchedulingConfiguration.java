@@ -4,6 +4,7 @@ import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,9 +21,10 @@ public class SchedulingConfiguration {
                                                ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                                SystemTaskService systemTaskService,
                                                ScheduledTaskHandler handler,
-                                               TenantListRepository tenantListRepository) {
+                                               TenantListRepository tenantListRepository,
+                                               TaskRepository taskRepository) {
         return new SchedulingManager(tenantContextHolder, threadPoolTaskScheduler,
-                                     systemTaskService, handler, tenantListRepository);
+                                     systemTaskService, handler, tenantListRepository, taskRepository);
     }
 
     @Bean

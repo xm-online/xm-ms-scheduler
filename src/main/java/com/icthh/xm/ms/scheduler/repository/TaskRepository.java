@@ -16,6 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
 
-    List<Task> findByEndDateGreaterThanEqual(Instant endDate);
+    List<Task> findByEndDateGreaterThanEqualAndStateKeyNot(Instant endDate, String stateKey);
 
 }

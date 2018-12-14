@@ -7,6 +7,8 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -15,7 +17,9 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
+import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
@@ -36,6 +40,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -60,6 +65,9 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     @Autowired
     private TenantListRepository tenantListRepository;
 
+    @Mock
+    private TaskRepository taskRepository;
+
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
 
@@ -73,7 +81,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
                                                   executed -> executedTasks.add(executed.getId()),
                                                   expired -> expiredTasks.add(expired.getId()),
-                                                  tenantListRepository);
+                                                  tenantListRepository, taskRepository);
     }
 
     @Test
@@ -216,6 +224,9 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     public void testInitOneTimeTasks() {
 
         TaskDTO task = createTaskOneTime(Instant.now().plusMillis(1000), 3);
+
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
 
         initScheduling(task);
 
