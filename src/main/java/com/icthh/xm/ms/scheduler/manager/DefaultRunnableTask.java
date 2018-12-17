@@ -59,10 +59,9 @@ public class DefaultRunnableTask implements RunnableTask {
         if (afterExpiry != null) {
             afterExpiry.accept(task);
         }
-        if (ONE_TIME == task.getScheduleType()) {
+        if (ONE_TIME.equals(task.getScheduleType())) {
             manager.setCompletion(task.getId());
         }
-
     }
 
     /**
