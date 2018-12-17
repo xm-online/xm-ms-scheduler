@@ -48,8 +48,8 @@ import java.util.List;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-    SecurityBeanOverrideConfiguration.class,
     SchedulerApp.class,
+    SecurityBeanOverrideConfiguration.class,
     WebappTenantOverrideConfiguration.class
 })
 public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
