@@ -15,6 +15,9 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
+import com.icthh.xm.ms.scheduler.SchedulerApp;
+import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.ms.scheduler.config.tenant.WebappTenantOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -28,7 +31,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.test.binder.MessageCollectorAutoConfiguration;
+import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
@@ -41,7 +47,11 @@ import java.util.List;
  *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = {
+    SecurityBeanOverrideConfiguration.class,
+    SchedulerApp.class,
+    WebappTenantOverrideConfiguration.class
+})
 public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
