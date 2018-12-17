@@ -15,6 +15,9 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
+import com.icthh.xm.ms.scheduler.SchedulerApp;
+import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.ms.scheduler.config.tenant.WebappTenantOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -41,7 +44,11 @@ import java.util.List;
  *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = {
+    SchedulerApp.class,
+    SecurityBeanOverrideConfiguration.class,
+    WebappTenantOverrideConfiguration.class
+})
 public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();

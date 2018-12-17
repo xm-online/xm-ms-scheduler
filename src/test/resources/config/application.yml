@@ -62,8 +62,8 @@ spring:
     thymeleaf:
         mode: XHTML
 
-liquibase:
-    contexts: test
+    liquibase:
+        contexts: test
 
 server:
     port: 10344
