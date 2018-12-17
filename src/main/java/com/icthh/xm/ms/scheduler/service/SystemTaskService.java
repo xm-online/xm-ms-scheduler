@@ -43,8 +43,8 @@ public class SystemTaskService {
     public List<TaskDTO> findUserNotFinishedTasks() {
         log.debug("Request to get all Tasks without paging");
 
-        return taskRepository.findByEndDateGreaterThanEqualAndStateKeyNot(Instant.now(), StateKey.DONE.name())
-                             .stream().map(taskMapper::toDto).collect(toList());
+        return taskRepository.findByEndDateGreaterThanEqualAndStateKeyNotOrStateKeyNull(Instant.now(),
+            StateKey.DONE.name()).stream().map(taskMapper::toDto).collect(toList());
     }
 
     /**

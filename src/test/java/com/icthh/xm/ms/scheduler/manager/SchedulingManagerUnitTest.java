@@ -7,6 +7,7 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +22,7 @@ import com.icthh.xm.ms.scheduler.SchedulerApp;
 import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.config.tenant.WebappTenantOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
@@ -242,6 +244,9 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         expectRunAndExpiryCounts(task, 1, 1);
 
+        Optional<Task> stored = taskRepository.findById(task.getId());
+        assertTrue(stored.isPresent());
+        assertEquals(stored.get().getStateKey(), StateKey.DONE.name());
     }
 
     @Ignore

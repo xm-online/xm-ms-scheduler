@@ -219,14 +219,22 @@ public class SchedulingManager {
     }
 
     /**
-     * Sets the task to DONE state.
-     * @param id the id of the entity
+     * Set state for task.
+     * Method init tenant context with value from input task because method called from another thread
+     *
+     * @param state new state of the task
+     * @param task  the task changing
      */
-    public void setCompletion(Long id) {
-        log.info("Marking task as finished : {}", id);
-        Task task = taskRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Entity is not found"));
-        task.setStateKey(StateKey.DONE.name());
-        taskRepository.save(task);
+    public void setState(StateKey state, TaskDTO task) {
+        Long taskId = task.getId();
+        log.info("Marking task as finished id: {}, tenant: {}", task.getId(), task.getTenant());
+        TenantContextUtils.setTenant(tenantContextHolder, task.getTenant());
+
+        Task taskFromDb = taskRepository.findById(taskId).orElseThrow(()
+            -> new IllegalArgumentException("Entity is not found"));
+
+        taskFromDb.setStateKey(state.toString());
+        taskRepository.save(taskFromDb);
     }
 
     private ScheduledFuture rescheduleTask(TaskDTO task, ScheduledFuture oldFuture) {
