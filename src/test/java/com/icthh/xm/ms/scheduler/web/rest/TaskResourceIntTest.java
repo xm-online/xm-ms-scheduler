@@ -49,8 +49,8 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 @RunWith(SpringRunner.class)
 @WithMockUser(authorities = {"SUPER-ADMIN"})
 @SpringBootTest(classes = {
-    SecurityBeanOverrideConfiguration.class,
     SchedulerApp.class,
+    SecurityBeanOverrideConfiguration.class,
     WebappTenantOverrideConfiguration.class
 })
 public class TaskResourceIntTest extends AbstractSpringContextTest {
