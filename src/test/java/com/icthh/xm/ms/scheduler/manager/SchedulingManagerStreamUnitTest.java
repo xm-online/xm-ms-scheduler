@@ -6,6 +6,7 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
@@ -14,7 +15,9 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantKey;
 import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
 import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
+import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.jayway.jsonpath.JsonPath;
@@ -80,6 +83,9 @@ public class SchedulingManagerStreamUnitTest {
     private TenantListRepository tenantListRepository;
 
     @Mock
+    private TaskRepository taskRepository;
+
+    @Mock
     private SystemTaskService systemTaskService;
 
     @Before
@@ -92,7 +98,7 @@ public class SchedulingManagerStreamUnitTest {
             .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
 
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler,
-            systemTaskService, handler, tenantListRepository);
+            systemTaskService, handler, tenantListRepository, taskRepository);
 
         when(tenantContext.getTenantKey()).thenReturn(Optional.of(TenantKey.valueOf(TEST_TENANT)));
         when(tenantContextHolder.getContext()).thenReturn(tenantContext);
@@ -127,6 +133,8 @@ public class SchedulingManagerStreamUnitTest {
     public void testOneTimeMessage() {
         TaskDTO task = createTaskOneTime(Instant.now().plusMillis(1000), 3);
 
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
         schedulingManager.createOrUpdateActiveUserTask(task);
 
         waitFor(2000);

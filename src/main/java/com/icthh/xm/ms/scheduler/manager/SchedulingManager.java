@@ -4,7 +4,10 @@ import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.PrivilegedTenantContext;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
+import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
+import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
@@ -26,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 
-
 /**
  * Scheduling manager component is designed to handle all active scheduled tasks.
  */
@@ -38,6 +40,7 @@ public class SchedulingManager {
     private final SystemTaskService taskService;
     private final ScheduledTaskHandler handler;
     private final TenantListRepository tenantListRepository;
+    private final TaskRepository taskRepository;
 
     private Consumer<TaskDTO> afterRun;
     private Consumer<TaskDTO> afterExpiration;
@@ -49,12 +52,14 @@ public class SchedulingManager {
                              final ThreadPoolTaskScheduler taskScheduler,
                              final SystemTaskService taskService,
                              final ScheduledTaskHandler handler,
-                             final TenantListRepository tenantListRepository) {
+                             final TenantListRepository tenantListRepository,
+                             final TaskRepository taskRepository) {
         this.tenantContextHolder = tenantContextHolder;
         this.taskScheduler = taskScheduler;
         this.taskService = taskService;
         this.handler = handler;
         this.tenantListRepository = tenantListRepository;
+        this.taskRepository = taskRepository;
     }
 
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
@@ -63,8 +68,9 @@ public class SchedulingManager {
                              final ScheduledTaskHandler handler,
                              final Consumer<TaskDTO> afterRun,
                              final Consumer<TaskDTO> afterExpiration,
-                             final TenantListRepository tenantListRepository) {
-        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository);
+                             final TenantListRepository tenantListRepository,
+                             final TaskRepository taskRepository) {
+        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository, taskRepository);
         this.afterRun = afterRun;
         this.afterExpiration = afterExpiration;
     }
@@ -212,6 +218,25 @@ public class SchedulingManager {
         return cancelled;
     }
 
+    /**
+     * Set state for task.
+     * Method init tenant context with value from input task because method called from another thread
+     *
+     * @param state new state of the task
+     * @param task  the task changing
+     */
+    public void setState(StateKey state, TaskDTO task) {
+        Long taskId = task.getId();
+        log.info("Marking task as finished id: {}, tenant: {}", task.getId(), task.getTenant());
+        TenantContextUtils.setTenant(tenantContextHolder, task.getTenant());
+
+        Task taskFromDb = taskRepository.findById(taskId).orElseThrow(()
+            -> new IllegalArgumentException("Entity is not found"));
+
+        taskFromDb.setStateKey(state.toString());
+        taskRepository.save(taskFromDb);
+    }
+
     private ScheduledFuture rescheduleTask(TaskDTO task, ScheduledFuture oldFuture) {
         if (oldFuture != null) {
             boolean cancelled = cancelTask(oldFuture);
@@ -267,6 +292,10 @@ public class SchedulingManager {
         } else {
             task.setEndDate(task.getStartDate());
         }
+        Task entity = taskRepository.findById(task.getId()).orElseThrow(() ->
+            new IllegalArgumentException("Entity is not found"));
+        entity.setEndDate(task.getEndDate());
+        taskRepository.save(entity);
         return taskScheduler.schedule(expirable, task.getStartDate());
     }
 
