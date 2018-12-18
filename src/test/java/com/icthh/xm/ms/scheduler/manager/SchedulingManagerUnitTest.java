@@ -28,7 +28,6 @@ import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -249,11 +248,13 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         assertEquals(stored.get().getStateKey(), StateKey.DONE.name());
     }
 
-    @Ignore
     @Test
     public void testInitOneTimeExpiredEndDateTasks() {
 
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(1000), 3);
+
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
 
         initScheduling(task);
 
@@ -264,11 +265,13 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     }
 
-    @Ignore
     @Test
-    public void testInitOneTimeExpiredasks() {
+    public void testInitOneTimeExpiredTasks() {
 
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(5000), 3);
+
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
 
         initScheduling(task);
 

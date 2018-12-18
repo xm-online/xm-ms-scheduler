@@ -7,9 +7,11 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.time.Instant;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,9 +25,14 @@ public class DefaultRunnableTask implements RunnableTask {
     final SchedulingManager manager;
     final Consumer<TaskDTO> afterRun;
     final Consumer<TaskDTO> afterExpiry;
+    final CountDownLatch latch;
 
     @Override
+    @SneakyThrows
     public void run() {
+
+        //wait until task is created in collection
+        latch.await();
 
         MdcUtils.putRid(MdcUtils.generateRid() + "::" + task.getTenant());
 

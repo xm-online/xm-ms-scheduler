@@ -22,7 +22,6 @@ import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -153,11 +152,12 @@ public class SchedulingManagerStreamUnitTest {
                 .equals(task.getId().toString())));
     }
 
-    @Ignore
     @Test
     public void testOneTimeMessageOldDateCorrectTtl() {
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(1000), 5);
 
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
         schedulingManager.createOrUpdateActiveUserTask(task);
 
         waitFor(2000);
@@ -176,11 +176,12 @@ public class SchedulingManagerStreamUnitTest {
                 .equals(task.getId().toString())));
     }
 
-    @Ignore
     @Test
     public void testOneTimeMessageOldDateExpiredTtl() {
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(3000), 2);
 
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
         schedulingManager.createOrUpdateActiveUserTask(task);
 
         waitFor(2000);
@@ -199,11 +200,12 @@ public class SchedulingManagerStreamUnitTest {
                 .equals(task.getId().toString())));
     }
 
-    @Ignore
     @Test
     public void testOneTimeMessageNullTtl() {
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(3000), null);
 
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenReturn(new Task());
         schedulingManager.createOrUpdateActiveUserTask(task);
 
         waitFor(2000);
