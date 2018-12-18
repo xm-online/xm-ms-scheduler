@@ -44,7 +44,7 @@ public class TaskService {
     public TaskDTO save(TaskDTO taskDTO) {
         log.debug("Request to save Task : {}", taskDTO);
         Task task = taskMapper.toEntity(taskDTO);
-        task = taskRepository.save(task);
+        task = taskRepository.saveAndFlush(task);
         TaskDTO dto = taskMapper.toDto(task);
         schedulingManager.createOrUpdateActiveUserTask(dto);
         return dto;
