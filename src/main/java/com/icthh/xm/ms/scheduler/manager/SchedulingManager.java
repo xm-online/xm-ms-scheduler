@@ -11,6 +11,7 @@ import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -131,12 +133,15 @@ public class SchedulingManager {
     private Integer initInsideTenant(final String tenantName, List<TaskDTO> tasks,
                                      Map<String, Map<String, ScheduledFuture>> schedulers) {
 
+        //Synchronization is necessary because task can start earlier than its future is created in collection
+        CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
         Map<String, ScheduledFuture> scheduledTasks = tasks
             .stream()
             .peek(task -> task.setTenant(tenantName))
-            .collect(Collectors.toMap(SchedulingManager::getTaskKey, this::schedule));
+            .collect(Collectors.toMap(SchedulingManager::getTaskKey, taskDTO -> this.schedule(taskDTO, latch)));
 
         schedulers.put(tenantName, scheduledTasks);
+        latch.countDown();
 
         return tasks.size();
     }
@@ -165,13 +170,16 @@ public class SchedulingManager {
 
     private void createOrUpdateActiveTask(TaskDTO task, Map<String, Map<String, ScheduledFuture>> schedulers) {
 
+        //Synchronization is necessary because task can start earlier than its future is created in collection
+        CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
         String currentTenant = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
         schedulers.computeIfAbsent(currentTenant, tenant -> new HashMap<>());
 
         task.setTenant(currentTenant);
 
         schedulers.get(currentTenant)
-            .compute(getTaskKey(task), (taskKey, oldFuture) -> rescheduleTask(task, oldFuture));
+            .compute(getTaskKey(task), (taskKey, oldFuture) -> rescheduleTask(task, oldFuture, latch));
+        latch.countDown();
     }
 
     public void deleteActiveTask(String taskKey) {
@@ -237,14 +245,14 @@ public class SchedulingManager {
         taskRepository.save(taskFromDb);
     }
 
-    private ScheduledFuture rescheduleTask(TaskDTO task, ScheduledFuture oldFuture) {
+    private ScheduledFuture rescheduleTask(TaskDTO task, ScheduledFuture oldFuture, CountDownLatch latch) {
         if (oldFuture != null) {
             boolean cancelled = cancelTask(oldFuture);
             log.info("cancel active task: {} for update. cancelled result: {}", getTaskKey(task), cancelled);
         } else {
             log.info("create new task during update: {}", getTaskKey(task));
         }
-        return schedule(task);
+        return schedule(task, latch);
     }
 
     private boolean cancelTask(ScheduledFuture future) {
@@ -255,8 +263,8 @@ public class SchedulingManager {
         return cancelled;
     }
 
-    private ScheduledFuture schedule(TaskDTO task) {
-        return schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration));
+    private ScheduledFuture schedule(TaskDTO task, CountDownLatch latch) {
+        return schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration, latch));
     }
 
     private ScheduledFuture schedule(RunnableTask expirable) {
