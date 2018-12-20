@@ -11,9 +11,10 @@ ENV XMX=512m \
 
 ADD src/main/docker/entrypoint.sh /
 
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends --no-install-suggests zip unzip \
+        && rm -rf /var/lib/apt/lists/*
+
 RUN chmod 750 /entrypoint.sh
 
-
-
 ADD build/libs/*.war /app.war
-

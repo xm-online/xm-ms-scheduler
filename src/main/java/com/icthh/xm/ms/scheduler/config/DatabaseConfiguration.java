@@ -6,14 +6,12 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.migration.db.XmMultiTenantSpringLiquibase;
 import com.icthh.xm.commons.migration.db.XmSpringLiquibase;
-import com.icthh.xm.ms.scheduler.util.DatabaseUtil;
+import com.icthh.xm.commons.migration.db.tenant.SchemaResolver;
 import io.github.jhipster.config.JHipsterConstants;
 import io.github.jhipster.config.h2.H2ConfigurationHelper;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
@@ -49,6 +47,7 @@ public class DatabaseConfiguration {
 
     private final Environment env;
     private final TenantListRepository tenantListRepository;
+    private final SchemaResolver schemaResolver;
 
     /**
      * Open the TCP port for the H2 database, so it is available remotely.
@@ -72,7 +71,7 @@ public class DatabaseConfiguration {
      */
     @Bean
     public SpringLiquibase liquibase(DataSource dataSource, LiquibaseProperties liquibaseProperties) {
-        createSchemas(dataSource);
+        schemaResolver.createSchemas(dataSource);
         SpringLiquibase liquibase = new XmSpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog(CHANGE_LOG_PATH);
@@ -99,7 +98,7 @@ public class DatabaseConfiguration {
         liquibase.setContexts(liquibaseProperties.getContexts());
         liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());
-        liquibase.setSchemas(getSchemas());
+        liquibase.setSchemas(schemaResolver.getSchemas());
         if (env.acceptsProfiles(JHipsterConstants.SPRING_PROFILE_NO_LIQUIBASE)) {
             liquibase.setShouldRun(false);
         } else {
@@ -107,20 +106,6 @@ public class DatabaseConfiguration {
             log.debug("Configuring Liquibase");
         }
         return liquibase;
-    }
-
-    private void createSchemas(DataSource dataSource) {
-        for (String schema : getSchemas()) {
-            try {
-                DatabaseUtil.createSchema(dataSource, schema);
-            } catch (Exception e) {
-                log.error("Failed to create schema '{}', error: {}", schema, e.getMessage(), e);
-            }
-        }
-    }
-
-    private List<String> getSchemas() {
-        return new ArrayList<>(tenantListRepository.getTenants());
     }
 
     @Bean

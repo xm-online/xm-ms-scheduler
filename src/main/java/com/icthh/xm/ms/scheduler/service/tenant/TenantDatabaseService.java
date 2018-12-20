@@ -4,8 +4,7 @@ import static com.icthh.xm.ms.scheduler.config.Constants.CHANGE_LOG_PATH;
 import static org.apache.commons.lang3.time.StopWatch.createStarted;
 
 import com.icthh.xm.commons.logging.aop.IgnoreLogginAspect;
-
-import com.icthh.xm.ms.scheduler.util.DatabaseUtil;
+import com.icthh.xm.commons.migration.db.util.DatabaseUtil;
 
 import javax.sql.DataSource;
 

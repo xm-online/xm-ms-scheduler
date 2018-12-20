@@ -27,6 +27,7 @@ public class ApplicationProperties {
     private boolean kafkaEnabled;
     private String kafkaSystemTopic;
     private String kafkaSystemQueue;
+    private String dbSchemaSuffix;
 
     @Getter
     @Setter
