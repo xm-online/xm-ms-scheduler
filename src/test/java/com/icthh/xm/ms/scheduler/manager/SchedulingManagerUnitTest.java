@@ -28,7 +28,6 @@ import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -106,7 +105,6 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
     }
 
-    @Ignore
     @Test
     public void testInitFixedRateTasks() {
 
