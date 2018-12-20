@@ -30,7 +30,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  *
@@ -69,7 +69,7 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
         MockitoAnnotations.initMocks(this);
         final SystemTaskResource taskResource = new SystemTaskResource(systemTaskService);
 
-        when(systemTaskService.getSystemTasks()).thenReturn(Arrays.asList(createTask()));
+        when(systemTaskService.getSystemTasks()).thenReturn(Collections.singletonList(createTask()));
         when(systemTaskService.findOneSystemTask("systask1")).thenReturn(createTask());
 
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)

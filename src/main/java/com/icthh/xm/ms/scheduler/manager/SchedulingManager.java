@@ -1,6 +1,9 @@
 package com.icthh.xm.ms.scheduler.manager;
 
+import static com.icthh.xm.commons.tenant.TenantContextUtils.buildTenant;
+
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
+import com.icthh.xm.commons.exceptions.BusinessException;
 import com.icthh.xm.commons.tenant.PrivilegedTenantContext;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
@@ -87,7 +90,7 @@ public class SchedulingManager {
             // Translate tenant to uppercase as only tenant list repo contains lowercase value
             String tenant = StringUtils.upperCase(tenantName);
             PrivilegedTenantContext ptc = tenantContextHolder.getPrivilegedContext();
-            taskCount += ptc.execute(TenantContextUtils.buildTenant(tenant), () -> initInsideTenant(tenant));
+            taskCount += ptc.execute(buildTenant(tenant), () -> initInsideTenant(tenant));
         }
 
         log.info("Finish Scheduler initialization with [{}] tenants and [{}] active tasks",
@@ -98,7 +101,7 @@ public class SchedulingManager {
 
         log.info("Merge system tasks");
 
-        tenantContextHolder.getPrivilegedContext().execute(TenantContextUtils.buildTenant(tenant), () -> {
+        tenantContextHolder.getPrivilegedContext().execute(buildTenant(tenant), () -> {
 
             List<TaskDTO> newTasks = taskService.findSystemNotFinishedTasks();
             Map<String, TaskDTO> remainingTasks = newTasks.stream()
@@ -234,15 +237,17 @@ public class SchedulingManager {
      * @param task  the task changing
      */
     public void setState(StateKey state, TaskDTO task) {
-        Long taskId = task.getId();
+        final Long taskId = task.getId();
         log.info("Marking task as finished id: {}, tenant: {}", task.getId(), task.getTenant());
-        TenantContextUtils.setTenant(tenantContextHolder, task.getTenant());
 
-        Task taskFromDb = taskRepository.findById(taskId).orElseThrow(()
-            -> new IllegalArgumentException("Entity is not found"));
+        tenantContextHolder.getPrivilegedContext().execute(buildTenant(task.getTenant()), () -> {
 
-        taskFromDb.setStateKey(state.toString());
-        taskRepository.save(taskFromDb);
+            Task taskFromDb = taskRepository.findById(taskId).orElseThrow(()
+                -> new BusinessException("Task not found for id " + taskId));
+
+            taskFromDb.setStateKey(state.toString());
+            taskRepository.save(taskFromDb);
+        });
     }
 
     private ScheduledFuture rescheduleTask(TaskDTO task, ScheduledFuture oldFuture, CountDownLatch latch) {
@@ -301,7 +306,7 @@ public class SchedulingManager {
             task.setEndDate(task.getStartDate());
         }
         Task entity = taskRepository.findById(task.getId()).orElseThrow(() ->
-            new IllegalArgumentException("Entity is not found"));
+            new BusinessException("Task is not found for id " + task.getId()));
         entity.setEndDate(task.getEndDate());
         taskRepository.save(entity);
         return taskScheduler.schedule(expirable, task.getStartDate());
