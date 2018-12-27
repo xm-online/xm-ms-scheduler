@@ -302,6 +302,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         // There are two tenants in the Scope, so we need to init tasks only for XM tenant.
         Mockito.when(systemTaskService.findUserNotFinishedTasks()).thenAnswer(answer);
+        schedulingManager.destroy();
         schedulingManager.init();
     }
 
