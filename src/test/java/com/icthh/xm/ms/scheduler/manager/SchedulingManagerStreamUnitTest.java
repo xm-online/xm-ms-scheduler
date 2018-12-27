@@ -224,6 +224,8 @@ public class SchedulingManagerStreamUnitTest {
         assertTrue(messages.stream().allMatch(m ->
             JsonPath.read(m.getPayload().toString(), "$.id").toString()
                 .equals(task.getId().toString())));
+
+        schedulingManager.deleteExpiredTask(task);
     }
 
 }
