@@ -4,6 +4,7 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
+import static java.time.temporal.ChronoUnit.HOURS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +39,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.temporal.TemporalUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -202,7 +204,7 @@ public class SchedulingManagerStreamUnitTest {
 
     @Test
     public void testOneTimeMessageNullTtl() {
-        TaskDTO task = createTaskOneTime(Instant.now().minusMillis(3000), null);
+        TaskDTO task = createTaskOneTime(Instant.now().minus(1, HOURS).minusSeconds(3000), null);
 
         when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
         when(taskRepository.save(any())).thenReturn(new Task());

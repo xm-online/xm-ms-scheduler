@@ -5,6 +5,7 @@ import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.messaging.support.MessageBuilder;
@@ -66,18 +67,14 @@ public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
     }
 
     @SuppressWarnings("unchecked")
+    @SneakyThrows
     private Map<String, Object> parseDataSilent(String data) {
-        try {
-            if (data.startsWith("{") || data.startsWith("[")) {
-                return mapper.readValue(data, Map.class);
-            } else {
-                Map<String, Object> map = new HashMap<>();
-                map.put(DEFAULT_KEY, data);
-                return map;
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (data.startsWith("{")) {
+            return mapper.readValue(data, Map.class);
+        } else {
+            Map<String, Object> map = new HashMap<>();
+            map.put(DEFAULT_KEY, data);
+            return map;
         }
     }
 

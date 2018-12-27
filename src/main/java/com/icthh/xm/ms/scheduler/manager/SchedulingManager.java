@@ -1,6 +1,7 @@
 package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.commons.tenant.TenantContextUtils.buildTenant;
+import static java.time.temporal.ChronoUnit.HOURS;
 
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.exceptions.BusinessException;
@@ -15,6 +16,7 @@ import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.math.BigInteger;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -303,7 +305,7 @@ public class SchedulingManager {
         if (task.getTtl() != null) {
             task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
         } else {
-            task.setEndDate(task.getStartDate());
+            task.setEndDate(task.getStartDate().plus(1, HOURS));
         }
         Task entity = taskRepository.findById(task.getId()).orElseThrow(() ->
             new BusinessException("Task is not found for id " + task.getId()));
