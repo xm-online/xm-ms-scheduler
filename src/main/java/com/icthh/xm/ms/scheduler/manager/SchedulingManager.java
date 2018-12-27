@@ -277,7 +277,6 @@ public class SchedulingManager {
     private ScheduledFuture schedule(RunnableTask expirable) {
 
         ScheduledFuture future;
-
         TaskDTO task = expirable.getTask();
 
         switch (task.getScheduleType()) {
