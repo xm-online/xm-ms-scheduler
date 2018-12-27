@@ -171,7 +171,6 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         waitAndDeleteTask(4000, task);
 
         expectRunAndExpiryCounts(task, 2, 1);
-
     }
 
     @Test
