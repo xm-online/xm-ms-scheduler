@@ -75,7 +75,7 @@ spring:
             discovery:
                 enabled: true
     kafka:
-        bootstrap-servers: localhost:9092
+        bootstrap-servers: localhost:9093
 
     liquibase:
         contexts: dev
@@ -161,4 +161,4 @@ oauth2:
 # ===================================================================
 
 application:
-    stream-binding-enabled: true
+    stream-binding-enabled: false
