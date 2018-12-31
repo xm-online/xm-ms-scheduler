@@ -68,6 +68,10 @@ spring:
             config:
                 watch:
                     enabled: false
+        stream:
+            kafka:
+                binder:
+                    autoCreateTopics: true
     jackson:
         serialization.write_dates_as_timestamps: false
     jpa:
@@ -91,6 +95,8 @@ spring:
             value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
         listener:
             concurrency: 16
+        producer:
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     liquibase:
         default-schema: XM
 

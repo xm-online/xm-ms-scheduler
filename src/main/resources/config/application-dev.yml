@@ -40,10 +40,7 @@ spring:
             kafka:
                 binder:
                     brokers: localhost
-                    zk-nodes: localhost
-            bindings:
-                output:
-                    destination: topic-jhipster
+                    defaultBrokerPort: 9092
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:h2:mem:scheduler;DB_CLOSE_DELAY=-1
@@ -78,7 +75,7 @@ spring:
             discovery:
                 enabled: true
     kafka:
-        bootstrap-servers: localhost:9093
+        bootstrap-servers: localhost:9092
 
     liquibase:
         contexts: dev
@@ -164,4 +161,4 @@ oauth2:
 # ===================================================================
 
 application:
-    stream-binding-enabled: false
+    stream-binding-enabled: true

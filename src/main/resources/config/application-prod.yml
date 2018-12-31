@@ -35,7 +35,7 @@ spring:
             kafka:
                 binder:
                     brokers: localhost
-                    zk-nodes: localhost
+                    defaultBrokerPort: 9092
             bindings:
                 output:
                     destination: topic-jhipster
