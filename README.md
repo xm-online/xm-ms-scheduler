@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/xm-online/xm-ms-scheduler.svg?branch=master)](https://travis-ci.org/xm-online/xm-ms-scheduler) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?&metric=sqale_index&branch=master&project=xm-online:xm-ms-scheduler)](https://sonarcloud.io/dashboard/index/xm-online:xm-ms-scheduler) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?&metric=ncloc&branch=master&project=xm-online:xm-ms-scheduler)](https://sonarcloud.io/dashboard/index/xm-online:xm-ms-scheduler) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?&metric=coverage&branch=master&project=xm-online:xm-ms-scheduler)](https://sonarcloud.io/dashboard/index/xm-online:xm-ms-scheduler)
+
 # scheduler
 This application was generated using JHipster 4.13.2, you can find documentation and help at [http://www.jhipster.tech/documentation-archive/v4.13.2](http://www.jhipster.tech/documentation-archive/v4.13.2).
 
