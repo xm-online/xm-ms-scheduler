@@ -1,39 +1,32 @@
 {
   "generator-jhipster": {
     "promptValues": {
-      "packageName": "com.icthh.xm.ms.scheduler",
-      "nativeLanguage": "en"
+      "packageName": "com.icthh.xm.ms.scheduler"
     },
-    "jhipsterVersion": "4.13.2",
+    "jhipsterVersion": "5.7.2",
+    "applicationType": "microservice",
     "baseName": "scheduler",
     "packageName": "com.icthh.xm.ms.scheduler",
     "packageFolder": "com/icthh/xm/ms/scheduler",
-    "serverPort": "8081",
+    "serverPort": "8086",
     "authenticationType": "uaa",
     "uaaBaseName": "uaa",
-    "enableHibernateCache": true,
-    "clusteredHttpSession": false,
+    "cacheProvider": "no",
     "websocket": false,
     "databaseType": "sql",
     "devDatabaseType": "h2Memory",
     "prodDatabaseType": "postgresql",
     "searchEngine": false,
-    "messageBroker": "kafka",
+    "messageBroker": false,
     "serviceDiscoveryType": "consul",
     "buildTool": "gradle",
-    "enableSocialSignIn": false,
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "dd07337b66546f9de3d9660505228fa9a17ee76e",
-    "enableTranslation": true,
-    "applicationType": "microservice",
+    "jwtSecretKey": "NGI5YTE5ZGIwOTFkMjZiZGY1NjdmYTg2ZmE4MTIxNmQyYzJiNmZkZDg4NzNiOWMwNTgwYzBkMDIwOWU4OGJhZWNmZThmZGJiYzUyNjQ0MTRjNTBjMzUyNTYxN2RhNmYxNGU2NzBmNjdlZDUwMGIzNGVjMTc2ODBlM2RhM2MxYzE=",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "nativeLanguage": "en",
-    "languages": [
-      "en",
-      "ru"
-    ],
-    "clientPackageManager": "yarn",
+    "otherModules": [],
+    "enableTranslation": false,
+    "clientPackageManager": "npm",
     "skipClient": true,
     "skipUserManagement": true
   }

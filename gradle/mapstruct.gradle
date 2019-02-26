@@ -1,8 +1,0 @@
-apply plugin: "net.ltgt.apt"
-
-dependencies {
-    provided "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    apt "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    provided "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
-    apt "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
-}

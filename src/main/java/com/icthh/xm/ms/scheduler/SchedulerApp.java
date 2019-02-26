@@ -1,33 +1,33 @@
 package com.icthh.xm.ms.scheduler;
 
-import com.icthh.xm.commons.logging.util.MdcUtils;
-import com.icthh.xm.commons.tenant.TenantContextHolder;
-import com.icthh.xm.commons.tenant.TenantContextUtils;
-import com.icthh.xm.commons.tenant.TenantKey;
+import com.icthh.xm.ms.scheduler.client.OAuth2InterceptedFeignConfiguration;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
 import com.icthh.xm.ms.scheduler.config.DefaultProfileUtil;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collection;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import io.github.jhipster.config.JHipsterConstants;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
 
-@SpringBootApplication(scanBasePackages = "com.icthh.xm")
-@EnableAutoConfiguration
+import javax.annotation.PostConstruct;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
+
+@ComponentScan(
+    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = OAuth2InterceptedFeignConfiguration.class)
+)
+@SpringBootApplication
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
 public class SchedulerApp {
@@ -35,19 +35,17 @@ public class SchedulerApp {
     private static final Logger log = LoggerFactory.getLogger(SchedulerApp.class);
 
     private final Environment env;
-    private final TenantContextHolder tenantContextHolder;
 
-    public SchedulerApp(Environment env, TenantContextHolder tenantContextHolder) {
+    public SchedulerApp(Environment env) {
         this.env = env;
-        this.tenantContextHolder = tenantContextHolder;
     }
 
     /**
      * Initializes scheduler.
      * <p>
-     * Spring profiles can be configured with a program arguments --spring.profiles.active=your-active-profile
+     * Spring profiles can be configured with a program argument --spring.profiles.active=your-active-profile
      * <p>
-     * You can find more information on how profiles work with JHipster on <a href="http://www.jhipster.tech/profiles/">http://www.jhipster.tech/profiles/</a>.
+     * You can find more information on how profiles work with JHipster on <a href="https://www.jhipster.tech/profiles/">https://www.jhipster.tech/profiles/</a>.
      */
     @PostConstruct
     public void initApplication() {
@@ -60,61 +58,56 @@ public class SchedulerApp {
             log.error("You have misconfigured your application! It should not " +
                 "run with both the 'dev' and 'cloud' profiles at the same time.");
         }
-        initContexts();
-    }
-
-    private void initContexts() {
-        // init tenant context, by default this is XM super tenant
-        TenantContextUtils.setTenant(tenantContextHolder, TenantKey.SUPER);
-
-        // init logger MDC context
-        MdcUtils.putRid(MdcUtils.generateRid() + "::" + TenantKey.SUPER.getValue());
-    }
-
-    /**
-     * Destroy scheduler.
-     */
-    @PreDestroy
-    public void destroyApplication() {
-        log.info("\n----------------------------------------------------------\n\t"
-                + "Application {} is closing"
-                + "\n----------------------------------------------------------",
-            env.getProperty("spring.application.name"));
     }
 
     /**
      * Main method, used to run the application.
      *
      * @param args the command line arguments
-     * @throws UnknownHostException if the local host name could not be resolved into an address
      */
-    public static void main(String[] args) throws UnknownHostException {
-
-        MdcUtils.putRid();
-
+    public static void main(String[] args) {
         SpringApplication app = new SpringApplication(SchedulerApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
+        logApplicationStartup(env);
+    }
+
+    private static void logApplicationStartup(Environment env) {
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
+        String serverPort = env.getProperty("server.port");
+        String contextPath = env.getProperty("server.servlet.context-path");
+        if (StringUtils.isBlank(contextPath)) {
+            contextPath = "/";
+        }
+        String hostAddress = "localhost";
+        try {
+            hostAddress = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            log.warn("The host name could not be determined, using `localhost` as fallback");
+        }
         log.info("\n----------------------------------------------------------\n\t" +
                 "Application '{}' is running! Access URLs:\n\t" +
-                "Local: \t\t{}://localhost:{}\n\t" +
-                "External: \t{}://{}:{}\n\t" +
+                "Local: \t\t{}://localhost:{}{}\n\t" +
+                "External: \t{}://{}:{}{}\n\t" +
                 "Profile(s): \t{}\n----------------------------------------------------------",
             env.getProperty("spring.application.name"),
             protocol,
-            env.getProperty("server.port"),
+            serverPort,
+            contextPath,
             protocol,
-            InetAddress.getLocalHost().getHostAddress(),
-            env.getProperty("server.port"),
+            hostAddress,
+            serverPort,
+            contextPath,
             env.getActiveProfiles());
 
         String configServerStatus = env.getProperty("configserver.status");
+        if (configServerStatus == null) {
+            configServerStatus = "Not found or not setup for this application";
+        }
         log.info("\n----------------------------------------------------------\n\t" +
-                "Config Server: \t{}\n----------------------------------------------------------",
-            configServerStatus == null ? "Not found or not setup for this application" : configServerStatus);
+                "Config Server: \t{}\n----------------------------------------------------------", configServerStatus);
     }
 }
