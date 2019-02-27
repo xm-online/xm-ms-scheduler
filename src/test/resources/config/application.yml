@@ -17,6 +17,15 @@
 spring:
     application:
         name: scheduler
+    cloud:
+        stream:
+            kafka:
+                binder:
+                    brokers: localhost
+                    zk-nodes: localhost
+            bindings:
+                output:
+                    destination: topic-jhipster
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:h2:mem:scheduler;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -82,7 +91,7 @@ jhipster:
         authentication:
             jwt:
                 # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
-                base64-secret: NGI5YTE5ZGIwOTFkMjZiZGY1NjdmYTg2ZmE4MTIxNmQyYzJiNmZkZDg4NzNiOWMwNTgwYzBkMDIwOWU4OGJhZWNmZThmZGJiYzUyNjQ0MTRjNTBjMzUyNTYxN2RhNmYxNGU2NzBmNjdlZDUwMGIzNGVjMTc2ODBlM2RhM2MxYzE=
+                base64-secret: OGY1ZTBmNTU5NmE5MDQ5MDMzNmQ5NjdjODYzMmFhNGE1NjdjOTE2ZjZmYzM0MDJlY2U1ZTk4YTUyNGY3ZmM2NTA0ZDI2ZjZiOWZlNWYyYjc1ZDE2M2Y0YzY4MzQ0ZmUyYjk4ZWE3ZTg4MzE2NjE5NGI5YzBhZjIwZmY0ZDhkMDc=
                 # Token is valid 24 hours
                 token-validity-in-seconds: 86400
         client-authorization:

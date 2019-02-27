@@ -9,10 +9,22 @@ services:
             - SPRING_CLOUD_CONSUL_PORT=8500
             - SPRING_DATASOURCE_URL=jdbc:postgresql://scheduler-postgresql:5432/scheduler
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+            - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka
+            - SPRING_CLOUD_STREAM_KAFKA_BINDER_ZK_NODES=zookeeper
     scheduler-postgresql:
         extends:
             file: postgresql.yml
             service: scheduler-postgresql
+    kafka:
+        extends:
+            file: kafka.yml
+            service: kafka
+        environment:
+            - KAFKA_ADVERTISED_HOST_NAME=kafka
+    zookeeper:
+        extends:
+            file: kafka.yml
+            service: zookeeper
     consul:
         image: consul:1.4.0
         command: consul agent -dev -ui -client 0.0.0.0
