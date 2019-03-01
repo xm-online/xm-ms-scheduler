@@ -35,7 +35,7 @@ spring:
             kafka:
                 binder:
                     brokers: localhost
-                    zk-nodes: localhost
+                    defaultBrokerPort: 9092
             bindings:
                 output:
                     destination: topic-jhipster
@@ -52,12 +52,10 @@ spring:
         show-sql: false
         properties:
             hibernate.id.new_generator_mappings: true
-            hibernate.connection.provider_disables_autocommit: true
             hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
-    liquibase:
-        contexts: prod
+            hibernate.cache.use_minimal_puts: true
     mail:
         host: localhost
         port: 25
@@ -74,6 +72,11 @@ spring:
         locator:
             discovery:
                 enabled: true
+    kafka:
+        bootstrap-servers: localhost:9093
+
+    liquibase:
+        contexts: prod
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
@@ -135,15 +138,16 @@ jhipster:
             host: localhost
             port: 5000
             queue-size: 512
+
 oauth2:
     signature-verification:
-        public-key-endpoint-uri: http://uaa/oauth/token_key
-        #ttl for public keys to verify JWT tokens (in ms)
-        ttl: 3600000
-        #max. rate at which public keys will be fetched (in ms)
-        public-key-refresh-rate-limit: 10000
+         public-key-endpoint-uri: http://config/api/token_key
+         #ttl for public keys to verify JWT tokens (in ms)
+         ttl: 3600000
+         #max. rate at which public keys will be fetched (in ms)
+         public-key-refresh-rate-limit: 10000
     web-client-configuration:
-        #change client secret in production, keep in sync with UAA configuration
+        #keep in sync with UAA configuration
         client-id: web_app
         secret: changeit
 
@@ -156,4 +160,5 @@ oauth2:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+    stream-binding-enabled: true

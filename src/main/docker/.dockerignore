@@ -1,14 +1,5 @@
 # https://docs.docker.com/engine/reference/builder/#dockerignore-file
-classes/
-generated-sources/
-generated-test-sources/
-h2db/
-maven-archiver/
-maven-status/
-reports/
-surefire-reports/
-test-classes/
-test-results/
-www/
+# by default ignore everything except the jar file
+**/*
 !*.jar
 !*.war

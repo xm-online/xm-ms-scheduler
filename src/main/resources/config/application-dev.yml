@@ -46,12 +46,13 @@ spring:
                 binder:
                     brokers: localhost
                     zk-nodes: localhost
+                    defaultBrokerPort: 9092
             bindings:
                 output:
                     destination: topic-jhipster
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:mem:scheduler;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        url: jdbc:h2:mem:scheduler;DB_CLOSE_DELAY=-1
         username: scheduler
         password:
         hikari:
@@ -89,6 +90,8 @@ spring:
         locator:
             discovery:
                 enabled: true
+    kafka:
+        bootstrap-servers: localhost:9093
 
 server:
     port: 8086
@@ -136,11 +139,11 @@ jhipster:
             queue-size: 512
 oauth2:
     signature-verification:
-        public-key-endpoint-uri: http://uaa/oauth/token_key
-        #ttl for public keys to verify JWT tokens (in ms)
-        ttl: 3600000
-        #max. rate at which public keys will be fetched (in ms)
-        public-key-refresh-rate-limit: 10000
+         public-key-endpoint-uri: http://config/api/token_key
+         #ttl for public keys to verify JWT tokens (in ms)
+         ttl: 3600000
+         #max. rate at which public keys will be fetched (in ms)
+         public-key-refresh-rate-limit: 10000
     web-client-configuration:
         #keep in sync with UAA configuration
         client-id: web_app
@@ -155,4 +158,5 @@ oauth2:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+    stream-binding-enabled: false

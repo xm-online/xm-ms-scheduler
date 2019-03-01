@@ -1,8 +1,9 @@
 package com.icthh.xm.ms.scheduler.config;
 
-import com.icthh.xm.ms.scheduler.config.oauth2.OAuth2JwtAccessTokenConverter;
-import com.icthh.xm.ms.scheduler.config.oauth2.OAuth2Properties;
-import com.icthh.xm.ms.scheduler.security.oauth2.OAuth2SignatureVerifierClient;
+import com.icthh.xm.commons.security.oauth2.ConfigSignatureVerifierClient;
+import com.icthh.xm.commons.security.oauth2.OAuth2JwtAccessTokenConverter;
+import com.icthh.xm.commons.security.oauth2.OAuth2Properties;
+import com.icthh.xm.commons.security.oauth2.OAuth2SignatureVerifierClient;
 import com.icthh.xm.ms.scheduler.security.AuthoritiesConstants;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,10 +39,10 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
             .headers()
             .frameOptions()
             .disable()
-        .and()
+            .and()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+            .and()
             .authorizeRequests()
             .antMatchers("/api/**").authenticated()
             .antMatchers("/management/health").permitAll()
@@ -60,7 +61,7 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
     }
 
     @Bean
-	@Qualifier("loadBalancedRestTemplate")
+    @Qualifier("loadBalancedRestTemplate")
     public RestTemplate loadBalancedRestTemplate(RestTemplateCustomizer customizer) {
         RestTemplate restTemplate = new RestTemplate();
         customizer.customize(restTemplate);
@@ -71,5 +72,11 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
     @Qualifier("vanillaRestTemplate")
     public RestTemplate vanillaRestTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public ConfigSignatureVerifierClient configSignatureVerifierClient(
+        @Qualifier("loadBalancedRestTemplate") RestTemplate restTemplate) {
+        return new ConfigSignatureVerifierClient(oAuth2Properties, restTemplate);
     }
 }
