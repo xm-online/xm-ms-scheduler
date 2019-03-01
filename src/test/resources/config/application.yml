@@ -36,8 +36,6 @@ spring:
         name:
         username:
         password:
-        hikari:
-            auto-commit: false
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedH2Dialect
         database: H2

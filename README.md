@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/xm-online/xm-ms-scheduler.svg?branch=master)](https://travis-ci.org/xm-online/xm-ms-scheduler) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?&metric=sqale_index&branch=master&project=xm-online:xm-ms-scheduler)](https://sonarcloud.io/dashboard/index/xm-online:xm-ms-scheduler) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?&metric=ncloc&branch=master&project=xm-online:xm-ms-scheduler)](https://sonarcloud.io/dashboard/index/xm-online:xm-ms-scheduler) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?&metric=coverage&branch=master&project=xm-online:xm-ms-scheduler)](https://sonarcloud.io/dashboard/index/xm-online:xm-ms-scheduler)
+
 # scheduler
 
 This application was generated using JHipster 5.7.2, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v5.7.2](https://www.jhipster.tech/documentation-archive/v5.7.2).
@@ -12,7 +14,32 @@ To start your application in the dev profile, simply run:
 
     ./gradlew
 
+
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
+
+### Development with kafka
+
+By default when you start this micro service with dev profile it uses property
+`application.stream-binding-enabled = false` and does not connect to messaging system.
+
+In case you need to send scheduled messages to real kafka destination do the following: 
+
+1. Turn on stream binding in application properties: `application.stream-binding-enabled = true`
+2. Run kafka. the easies way to do it is: 
+   ```
+   docker run --name kafka -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 spotify/kafka
+   ```
+3. Start the micro service
+4. login to kafka docker and consume events:
+    ```
+    docker exec -it kafka bash
+    /opt/kafka_2.11-0.10.1.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic scheduler_queue
+    ```
+   useful kafka commands:
+   ```
+    /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh --list --zookeeper localhost:2181
+    /opt/kafka_2.11-0.10.1.0/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+   ```
 
 ## Building for production
 
@@ -23,6 +50,7 @@ To optimize the scheduler application for production, run:
 To ensure everything worked, run:
 
     java -jar build/libs/*.war
+
 
 Refer to [Using JHipster in production][] for more details.
 

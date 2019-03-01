@@ -44,8 +44,6 @@ spring:
         url: jdbc:postgresql://localhost:5432/scheduler
         username: scheduler
         password:
-        hikari:
-            auto-commit: false
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
