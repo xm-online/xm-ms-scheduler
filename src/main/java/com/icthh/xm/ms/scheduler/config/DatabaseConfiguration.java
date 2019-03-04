@@ -58,12 +58,12 @@ public class DatabaseConfiguration {
      * @return the H2 database TCP server
      * @throws SQLException if the server failed to start
      */
-//    @Bean(initMethod = "start", destroyMethod = "stop")
-//    @Profile(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
-//    public Object h2TCPServer() throws SQLException {
-//        log.debug("Starting H2 database");
-//        return H2ConfigurationHelper.createServer();
-//    }
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Profile(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
+    public Object h2TCPServer() throws SQLException {
+        log.debug("Starting H2 database");
+        return H2ConfigurationHelper.createServer();
+    }
 
     /**
      * Liquibase configuration.
