@@ -4,25 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
-import org.springframework.messaging.support.MessageBuilder;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
+import org.springframework.messaging.support.MessageBuilder;
+
 /**
  * Default implementation for scheduled task handler. Sends messages to spring cloud stream (kafka binding)
  *
- * Receives {@link ChannelNameResolver} for tenant based resolver name creation
+ * <p>Receives {@link ChannelNameResolver} for tenant based resolver name creation
  *
- * and {@link BinderAwareChannelResolver} for actual message sending into the channel.
+ * <p>and {@link BinderAwareChannelResolver} for actual message sending into the channel.
  */
 @RequiredArgsConstructor
 @Slf4j

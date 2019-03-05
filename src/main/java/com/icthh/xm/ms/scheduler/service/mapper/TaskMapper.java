@@ -1,14 +1,13 @@
 package com.icthh.xm.ms.scheduler.service.mapper;
 
-import com.icthh.xm.ms.scheduler.domain.*;
+import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity Task and its DTO TaskDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring")
 public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
 
 

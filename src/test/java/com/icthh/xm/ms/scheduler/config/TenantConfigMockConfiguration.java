@@ -1,18 +1,19 @@
 package com.icthh.xm.ms.scheduler.config;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.icthh.xm.commons.config.client.repository.TenantConfigRepository;
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.web.spring.TenantVerifyInterceptor;
 import com.icthh.xm.ms.scheduler.TaskTestUtil;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 @TestConfiguration
 public class TenantConfigMockConfiguration {
@@ -21,7 +22,7 @@ public class TenantConfigMockConfiguration {
     @Primary
     public TenantListRepository tenantListRepository() {
         TenantListRepository mockTenantListRepository = mock(TenantListRepository.class);
-        Set set = new HashSet();
+        Set<String> set = new HashSet<>();
         set.add(TaskTestUtil.TEST_TENANT);
         set.add(TaskTestUtil.XM_TENANT);
         when(mockTenantListRepository.getTenants()).thenReturn(set);

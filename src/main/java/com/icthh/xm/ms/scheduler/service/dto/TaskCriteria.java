@@ -1,17 +1,14 @@
 package com.icthh.xm.ms.scheduler.service.dto;
 
-import java.io.Serializable;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
-import io.github.jhipster.service.filter.BooleanFilter;
-import io.github.jhipster.service.filter.DoubleFilter;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+
 import io.github.jhipster.service.filter.Filter;
-import io.github.jhipster.service.filter.FloatFilter;
-import io.github.jhipster.service.filter.IntegerFilter;
+import io.github.jhipster.service.filter.InstantFilter;
 import io.github.jhipster.service.filter.LongFilter;
 import io.github.jhipster.service.filter.StringFilter;
 
-import io.github.jhipster.service.filter.InstantFilter;
+import java.io.Serializable;
 
 
 
@@ -26,13 +23,13 @@ import io.github.jhipster.service.filter.InstantFilter;
  */
 public class TaskCriteria implements Serializable {
     /**
-     * Class for filtering ScheduleType
+     * Class for filtering ScheduleType.
      */
     public static class ScheduleTypeFilter extends Filter<ScheduleType> {
     }
 
     /**
-     * Class for filtering ChannelType
+     * Class for filtering ChannelType.
      */
     public static class ChannelTypeFilter extends Filter<ChannelType> {
     }
@@ -185,22 +182,22 @@ public class TaskCriteria implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (key != null ? "key=" + key + ", " : "") +
-                (name != null ? "name=" + name + ", " : "") +
-                (typeKey != null ? "typeKey=" + typeKey + ", " : "") +
-                (stateKey != null ? "stateKey=" + stateKey + ", " : "") +
-                (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-                (startDate != null ? "startDate=" + startDate + ", " : "") +
-                (endDate != null ? "endDate=" + endDate + ", " : "") +
-                (scheduleType != null ? "scheduleType=" + scheduleType + ", " : "") +
-                (delay != null ? "delay=" + delay + ", " : "") +
-                (cronExpression != null ? "cronExpression=" + cronExpression + ", " : "") +
-                (channelType != null ? "channelType=" + channelType + ", " : "") +
-                (description != null ? "description=" + description + ", " : "") +
-                (data != null ? "data=" + data + ", " : "") +
-            "}";
+        return "TaskCriteria{"
+            + (id != null ? "id=" + id + ", " : "")
+            + (key != null ? "key=" + key + ", " : "")
+            + (name != null ? "name=" + name + ", " : "")
+            + (typeKey != null ? "typeKey=" + typeKey + ", " : "")
+            + (stateKey != null ? "stateKey=" + stateKey + ", " : "")
+            + (createdBy != null ? "createdBy=" + createdBy + ", " : "")
+            + (startDate != null ? "startDate=" + startDate + ", " : "")
+            + (endDate != null ? "endDate=" + endDate + ", " : "")
+            + (scheduleType != null ? "scheduleType=" + scheduleType + ", " : "")
+            + (delay != null ? "delay=" + delay + ", " : "")
+            + (cronExpression != null ? "cronExpression=" + cronExpression + ", " : "")
+            + (channelType != null ? "channelType=" + channelType + ", " : "")
+            + (description != null ? "description=" + description + ", " : "")
+            + (data != null ? "data=" + data + ", " : "")
+            + "}";
     }
 
 }

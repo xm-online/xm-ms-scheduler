@@ -15,7 +15,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Default implementation of scheduler task
+ * Default implementation of scheduler task.
  **/
 @RequiredArgsConstructor
 @Slf4j

@@ -13,7 +13,7 @@ public class SchedulerApplicationRunner implements ApplicationRunner {
     private SchedulingManager schedulingManager;
 
     @Override
-    public void run(ApplicationArguments applicationArguments) throws Exception {
+    public void run(ApplicationArguments applicationArguments) {
         schedulingManager.init();
     }
 }

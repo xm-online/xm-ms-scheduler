@@ -1,8 +1,7 @@
 package com.icthh.xm.ms.scheduler.service;
 
-import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
-
 import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
@@ -38,12 +37,12 @@ public class TaskService {
     /**
      * Save a task.
      *
-     * @param taskDTO the entity to save
+     * @param taskDtO the entity to save
      * @return the persisted entity
      */
-    public TaskDTO save(TaskDTO taskDTO) {
-        log.debug("Request to save Task : {}", taskDTO);
-        Task task = taskMapper.toEntity(taskDTO);
+    public TaskDTO save(TaskDTO taskDtO) {
+        log.debug("Request to save Task : {}", taskDtO);
+        Task task = taskMapper.toEntity(taskDtO);
         task = taskRepository.saveAndFlush(task);
         TaskDTO dto = taskMapper.toDto(task);
         schedulingManager.createOrUpdateActiveUserTask(dto);

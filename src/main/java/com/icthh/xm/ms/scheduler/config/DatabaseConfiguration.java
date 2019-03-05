@@ -23,6 +23,8 @@ import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -48,6 +50,7 @@ public class DatabaseConfiguration {
     private final Environment env;
     private final TenantListRepository tenantListRepository;
     private final SchemaResolver schemaResolver;
+    private final JpaProperties jpaProperties;
 
     /**
      * Open the TCP port for the H2 database, so it is available remotely.
@@ -63,7 +66,7 @@ public class DatabaseConfiguration {
     }
 
     /**
-     * Liquibase configuration
+     * Liquibase configuration.
      *
      * @param dataSource          db data source
      * @param liquibaseProperties configuration properties
@@ -124,7 +127,7 @@ public class DatabaseConfiguration {
         MultiTenantConnectionProvider multiTenantConnectionProviderImpl,
         CurrentTenantIdentifierResolver currentTenantIdentifierResolverImpl) {
         Map<String, Object> properties = new HashMap<>();
-        //properties.putAll(jpaProperties.getHibernateProperties(dataSource));
+        properties.putAll(jpaProperties.getHibernateProperties(new HibernateSettings()));
         properties.put(org.hibernate.cfg.Environment.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
         properties
             .put(org.hibernate.cfg.Environment.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProviderImpl);

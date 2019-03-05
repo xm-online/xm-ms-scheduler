@@ -1,16 +1,24 @@
 package com.icthh.xm.ms.scheduler.config;
 
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.JHipsterProperties;
-
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.servlet.InstrumentedFilter;
 import com.codahale.metrics.servlets.MetricsServlet;
+import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterProperties;
+import io.github.jhipster.config.h2.H2ConfigurationHelper;
+import io.undertow.UndertowOptions;
+
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import io.undertow.UndertowOptions;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
 import org.springframework.boot.web.server.MimeMappings;
 import org.springframework.boot.web.server.WebServerFactory;
@@ -20,14 +28,10 @@ import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerF
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.http.MediaType;
-
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import javax.servlet.*;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
@@ -38,16 +42,18 @@ import javax.servlet.*;
 public class WebConfigurer implements ServletContextInitializer, WebServerFactoryCustomizer<WebServerFactory> {
 
     private final Environment env;
+
     private final JHipsterProperties jHipsterProperties;
 
     private MetricRegistry metricRegistry;
 
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
+    public void onStartup(ServletContext servletContext) {
         if (env.getActiveProfiles().length != 0) {
             log.info("Web application configuration, using profiles: {}", (Object[]) env.getActiveProfiles());
         }
-        EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
+        EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD,
+            DispatcherType.ASYNC);
         initMetrics(servletContext, disps);
         if (env.acceptsProfiles(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)) {
             initH2Console(servletContext);
@@ -68,8 +74,8 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
          * See the JHipsterProperties class and your application-*.yml configuration files
          * for more information.
          */
-        if (jHipsterProperties.getHttp().getVersion().equals(JHipsterProperties.Http.Version.V_2_0) &&
-            server instanceof UndertowServletWebServerFactory) {
+        if (jHipsterProperties.getHttp().getVersion().equals(JHipsterProperties.Http.Version.V_2_0)
+            && server instanceof UndertowServletWebServerFactory) {
 
             ((UndertowServletWebServerFactory) server)
                 .addBuilderCustomizers(builder ->
@@ -81,9 +87,11 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         if (server instanceof ConfigurableServletWebServerFactory) {
             MimeMappings mappings = new MimeMappings(MimeMappings.DEFAULT);
             // IE issue, see https://github.com/jhipster/generator-jhipster/pull/711
-            mappings.add("html", MediaType.TEXT_HTML_VALUE + ";charset=" + StandardCharsets.UTF_8.name().toLowerCase());
+            mappings.add("html", MediaType.TEXT_HTML_VALUE + ";charset="
+                + StandardCharsets.UTF_8.name().toLowerCase());
             // CloudFoundry issue, see https://github.com/cloudfoundry/gorouter/issues/64
-            mappings.add("json", MediaType.TEXT_HTML_VALUE + ";charset=" + StandardCharsets.UTF_8.name().toLowerCase());
+            mappings.add("json", MediaType.TEXT_HTML_VALUE + ";charset="
+                + StandardCharsets.UTF_8.name().toLowerCase());
             ConfigurableServletWebServerFactory servletWebServer = (ConfigurableServletWebServerFactory) server;
             servletWebServer.setMimeMappings(mappings);
         }
@@ -115,6 +123,10 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         metricsAdminServlet.setLoadOnStartup(2);
     }
 
+    /**
+     * Create the cors filter.
+     * @return the cors filte
+     */
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -133,24 +145,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
      */
     private void initH2Console(ServletContext servletContext) {
         log.debug("Initialize H2 console");
-        try {
-            // We don't want to include H2 when we are packaging for the "prod" profile and won't
-            // actually need it, so we have to load / invoke things at runtime through reflection.
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            Class<?> servletClass = Class.forName("org.h2.server.web.WebServlet", true, loader);
-            Servlet servlet = (Servlet) servletClass.newInstance();
-
-            ServletRegistration.Dynamic h2ConsoleServlet = servletContext.addServlet("H2Console", servlet);
-            h2ConsoleServlet.addMapping("/h2-console/*");
-            h2ConsoleServlet.setInitParameter("-properties", "src/main/resources/");
-            h2ConsoleServlet.setLoadOnStartup(1);
-
-        } catch (ClassNotFoundException | LinkageError e) {
-            throw new RuntimeException("Failed to load and initialize org.h2.server.web.WebServlet", e);
-
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new RuntimeException("Failed to instantiate org.h2.server.web.WebServlet", e);
-        }
+        H2ConfigurationHelper.initH2Console(servletContext);
     }
 
     @Autowired(required = false)

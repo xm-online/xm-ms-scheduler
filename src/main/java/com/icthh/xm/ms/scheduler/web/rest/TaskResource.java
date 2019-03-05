@@ -60,7 +60,8 @@ public class TaskResource {
      * POST  /tasks : Create a new task.
      *
      * @param taskDTO the taskDTO to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new taskDTO, or with status 400 (Bad Request) if the task has already an ID
+     * @return the ResponseEntity with status 201 (Created) and with body the new taskDTO, or with status
+     * 400 (Bad Request) if the task has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PreAuthorize("hasPermission({'task': #taskDTO}, 'TASK.CREATE')")

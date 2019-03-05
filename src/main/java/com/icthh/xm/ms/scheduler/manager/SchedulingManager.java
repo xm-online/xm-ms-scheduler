@@ -16,7 +16,6 @@ import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.math.BigInteger;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,6 +54,7 @@ public class SchedulingManager {
     private Map<String, Map<String, ScheduledFuture>> systemSchedulers = new ConcurrentHashMap<>();
     private Map<String, Map<String, ScheduledFuture>> userSchedulers = new ConcurrentHashMap<>();
 
+    /** The constructor. */
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
                              final ThreadPoolTaskScheduler taskScheduler,
                              final SystemTaskService taskService,
@@ -69,6 +69,7 @@ public class SchedulingManager {
         this.taskRepository = taskRepository;
     }
 
+    /** The constructor. */
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
                              final ThreadPoolTaskScheduler taskScheduler,
                              final SystemTaskService taskService,
@@ -82,6 +83,9 @@ public class SchedulingManager {
         this.afterExpiration = afterExpiration;
     }
 
+    /**
+     * Init.
+     */
     public void init() {
 
         int taskCount = 0;

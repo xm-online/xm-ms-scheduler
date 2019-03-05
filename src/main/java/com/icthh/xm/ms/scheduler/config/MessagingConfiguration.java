@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * Configures Spring Cloud Stream support.
- *
  * See http://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/
  * for more information.
  */

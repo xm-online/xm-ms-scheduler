@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- *
+ * The scheduling configuration.
  */
 @Configuration
 public class SchedulingConfiguration {
@@ -27,6 +27,11 @@ public class SchedulingConfiguration {
                                      systemTaskService, handler, tenantListRepository, taskRepository);
     }
 
+    /**
+     * Creates the thread pool  task scheduler.
+     * @param applicationProperties the application properties
+     * @return the scheduler
+     */
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler(ApplicationProperties applicationProperties) {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
