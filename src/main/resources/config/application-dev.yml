@@ -40,7 +40,7 @@ spring:
             kafka:
                 binder:
                     brokers: localhost
-                    defaultBrokerPort: 9093
+                    defaultBrokerPort: 9092
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:h2:mem:scheduler;DB_CLOSE_DELAY=-1
@@ -75,7 +75,7 @@ spring:
             discovery:
                 enabled: true
     kafka:
-        bootstrap-servers: localhost:9092
+        bootstrap-servers: localhost:9093
 
     liquibase:
         contexts: dev
