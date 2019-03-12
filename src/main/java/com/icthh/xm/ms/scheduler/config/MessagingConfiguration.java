@@ -1,26 +1,14 @@
 package com.icthh.xm.ms.scheduler.config;
 
-import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
-
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandlerImpl;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.binder.DefaultBinderFactory.Listener;
-import org.springframework.cloud.stream.binder.kafka.KafkaBinderHealthIndicator;
-import org.springframework.cloud.stream.binder.kafka.KafkaMessageChannelBinder;
-import org.springframework.cloud.stream.binder.kafka.config.KafkaBinderConfiguration;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.Order;
 
 /**
  * Configures Spring Cloud Stream support.
@@ -31,31 +19,17 @@ import org.springframework.core.annotation.Order;
 @Slf4j
 @EnableBinding
 @ConditionalOnProperty("application.stream-binding-enabled")
-@Import({KafkaBinderConfiguration.class})
 @RequiredArgsConstructor
 public class MessagingConfiguration {
 
-    private final KafkaBinderHealthIndicator kafkaBinderHealthIndicator;
-    private final KafkaMessageChannelBinder binder;
+    private static final String DEFAULT_SCHEDULER_QUEUE = "scheduler_xm_queue";
 
     @Bean
     public ScheduledTaskHandler scheduledTaskHandler(BinderAwareChannelResolver channelResolver,
                                                      ChannelNameResolver nameResolver) {
+        // resolve destination for force init binding health check
+        channelResolver.resolveDestination(DEFAULT_SCHEDULER_QUEUE);
         return new ScheduledTaskHandlerImpl(channelResolver, nameResolver);
-    }
-
-    @Bean
-    @Order(HIGHEST_PRECEDENCE)
-    public Listener healthCheckInit() {
-        return (name, context) -> {
-            registerBean(context, kafkaBinderHealthIndicator);
-            // TODO in this case check message was sended
-        };
-    }
-
-    private void registerBean(ApplicationContext context, HealthIndicator healthIndicator) {
-        ((AnnotationConfigApplicationContext) context)
-            .registerBean(healthIndicator.getClass(), healthIndicator);
     }
 
 }
