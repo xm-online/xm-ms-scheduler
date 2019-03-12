@@ -161,4 +161,4 @@ oauth2:
 # ===================================================================
 
 application:
-    stream-binding-enabled: true
+    stream-binding-enabled: false

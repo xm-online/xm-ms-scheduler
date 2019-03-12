@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 @Slf4j
 @EnableBinding
 @ConditionalOnProperty("application.stream-binding-enabled")
-@RequiredArgsConstructor
 public class MessagingConfiguration {
 
     private static final String DEFAULT_SCHEDULER_QUEUE = "scheduler_xm_queue";
