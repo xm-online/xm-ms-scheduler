@@ -104,8 +104,6 @@ spring:
     liquibase:
         default-schema: XM
 
-
-
 security:
     basic:
         enabled: false
