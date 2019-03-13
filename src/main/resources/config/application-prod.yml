@@ -19,6 +19,11 @@ logging:
         com.icthh.xm.ms.scheduler: INFO
         io.github.jhipster: INFO
 
+management:
+    health:
+        binders:
+            enabled: true
+
 spring:
     devtools:
         restart:
