@@ -1,5 +1,6 @@
 package com.icthh.xm.ms.scheduler.service.tenant;
 
+import static com.icthh.xm.commons.tenant.TenantContextUtils.assertTenantKeyValid;
 import static com.icthh.xm.ms.scheduler.config.Constants.CHANGE_LOG_PATH;
 import static org.apache.commons.lang3.time.StopWatch.createStarted;
 
@@ -56,6 +57,7 @@ public class TenantDatabaseService {
         final StopWatch stopWatch = createStarted();
         try {
             log.info("START - SETUP:CreateTenant:liquibase tenantKey: {}", tenantKey);
+            assertTenantKeyValid(tenantKey);
             SpringLiquibase liquibase = new SpringLiquibase();
             liquibase.setResourceLoader(resourceLoader);
             liquibase.setDataSource(dataSource);
