@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
     <property name="textType" value="varchar" dbms="postgresql, h2"/>
-    <property name="textType" value="varchar(1024)" dbms="oracle"/>
+    <property name="textType" value="varchar2(4000)" dbms="oracle"/>
 
     <changeSet id="20190828140700-1" author="yevheniiMuzyka">
         <modifyDataType tableName="task" columnName="data" newDataType="${textType}"/>
