@@ -1,5 +1,7 @@
 package com.icthh.xm.ms.scheduler.service.mapper;
 
+import org.mapstruct.Mapping;
+
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ public interface EntityMapper <D, E> {
 
     E toEntity(D dto);
 
+    @Mapping(target = "tenant", ignore = true)
     D toDto(E entity);
 
     List <E> toEntity(List<D> dtoList);
