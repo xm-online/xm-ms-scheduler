@@ -20,7 +20,6 @@ import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.SchedulerApp;
 import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
-import com.icthh.xm.ms.scheduler.config.tenant.WebappTenantOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
@@ -52,8 +51,7 @@ import java.util.Optional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
     SchedulerApp.class,
-    SecurityBeanOverrideConfiguration.class,
-    WebappTenantOverrideConfiguration.class
+    SecurityBeanOverrideConfiguration.class
 })
 public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
