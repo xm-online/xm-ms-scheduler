@@ -1,8 +1,8 @@
 package com.icthh.xm.ms.scheduler.config.tenant;
 
+import com.icthh.xm.commons.migration.db.tenant.provisioner.TenantDatabaseProvisioner;
 import com.icthh.xm.commons.tenantendpoint.TenantManager;
 import com.icthh.xm.commons.tenantendpoint.provisioner.TenantAbilityCheckerProvisioner;
-import com.icthh.xm.commons.tenantendpoint.provisioner.TenantDatabaseProvisioner;
 import com.icthh.xm.commons.tenantendpoint.provisioner.TenantListProvisioner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

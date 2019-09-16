@@ -4,9 +4,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.icthh.xm.commons.gen.model.Tenant;
+import com.icthh.xm.commons.migration.db.tenant.provisioner.TenantDatabaseProvisioner;
 import com.icthh.xm.commons.tenantendpoint.TenantManager;
 import com.icthh.xm.commons.tenantendpoint.provisioner.TenantAbilityCheckerProvisioner;
-import com.icthh.xm.commons.tenantendpoint.provisioner.TenantDatabaseProvisioner;
 import com.icthh.xm.commons.tenantendpoint.provisioner.TenantListProvisioner;
 import org.junit.Before;
 import org.junit.Test;
