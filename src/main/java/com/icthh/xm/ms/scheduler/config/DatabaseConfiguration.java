@@ -8,7 +8,6 @@ import com.icthh.xm.commons.migration.db.XmMultiTenantSpringLiquibase;
 import com.icthh.xm.commons.migration.db.XmSpringLiquibase;
 import com.icthh.xm.commons.migration.db.tenant.SchemaResolver;
 import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.h2.H2ConfigurationHelper;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import liquibase.integration.spring.MultiTenantSpringLiquibase;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.h2.tools.Server;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
@@ -62,7 +62,7 @@ public class DatabaseConfiguration {
     @Profile(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
     public Object h2TCPServer() throws SQLException {
         log.debug("Starting H2 database");
-        return H2ConfigurationHelper.createServer();
+        return Server.createTcpServer("-tcp", "-tcpAllowOthers");
     }
 
     /**
