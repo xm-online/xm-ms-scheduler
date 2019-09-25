@@ -2,7 +2,7 @@ package com.icthh.xm.ms.scheduler.web.rest;
 
 import com.icthh.xm.commons.gen.api.TenantsApiDelegate;
 import com.icthh.xm.commons.gen.model.Tenant;
-import com.icthh.xm.ms.scheduler.service.tenant.TenantService;
+import com.icthh.xm.commons.tenantendpoint.TenantManager;
 
 import java.util.List;
 
@@ -19,20 +19,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class TenantResource implements TenantsApiDelegate {
 
-    private final TenantService tenantService;
+    private final TenantManager tenantManager;
 
     @Override
     @Transactional
     @PreAuthorize("hasPermission({'tenant':#tenant}, 'SCHEDULER.TENANT.CREATE')")
     public ResponseEntity<Void> addTenant(Tenant tenant) {
-        tenantService.createTenant(tenant.getTenantKey().toUpperCase());
+        tenantManager.createTenant(tenant);
         return ResponseEntity.ok().build();
     }
 
     @Override
     @PreAuthorize("hasPermission({'tenantKey':#tenantKey}, 'SCHEDULER.TENANT.DELETE')")
     public ResponseEntity<Void> deleteTenant(String tenantKey) {
-        throw new UnsupportedOperationException();
+        tenantManager.deleteTenant(tenantKey);
+        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -50,6 +51,7 @@ public class TenantResource implements TenantsApiDelegate {
     @Override
     @PreAuthorize("hasPermission({'tenant':#tenant, 'status':#status}, 'SCHEDULER.TENANT.UPDATE')")
     public ResponseEntity<Void> manageTenant(String tenant, String status) {
-        throw new UnsupportedOperationException();
+        tenantManager.manageTenant(tenant, status);
+        return ResponseEntity.ok().build();
     }
 }

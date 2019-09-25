@@ -158,3 +158,4 @@ oauth2:
 
 application:
     stream-binding-enabled: false
+    h2-port: 9099

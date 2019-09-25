@@ -3,18 +3,17 @@ package com.icthh.xm.ms.scheduler.config;
 import static com.icthh.xm.ms.scheduler.config.Constants.CHANGE_LOG_PATH;
 
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
-import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.migration.db.XmMultiTenantSpringLiquibase;
 import com.icthh.xm.commons.migration.db.XmSpringLiquibase;
 import com.icthh.xm.commons.migration.db.tenant.SchemaResolver;
 import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.h2.H2ConfigurationHelper;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import io.github.jhipster.config.h2.H2ConfigurationHelper;
 import liquibase.integration.spring.MultiTenantSpringLiquibase;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.AllArgsConstructor;
@@ -48,9 +47,9 @@ public class DatabaseConfiguration {
     private static final String JPA_PACKAGES = "com.icthh.xm.ms.scheduler.domain";
 
     private final Environment env;
-    private final TenantListRepository tenantListRepository;
     private final SchemaResolver schemaResolver;
     private final JpaProperties jpaProperties;
+    private final ApplicationProperties applicationProperties;
 
     /**
      * Open the TCP port for the H2 database, so it is available remotely.
@@ -62,7 +61,7 @@ public class DatabaseConfiguration {
     @Profile(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
     public Object h2TCPServer() throws SQLException {
         log.debug("Starting H2 database");
-        return H2ConfigurationHelper.createServer();
+        return H2ConfigurationHelper.createServer(applicationProperties.getH2Port());
     }
 
     /**

@@ -4,7 +4,6 @@ import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.SchedulerApp;
 import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
-import com.icthh.xm.ms.scheduler.config.tenant.WebappTenantOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.TaskService;
@@ -50,8 +49,7 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 @WithMockUser(authorities = {"SUPER-ADMIN"})
 @SpringBootTest(classes = {
     SchedulerApp.class,
-    SecurityBeanOverrideConfiguration.class,
-    WebappTenantOverrideConfiguration.class
+    SecurityBeanOverrideConfiguration.class
 })
 public class TaskResourceIntTest extends AbstractSpringContextTest {
 
