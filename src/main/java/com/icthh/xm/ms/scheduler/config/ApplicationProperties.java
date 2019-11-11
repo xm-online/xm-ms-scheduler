@@ -31,6 +31,8 @@ public class ApplicationProperties {
     private String dbSchemaSuffix;
     private String h2Port = "9099";
 
+    private KafkaMetric kafkaMetric;
+
     @Getter
     @Setter
     public static class Scheduler {
@@ -46,5 +48,13 @@ public class ApplicationProperties {
         private int maxAttempts;
         private long delay;
         private int multiplier;
+    }
+
+    @Getter
+    @Setter
+    public static class KafkaMetric {
+        private boolean enabled;
+        private int connectionTimeoutTopic;
+        List<String> metricTopics;
     }
 }
