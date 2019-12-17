@@ -15,7 +15,7 @@ import com.icthh.xm.commons.tenant.TenantContext;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantKey;
 import com.icthh.xm.ms.scheduler.config.MessagingConfiguration;
-import com.icthh.xm.ms.scheduler.config.SchedulingHandlerConfiguration;
+import com.icthh.xm.ms.scheduler.config.SchedulingHandlerOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
@@ -30,6 +30,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
+import org.springframework.cloud.stream.config.BindingServiceConfiguration;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.stream.test.binder.MessageCollectorAutoConfiguration;
 import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
@@ -39,7 +40,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.temporal.TemporalUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +53,8 @@ import java.util.Optional;
     TestSchedulingManagerConfiguration.class,
     MessageCollectorAutoConfiguration.class,
     MessagingConfiguration.class,
-    SchedulingHandlerConfiguration.class
+    SchedulingHandlerOverrideConfiguration.class,
+    BindingServiceConfiguration.class
 }, properties = {"application.stream-binding-enabled=true"})
 public class SchedulingManagerStreamUnitTest {
 
