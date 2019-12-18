@@ -17,7 +17,7 @@
     "databaseType": "sql",
     "devDatabaseType": "h2Memory",
     "prodDatabaseType": "postgresql",
-    "searchEngine": "elasticsearch",
+    "searchEngine": false,
     "messageBroker": "kafka",
     "serviceDiscoveryType": "consul",
     "buildTool": "gradle",
@@ -32,7 +32,7 @@
     "entitySuffix": "",
     "dtoSuffix": "DTO",
     "otherModules": [],
-    "enableTranslation": true,
+    "enableTranslation": false,
     "clientPackageManager": "npm",
     "nativeLanguage": "en",
     "languages": [

@@ -47,8 +47,8 @@ spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:postgresql://localhost:5432/scheduler
-        username: postgres
-        password: postgres
+        username: scheduler
+        password:
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
@@ -79,7 +79,7 @@ spring:
             discovery:
                 enabled: true
     kafka:
-        bootstrap-servers: localhost:9092
+        bootstrap-servers: localhost:9093
 
     liquibase:
         contexts: prod

@@ -1,0 +1,73 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "key",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "typeKey",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "stateKey",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "startDate",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "endDate",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "scheduleType",
+            "fieldType": "ScheduleType",
+            "fieldValues": "FIXED_RATE,FIXED_DELAY,CRON"
+        },
+        {
+            "fieldName": "delay",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "cronExpression",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "channelType",
+            "fieldType": "ChannelType",
+            "fieldValues": "QUEUE,TOPIC"
+        },
+        {
+            "fieldName": "description",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "data",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180109092400",
+    "entityTableName": "task",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "serviceClass",
+    "jpaMetamodelFiltering": true,
+    "microserviceName": "scheduler"
+}

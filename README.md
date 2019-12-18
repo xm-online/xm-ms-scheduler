@@ -58,7 +58,7 @@ Refer to [Using JHipster in production][] for more details.
 
 To launch your application's tests, run:
 
-    ./gradlew test integrationTest jacocoTestReport
+    ./gradlew test
 
 For more information, refer to the [Running tests page][].
 
