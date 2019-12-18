@@ -59,7 +59,6 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
             hibernate.cache.use_minimal_puts: true
-            hibernate.dialect: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
             hibernate.model.generator_name_as_sequence_name: false # see org.hibernate.cfg.AvailableSettings.PREFER_GENERATOR_NAME_AS_DEFAULT_SEQUENCE_NAME
     main:
         allow-bean-definition-overriding: true
