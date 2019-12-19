@@ -126,6 +126,7 @@ springBoot {
 test {
     useJUnitPlatform()
     exclude "**/*IT*", "**/*IntTest*"
+    exclude '**/CucumberTest*'
 
     testLogging {
         events 'FAILED', 'SKIPPED'
