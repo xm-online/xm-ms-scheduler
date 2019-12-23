@@ -124,40 +124,23 @@ springBoot {
 }
 
 test {
-    useJUnitPlatform()
-    exclude "**/*IT*", "**/*IntTest*"
     exclude '**/CucumberTest*'
 
-    testLogging {
-        events 'FAILED', 'SKIPPED'
-    }
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
     reports.html.enabled = true
-}
-
-task integrationTest(type: Test) {
-    useJUnitPlatform()
-    description = "Execute integration tests."
-    group = "verification"
-    include "**/*IT*", "**/*IntTest*"
-    exclude "**/*CucumberIT*"
-
     testLogging {
-        events 'FAILED', 'SKIPPED'
+        exceptionFormat = 'full'
+        showStandardStreams = true
+        events "passed", "skipped", "failed", "standardOut", "standardError"
     }
-    // uncomment if the tests reports are not generated
-    // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
-    // ignoreFailures true
-    reports.html.enabled = false
 }
 
 task cucumberTest(type: Test) {
     description = "Execute cucumber BDD tests."
     group = "verification"
-    include "**/*CucumberIT*"
-    exclude '**/CucumberTest*'
+    include '**/CucumberTest*'
 
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
@@ -166,16 +149,9 @@ task cucumberTest(type: Test) {
 }
 
 check.dependsOn cucumberTest
-
-check.dependsOn integrationTest
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests")
     reportOn test
-}
-
-task integrationTestReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests")
-    reportOn integrationTest
 }
 
 task cucumberTestReport(type: TestReport) {
