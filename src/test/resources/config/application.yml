@@ -22,6 +22,12 @@ spring:
     cache:
         type: simple
     cloud:
+        bus:
+            enabled: false
+        discovery:
+            enabled: false
+        consul:
+            enabled: false
         stream:
             kafka:
                 binder:
