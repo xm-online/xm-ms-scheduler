@@ -96,6 +96,9 @@ spring:
 
 server:
     port: 8086
+    http2:
+        enabled: false # To use HTTP/2 you will need SSL support (see above the "server.ssl" configuration)
+
 
 # ===================================================================
 # JHipster specific properties
