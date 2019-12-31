@@ -115,12 +115,17 @@ if (OperatingSystem.current().isWindows()) {
 
 defaultTasks "bootRun"
 
-war {
-
-}
-
 springBoot {
     mainClassName = "com.icthh.xm.ms.scheduler.SchedulerApp"
+}
+
+bootWar {
+    mainClassName = 'com.icthh.xm.ms.scheduler.SchedulerApp'
+    manifest {
+        attributes(
+            "Implementation-Version": archiveVersion
+        )
+    }
 }
 
 test {
