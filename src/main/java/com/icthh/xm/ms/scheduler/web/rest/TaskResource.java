@@ -3,6 +3,7 @@ package com.icthh.xm.ms.scheduler.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.icthh.xm.commons.exceptions.BusinessException;
 import com.icthh.xm.commons.exceptions.ErrorConstants;
+import com.icthh.xm.commons.permission.annotation.PrivilegeDescription;
 import com.icthh.xm.ms.scheduler.service.TaskQueryService;
 import com.icthh.xm.ms.scheduler.service.TaskService;
 
@@ -67,6 +68,7 @@ public class TaskResource {
     @PreAuthorize("hasPermission({'task': #taskDTO}, 'TASK.CREATE')")
     @PostMapping("/tasks")
     @Timed
+    @PrivilegeDescription("Privilege to create a new task")
     public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO taskDTO) throws URISyntaxException {
         log.debug("REST request to save Task : {}", taskDTO);
         if (taskDTO.getId() != null) {
@@ -90,6 +92,7 @@ public class TaskResource {
     @PreAuthorize("hasPermission({'id': #taskDTO.id, 'newTask': #taskDTO}, 'task', 'TASK.UPDATE')")
     @PutMapping("/tasks")
     @Timed
+    @PrivilegeDescription("Privilege to updates an existing task")
     public ResponseEntity<TaskDTO> updateTask(@Valid @RequestBody TaskDTO taskDTO) throws URISyntaxException {
         log.debug("REST request to update Task : {}", taskDTO);
         if (taskDTO.getId() == null) {
@@ -126,6 +129,7 @@ public class TaskResource {
     @PostAuthorize("hasPermission({'returnObject': returnObject.body}, 'TASK.GET_LIST.ITEM')")
     @GetMapping("/tasks/{id}")
     @Timed
+    @PrivilegeDescription("Privilege to get the task by id")
     public ResponseEntity<TaskDTO> getTask(@PathVariable Long id) {
         log.debug("REST request to get Task : {}", id);
         TaskDTO taskDTO = taskService.findOne(id);
@@ -141,6 +145,7 @@ public class TaskResource {
     @PreAuthorize("hasPermission({'id': #id}, 'task', 'TASK.DELETE')")
     @DeleteMapping("/tasks/{id}")
     @Timed
+    @PrivilegeDescription("Privilege to delete the task by id")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         log.debug("REST request to delete Task : {}", id);
         taskService.delete(id);
