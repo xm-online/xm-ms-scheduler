@@ -68,7 +68,7 @@ public class TaskResource {
     @PreAuthorize("hasPermission({'task': #taskDTO}, 'TASK.CREATE')")
     @PostMapping("/tasks")
     @Timed
-    @PrivilegeDescription("Privilege to create a new task")
+    @PrivilegeDescription("Privilege to schedule a new task")
     public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO taskDTO) throws URISyntaxException {
         log.debug("REST request to save Task : {}", taskDTO);
         if (taskDTO.getId() != null) {

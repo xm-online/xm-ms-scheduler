@@ -48,7 +48,7 @@ public class TaskQueryService extends QueryService<Task> {
      */
     @FindWithPermission("TASK.GET_LIST")
     @Transactional(readOnly = true)
-    @PrivilegeDescription("Privilege to get all the tasks which matches the criteria from the database")
+    @PrivilegeDescription("Privilege to get all scheduled tasks")
     public List<TaskDTO> findByCriteria(TaskCriteria criteria, String privilegeKey) {
         log.debug("find by criteria : {}", criteria);
         List<Task> result = permittedRepository.findWithPermission(Task.class, criteria, null, privilegeKey)
@@ -65,7 +65,7 @@ public class TaskQueryService extends QueryService<Task> {
      */
     @FindWithPermission("TASK.GET_LIST")
     @Transactional(readOnly = true)
-    @PrivilegeDescription("Privilege to get all the tasks which matches the criteria from the database")
+    @PrivilegeDescription("Privilege to get all scheduled tasks")
     public Page<TaskDTO> findByCriteria(TaskCriteria criteria, Pageable pageable, String privilegeKey) {
         log.debug("find by criteria : {}, page: {}", criteria, pageable);
         Page<Task> result = permittedRepository.findWithPermission(Task.class, criteria, pageable, privilegeKey);
