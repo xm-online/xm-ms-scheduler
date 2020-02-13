@@ -3,6 +3,7 @@ package com.icthh.xm.ms.scheduler.config;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandlerImpl;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
+import com.icthh.xm.ms.scheduler.nameresolver.TenantAwareChannelNameResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,6 +22,11 @@ import org.springframework.context.annotation.Bean;
 public class MessagingConfiguration {
 
     private static final String DEFAULT_SCHEDULER_QUEUE = "scheduler_xm_queue";
+
+    @Bean
+    public ChannelNameResolver channelNameResolver() {
+        return new TenantAwareChannelNameResolver();
+    }
 
     @Bean
     public ScheduledTaskHandler scheduledTaskHandler(BinderAwareChannelResolver channelResolver,

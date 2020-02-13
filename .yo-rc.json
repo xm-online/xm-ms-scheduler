@@ -1,9 +1,10 @@
 {
   "generator-jhipster": {
     "promptValues": {
-      "packageName": "com.icthh.xm.ms.scheduler"
+      "packageName": "com.icthh.xm.ms.scheduler",
+      "nativeLanguage": "en"
     },
-    "jhipsterVersion": "5.7.2",
+    "jhipsterVersion": "6.5.1",
     "applicationType": "microservice",
     "baseName": "scheduler",
     "packageName": "com.icthh.xm.ms.scheduler",
@@ -21,15 +22,23 @@
     "serviceDiscoveryType": "consul",
     "buildTool": "gradle",
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "OGY1ZTBmNTU5NmE5MDQ5MDMzNmQ5NjdjODYzMmFhNGE1NjdjOTE2ZjZmYzM0MDJlY2U1ZTk4YTUyNGY3ZmM2NTA0ZDI2ZjZiOWZlNWYyYjc1ZDE2M2Y0YzY4MzQ0ZmUyYjk4ZWE3ZTg4MzE2NjE5NGI5YzBhZjIwZmY0ZDhkMDc=",
+    "jwtSecretKey": "MGMwMjJmZWU4MjY2M2RhZTA3ZGExZDk3NTY2Mjg3YjVkOGI0MGI4YWI3NWJhYmMyMWY1NDNiNTZjNzQwYWZlZTNlYWRmNDFiOWUzZGZlYWQyMDYyMjM2MDFkZTQ4MTVkNzcwMTYxZDkxZWZkMTAxOGY0NjYzNDVlMWNkNzdiNmI=",
+    "embeddableLaunchScript": false,
     "testFrameworks": [
       "gatling",
       "cucumber"
     ],
     "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
     "otherModules": [],
     "enableTranslation": false,
     "clientPackageManager": "npm",
+    "nativeLanguage": "en",
+    "languages": [
+      "en"
+    ],
+    "blueprints": [],
     "skipClient": true,
     "skipUserManagement": true
   }
