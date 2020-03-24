@@ -7,12 +7,8 @@ services:
         env_file:
             - ./env/scheduler-app.env
         secrets:
-            - source: SPRING_DATASOURCE_PASSWORD
+            - source: SCHEDULER_SPRING_DATASOURCE_PASSWORD
               target: SPRING_DATASOURCE_PASSWORD
-            - source: SPRING_DATASOURCE_URL
-              target: SPRING_DATASOURCE_URL
-            - source: SPRING_DATASOURCE_USERNAME
-              target: SPRING_DATASOURCE_USERNAME
         deploy:
             mode: replicated
             replicas: 1
@@ -25,11 +21,7 @@ services:
                 syslog-facility: local7
 
 secrets:
-    SPRING_DATASOURCE_PASSWORD:
-        external: true
-    SPRING_DATASOURCE_URL:
-        external: true
-    SPRING_DATASOURCE_USERNAME:
+    SCHEDULER_SPRING_DATASOURCE_PASSWORD:
         external: true
 
 networks:
