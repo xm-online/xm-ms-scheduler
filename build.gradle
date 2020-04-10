@@ -69,7 +69,6 @@ checkstyle {
 defaultTasks 'bootRun'
 
 group = 'com.icthh.xm.ms.scheduler'
-version = '0.0.1-SNAPSHOT'
 
 description = ''
 
