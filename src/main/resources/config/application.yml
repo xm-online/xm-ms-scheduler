@@ -185,3 +185,7 @@ application:
         enabled: true
         connectionTimeoutTopic: 1000
         metricTopics: system_topic
+
+gracefulShutdown:
+    enabled: false
+    shutdownDelay:
