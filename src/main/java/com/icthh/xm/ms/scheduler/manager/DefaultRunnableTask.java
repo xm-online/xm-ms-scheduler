@@ -53,10 +53,11 @@ public class DefaultRunnableTask implements RunnableTask {
                 // time to delete
                 deleteExpired();
             }
+        } catch (Throwable ex) {
+            log.error(ex.getMessage(), ex);
         } finally {
             MdcUtils.clear();
         }
-
     }
 
     /**
