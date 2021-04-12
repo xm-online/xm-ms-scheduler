@@ -33,7 +33,11 @@
             <Pattern>%d %-5level [%thread] [%X{rid}] %logger{0}: %msg%n</Pattern>
         </encoder>
     </appender>
-
+    
+    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+    
     <logger name="javax.activation" level="WARN"/>
     <logger name="javax.mail" level="WARN"/>
     <logger name="javax.management.remote" level="WARN"/>
@@ -81,7 +85,7 @@
     </contextListener>
 
     <root level="#logback.loglevel#">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="${LOG_APPENDER_NAME:-STDOUT}"/>
     </root>
 
 </configuration>
