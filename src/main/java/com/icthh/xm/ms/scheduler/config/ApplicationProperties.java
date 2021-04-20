@@ -23,6 +23,7 @@ public class ApplicationProperties {
     private final Scheduler scheduler = new Scheduler();
 
     private List<String> tenantIgnoredPathList = Collections.emptyList();
+    private List<String> timelineIgnoredHttpMethods = Collections.emptyList();
     // TODO - why do we need this property?
     private boolean streamBindingEnabled = true;
     private boolean kafkaEnabled;
