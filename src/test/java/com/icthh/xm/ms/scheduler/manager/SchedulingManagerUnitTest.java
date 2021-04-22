@@ -113,7 +113,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         // due to fixed rate we need to delete task little bit earlier
         waitAndDeleteTask(495, task);
 
-        expectRunAndExpiryCounts(task, 5, 0);
+        expectRunAndExpiryCounts(task, 6, 0);
 
     }
 
