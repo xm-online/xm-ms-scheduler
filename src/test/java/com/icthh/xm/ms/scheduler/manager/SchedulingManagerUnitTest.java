@@ -109,14 +109,14 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     @Test
     public void testInitFixedRateTasks() {
 
-        TaskDTO task = createTaskFixedRate(100L, null, null);
+        TaskDTO task = createTaskFixedRate(1000L, null, null);
 
         initScheduling(task);
 
         // due to fixed rate we need to delete task little bit earlier
-        waitAndDeleteTask(495, task);
+        waitAndDeleteTask(4950, task);
 
-        expectRunAndExpiryCounts(task, 6, 0);
+        expectRunAndExpiryCounts(task, 5, 0);
 
     }
 
