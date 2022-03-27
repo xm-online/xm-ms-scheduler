@@ -25,7 +25,8 @@ public class TaskTestUtil {
                                      String cron,
                                      Instant startDate,
                                      Instant endDate,
-                                     Integer ttl) {
+                                     Integer ttl,
+                                     String cronTriggerTimeZoneId) {
         TaskDTO dto = new TaskDTO();
         dto.setId(aLong.incrementAndGet());
         dto.setScheduleType(type);
@@ -34,23 +35,28 @@ public class TaskTestUtil {
         dto.setStartDate(startDate);
         dto.setEndDate(endDate);
         dto.setTtl(ttl);
+        dto.setCronTriggerTimeZoneId(cronTriggerTimeZoneId);
         return dto;
     }
 
     public static TaskDTO createTaskFixedDelay(Long delay, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.FIXED_DELAY, delay, null, startDate, endDate, null);
+        return createTask(ScheduleType.FIXED_DELAY, delay, null, startDate, endDate, null, null);
     }
 
     public static TaskDTO createTaskFixedRate(Long delay, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.FIXED_RATE, delay, null, startDate, endDate, null);
+        return createTask(ScheduleType.FIXED_RATE, delay, null, startDate, endDate, null, null);
     }
 
     public static TaskDTO createTaskByCron(String cron, Instant startDate, Instant endDate) {
-        return createTask(ScheduleType.CRON, null, cron, startDate, endDate, null);
+        return createTask(ScheduleType.CRON, null, cron, startDate, endDate, null, null);
+    }
+
+    public static TaskDTO createTaskByCron(String cron, String cronTriggerTimeZoneId) {
+        return createTask(ScheduleType.CRON, null, cron, null, null, null, cronTriggerTimeZoneId);
     }
 
     public static TaskDTO createTaskOneTime(Instant startDate, Integer ttl) {
-        return createTask(ScheduleType.ONE_TIME, null, null, startDate, null, ttl);
+        return createTask(ScheduleType.ONE_TIME, null, null, startDate, null, ttl, null);
     }
 
     public static void waitFor(long wait) {

@@ -16,6 +16,7 @@ import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
@@ -291,7 +293,13 @@ public class SchedulingManager {
                 future = taskScheduler.scheduleAtFixedRate(expirable, getStartDate(task), task.getDelay());
                 break;
             case CRON:
-                future = taskScheduler.schedule(expirable, new CronTrigger(task.getCronExpression()));
+                if (StringUtils.isNotBlank(task.getCronTriggerTimeZoneId())) {
+                    ZoneId zoneId = ZoneId.of(task.getCronTriggerTimeZoneId());
+                    TimeZone timeZone = TimeZone.getTimeZone(zoneId);
+                    future = taskScheduler.schedule(expirable, new CronTrigger(task.getCronExpression(), timeZone));
+                } else {
+                    future = taskScheduler.schedule(expirable, new CronTrigger(task.getCronExpression()));
+                }
                 break;
             case ONE_TIME:
                 future = scheduleOneTimeTask(expirable, task);

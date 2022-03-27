@@ -39,6 +39,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,6 +132,32 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         expectRunAndExpiryCounts(task, 4, 0);
 
+    }
+
+    @Test
+    public void testCronTimeZone() {
+        // micronesia time zone id
+        String testZoneId = "Pacific/Kosrae";
+        String systemTimeZone = ZoneId.systemDefault().getId();
+        assert !testZoneId.equals(systemTimeZone); // precondition for correct test
+
+        var kosraeTime = LocalTime.now(ZoneId.of(testZoneId));
+        TaskDTO task = createTaskByCron("0/1 * " + kosraeTime.getHour() + " * * ?", testZoneId);
+        initScheduling(task);
+        waitAndDeleteTask(2000, task);
+        expectRunAndExpiryCounts(task, 2, 0);
+
+        kosraeTime = LocalTime.now(ZoneId.of(testZoneId));
+        TaskDTO task2 = createTaskByCron("0/1 * " + kosraeTime.getHour() + " * * ?", systemTimeZone);
+        initScheduling(task2);
+        waitAndDeleteTask(2000, task2);
+        expectRunAndExpiryCounts(task2, 0, 0);
+
+        var systemTime = LocalTime.now();
+        TaskDTO task3 = createTaskByCron("0/1 * " + systemTime.getHour() + " * * ?", systemTimeZone);
+        initScheduling(task3);
+        waitAndDeleteTask(2000, task3);
+        expectRunAndExpiryCounts(task3, 2, 0);
     }
 
     @Test
