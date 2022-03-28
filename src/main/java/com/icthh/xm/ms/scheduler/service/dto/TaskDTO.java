@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -40,6 +42,9 @@ public class TaskDTO implements Serializable {
     private Long delay;
 
     private String cronExpression;
+
+    @Getter @Setter
+    private String cronTriggerTimeZoneId;
 
     private ChannelType channelType;
 
@@ -222,6 +227,7 @@ public class TaskDTO implements Serializable {
             + ", scheduleType='" + getScheduleType() + "'"
             + ", delay=" + getDelay()
             + ", cronExpression='" + getCronExpression() + "'"
+            + ", cronTriggerTimeZoneId='" + getCronTriggerTimeZoneId() + "'"
             + ", channelType='" + getChannelType() + "'"
             + ", description='" + getDescription() + "'"
             + ", ttl='" + getTtl() + "'"

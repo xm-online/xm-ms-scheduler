@@ -39,6 +39,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
@@ -106,14 +109,14 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     @Test
     public void testInitFixedRateTasks() {
 
-        TaskDTO task = createTaskFixedRate(100L, null, null);
+        TaskDTO task = createTaskFixedRate(1000L, null, null);
 
         initScheduling(task);
 
         // due to fixed rate we need to delete task little bit earlier
-        waitAndDeleteTask(495, task);
+        waitAndDeleteTask(4950, task);
 
-        expectRunAndExpiryCounts(task, 6, 0);
+        expectRunAndExpiryCounts(task, 5, 0);
 
     }
 
@@ -129,6 +132,32 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
 
         expectRunAndExpiryCounts(task, 4, 0);
 
+    }
+
+    @Test
+    public void testCronTimeZone() {
+        // micronesia time zone id
+        String testZoneId = "Pacific/Kosrae";
+        String systemTimeZone = ZoneId.systemDefault().getId();
+        assert !testZoneId.equals(systemTimeZone); // precondition for correct test
+
+        var kosraeTime = LocalTime.now(ZoneId.of(testZoneId));
+        TaskDTO task = createTaskByCron("0/1 * " + kosraeTime.getHour() + " * * ?", testZoneId);
+        initScheduling(task);
+        waitAndDeleteTask(2000, task);
+        expectRunAndExpiryCounts(task, 2, 0);
+
+        kosraeTime = LocalTime.now(ZoneId.of(testZoneId));
+        TaskDTO task2 = createTaskByCron("0/1 * " + kosraeTime.getHour() + " * * ?", systemTimeZone);
+        initScheduling(task2);
+        waitAndDeleteTask(2000, task2);
+        expectRunAndExpiryCounts(task2, 0, 0);
+
+        var systemTime = LocalTime.now();
+        TaskDTO task3 = createTaskByCron("0/1 * " + systemTime.getHour() + " * * ?", systemTimeZone);
+        initScheduling(task3);
+        waitAndDeleteTask(2000, task3);
+        expectRunAndExpiryCounts(task3, 2, 0);
     }
 
     @Test
