@@ -1,16 +1,5 @@
 package com.icthh.xm.ms.scheduler.manager;
 
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.XM_TENANT;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
@@ -21,11 +10,14 @@ import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
 import com.icthh.xm.ms.scheduler.SchedulerApp;
 import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
 import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,8 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.math.BigInteger;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -47,10 +39,28 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.XM_TENANT;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
     SchedulerApp.class,
@@ -91,6 +101,66 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
                                                   executed -> executedTasks.add(executed.getId()),
                                                   expired -> expiredTasks.add(expired.getId()),
                                                   tenantListRepository, taskRepository);
+    }
+
+    @Test
+    public void testConcurrentTaskCreate() throws InterruptedException, ExecutionException {
+        CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
+        CountDownLatch runLatch = new CountDownLatch(BigInteger.ONE.intValue());
+        var thread1 = Executors.newSingleThreadExecutor();
+        var thread2 = Executors.newSingleThreadExecutor();
+
+        Future<TaskDTO> task1 = thread1.submit(() -> {
+            TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
+            when(taskRepository.findById(1L)).thenReturn(Optional.of(
+                    new Task().startDate(Instant.now()).endDate(Instant.now())
+            ));
+
+            TaskDTO taskDto = new TaskDTO() {
+                @Override
+                @SneakyThrows
+                public ScheduleType getScheduleType() {
+                    log.info("Scheduling task 1 in progress");
+                    runLatch.countDown();
+                    log.info("Scheduling task 1 paused, task 2 should be run");
+                    latch.await();
+                    log.info("Scheduling task 1 unpaused");
+                    return super.getScheduleType();
+                }
+            };
+            taskDto.setId(1L);
+            taskDto.setKey(UUID.randomUUID().toString());
+            taskDto.setScheduleType(ScheduleType.ONE_TIME);
+            taskDto.setStartDate(Instant.now().plus(1, ChronoUnit.HOURS));
+            log.info("Scheduling task 1 start");
+            schedulingManager.createOrUpdateActiveUserTask(taskDto);
+            log.info("Scheduling task 1 finish");
+            return taskDto;
+        });
+        runLatch.await();
+        Future<TaskDTO> task2 = thread2.submit(() -> {
+            TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
+            when(taskRepository.findById(2L)).thenReturn(Optional.of(
+                    new Task().startDate(Instant.now()).endDate(Instant.now())
+            ));
+
+            TaskDTO taskDto = new TaskDTO();
+            taskDto.setId(2L);
+            taskDto.setKey(UUID.randomUUID().toString());
+            taskDto.setScheduleType(ScheduleType.ONE_TIME);
+            taskDto.setStartDate(Instant.now().plus(1, ChronoUnit.HOURS));
+            log.info("Scheduling task 2 start");
+            schedulingManager.createOrUpdateActiveUserTask(taskDto);
+            log.info("Scheduling task 2 finish");
+            latch.countDown();
+            log.info("Scheduling task 1 should be unpaused");
+            return taskDto;
+        });
+        log.info("All tasks scheduled");
+        task1.get();
+        log.info("Thread 1 finished");
+        task2.get();
+        log.info("Thread 2 finished");
     }
 
     @Test

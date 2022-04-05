@@ -184,7 +184,7 @@ public class SchedulingManager {
         //Synchronization is necessary because task can start earlier than its future is created in collection
         CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
         String currentTenant = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
-        schedulers.computeIfAbsent(currentTenant, tenant -> new HashMap<>());
+        schedulers.computeIfAbsent(currentTenant, tenant -> new ConcurrentHashMap<>());
 
         task.setTenant(currentTenant);
 
