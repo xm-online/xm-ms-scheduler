@@ -149,7 +149,7 @@ public class SchedulingManager {
         Map<String, ScheduledFuture> scheduledTasks = tasks
             .stream()
             .peek(task -> task.setTenant(tenantName))
-            .collect(Collectors.toMap(SchedulingManager::getTaskKey, taskDTO -> this.schedule(taskDTO, latch)));
+            .collect(Collectors.toConcurrentMap(SchedulingManager::getTaskKey, taskDTO -> this.schedule(taskDTO, latch)));
 
         schedulers.put(tenantName, scheduledTasks);
         latch.countDown();
