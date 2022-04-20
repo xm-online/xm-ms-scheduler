@@ -146,10 +146,11 @@ public class SchedulingManager {
 
         //Synchronization is necessary because task can start earlier than its future is created in collection
         CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
-        Map<String, ScheduledFuture> scheduledTasks = new ConcurrentHashMap<>();
-        tasks.stream().peek(task -> task.setTenant(tenantName)).forEach(taskDTO -> {
-            scheduledTasks.put(SchedulingManager.getTaskKey(taskDTO), this.schedule(taskDTO, latch));
-        });
+        Map<String, ScheduledFuture> scheduledTasks = tasks
+            .stream()
+            .peek(task -> task.setTenant(tenantName))
+            .collect(Collectors.toConcurrentMap(SchedulingManager::getTaskKey, taskDTO -> this.schedule(taskDTO, latch)));
+
         schedulers.put(tenantName, scheduledTasks);
         latch.countDown();
 
