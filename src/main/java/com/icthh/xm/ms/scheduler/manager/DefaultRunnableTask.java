@@ -37,22 +37,25 @@ public class DefaultRunnableTask implements RunnableTask {
         MdcUtils.putRid(MdcUtils.generateRid() + "::" + task.getTenant());
 
         try {
-            if (isExpiredBeforeExecution()) {
-                deleteExpired();
-                return;
-            }
 
-            log.info("execute scheduled task: {}", task);
-            manager.handleTask(task);
+            log.info("\n\nTEST RUN\n\n");
 
-            if (afterRun != null) {
-                afterRun.accept(task);
-            }
-
-            if (isExpiredAfterExecution()) {
-                // time to delete
-                deleteExpired();
-            }
+//            if (isExpiredBeforeExecution()) {
+//                deleteExpired();
+//                return;
+//            }
+//
+//            log.info("execute scheduled task: {}", task);
+//            manager.handleTask(task);
+//
+//            if (afterRun != null) {
+//                afterRun.accept(task);
+//            }
+//
+//            if (isExpiredAfterExecution()) {
+//                // time to delete
+//                deleteExpired();
+//            }
         } finally {
             MdcUtils.clear();
         }
