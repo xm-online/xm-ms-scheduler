@@ -7,6 +7,7 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
@@ -104,7 +105,7 @@ public class DefaultRunnableTask implements RunnableTask {
             //if one time task was executed it is already expired
             case ONE_TIME:
                 if (task.getStartDate() != null
-                    && task.getStartDate().isBefore(Instant.now())) {
+                    && task.getStartDate().minus(1, ChronoUnit.MINUTES).isBefore(Instant.now())) {
                     log.info("remove scheduled task {} due to finished execution", task.getId());
                     return true;
                 } else {
