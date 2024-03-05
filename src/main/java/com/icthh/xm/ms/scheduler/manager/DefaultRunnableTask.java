@@ -27,6 +27,7 @@ public class DefaultRunnableTask implements RunnableTask {
     final Consumer<TaskDTO> afterRun;
     final Consumer<TaskDTO> afterExpiry;
     final CountDownLatch latch;
+    final int infelicity;
 
     @Override
     @SneakyThrows
@@ -105,7 +106,7 @@ public class DefaultRunnableTask implements RunnableTask {
             //if one time task was executed it is already expired
             case ONE_TIME:
                 if (task.getStartDate() != null
-                    && task.getStartDate().minus(1, ChronoUnit.MINUTES).isBefore(Instant.now())) {
+                    && task.getStartDate().minus(infelicity, ChronoUnit.SECONDS).isBefore(Instant.now())) {
                     log.info("remove scheduled task {} due to finished execution", task.getId());
                     return true;
                 } else {

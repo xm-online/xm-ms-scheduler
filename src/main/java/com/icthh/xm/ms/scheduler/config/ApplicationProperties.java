@@ -38,6 +38,7 @@ public class ApplicationProperties {
     public static class Scheduler {
         private int threadPoolSize = 5;
         private String taskPathPattern;
+        private int infelicity;
     }
 
     // TODO - do we need this properties?

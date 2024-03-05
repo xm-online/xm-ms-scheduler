@@ -177,6 +177,7 @@ application:
     scheduler:
         task-path-pattern: /config/tenants/{tenantName}/scheduler/tasks.yml
         thread-pool-size: 5
+        infelicity: 60
     retry:
         max-attempts: 3
         delay: 1000 #in milliseconds

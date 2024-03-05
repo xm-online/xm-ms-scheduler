@@ -87,7 +87,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
                                                   executed -> executedTasks.add(executed.getId()),
                                                   expired -> expiredTasks.add(expired.getId()),
-                                                  tenantListRepository, taskRepository);
+                                                  tenantListRepository, taskRepository,1);
     }
 
     @Test

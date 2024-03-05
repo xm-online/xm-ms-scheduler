@@ -17,18 +17,20 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class SchedulingConfiguration {
 
     @Bean(destroyMethod = "destroy")
-    public SchedulingManager schedulingManager(TenantContextHolder tenantContextHolder,
+    public SchedulingManager schedulingManager(ApplicationProperties applicationProperties,
+                                               TenantContextHolder tenantContextHolder,
                                                ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                                SystemTaskService systemTaskService,
                                                ScheduledTaskHandler handler,
                                                TenantListRepository tenantListRepository,
                                                TaskRepository taskRepository) {
         return new SchedulingManager(tenantContextHolder, threadPoolTaskScheduler,
-                                     systemTaskService, handler, tenantListRepository, taskRepository);
+            systemTaskService, handler, tenantListRepository, taskRepository, applicationProperties.getScheduler().getInfelicity());
     }
 
     /**
      * Creates the thread pool  task scheduler.
+     *
      * @param applicationProperties the application properties
      * @return the scheduler
      */

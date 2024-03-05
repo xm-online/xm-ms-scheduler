@@ -100,7 +100,7 @@ public class SchedulingManagerStreamUnitTest {
             .forEach(s -> messageCollector.forChannel(channelResolver.resolveDestination(s)).clear());
 
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler,
-            systemTaskService, handler, tenantListRepository, taskRepository);
+            systemTaskService, handler, tenantListRepository, taskRepository,1);
 
         when(tenantContext.getTenantKey()).thenReturn(Optional.of(TenantKey.valueOf(TEST_TENANT)));
         when(tenantContextHolder.getContext()).thenReturn(tenantContext);

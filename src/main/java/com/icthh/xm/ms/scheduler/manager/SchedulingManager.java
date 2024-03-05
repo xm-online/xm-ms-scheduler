@@ -47,6 +47,7 @@ public class SchedulingManager {
     private final ScheduledTaskHandler handler;
     private final TenantListRepository tenantListRepository;
     private final TaskRepository taskRepository;
+    private final int infelicity;
 
     private Consumer<TaskDTO> afterRun;
     private Consumer<TaskDTO> afterExpiration;
@@ -54,22 +55,28 @@ public class SchedulingManager {
     private Map<String, Map<String, ScheduledFuture>> systemSchedulers = new ConcurrentHashMap<>();
     private Map<String, Map<String, ScheduledFuture>> userSchedulers = new ConcurrentHashMap<>();
 
-    /** The constructor. */
+    /**
+     * The constructor.
+     */
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
                              final ThreadPoolTaskScheduler taskScheduler,
                              final SystemTaskService taskService,
                              final ScheduledTaskHandler handler,
                              final TenantListRepository tenantListRepository,
-                             final TaskRepository taskRepository) {
+                             final TaskRepository taskRepository,
+                             final int infelicity) {
         this.tenantContextHolder = tenantContextHolder;
         this.taskScheduler = taskScheduler;
         this.taskService = taskService;
         this.handler = handler;
         this.tenantListRepository = tenantListRepository;
         this.taskRepository = taskRepository;
+        this.infelicity = infelicity;
     }
 
-    /** The constructor. */
+    /**
+     * The constructor.
+     */
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
                              final ThreadPoolTaskScheduler taskScheduler,
                              final SystemTaskService taskService,
@@ -77,8 +84,9 @@ public class SchedulingManager {
                              final Consumer<TaskDTO> afterRun,
                              final Consumer<TaskDTO> afterExpiration,
                              final TenantListRepository tenantListRepository,
-                             final TaskRepository taskRepository) {
-        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository, taskRepository);
+                             final TaskRepository taskRepository,
+                             final int infelicity) {
+        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository, taskRepository, infelicity);
         this.afterRun = afterRun;
         this.afterExpiration = afterExpiration;
     }
@@ -275,7 +283,7 @@ public class SchedulingManager {
     }
 
     private ScheduledFuture schedule(TaskDTO task, CountDownLatch latch) {
-        return schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration, latch));
+        return schedule(new DefaultRunnableTask(task, this, afterRun, afterExpiration, latch, infelicity));
     }
 
     private ScheduledFuture schedule(RunnableTask expirable) {
