@@ -301,6 +301,10 @@ dependencies {
     implementation "com.icthh.xm.commons:xm-commons-timeline:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-metric:${xm_commons_version}"
 
+    implementation "io.undertow:undertow-core:${undertow_version}"
+    implementation "io.undertow:undertow-servlet:${undertow_version}"
+    implementation "io.undertow:undertow-websockets-jsr:${undertow_version}"
+
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor "org.glassfish.jaxb:jaxb-runtime:${jaxb_runtime_version}"
