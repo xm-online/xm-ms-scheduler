@@ -38,7 +38,6 @@ public class ApplicationProperties {
     @Setter
     public static class Scheduler {
         private int threadPoolSize = 5;
-        private String taskPathPattern;
     }
 
     // TODO - do we need this properties?

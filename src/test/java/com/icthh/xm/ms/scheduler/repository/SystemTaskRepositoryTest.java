@@ -1,20 +1,10 @@
 package com.icthh.xm.ms.scheduler.repository;
 
-import static com.icthh.xm.commons.tenant.TenantContextUtils.getRequiredTenantKeyValue;
-import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
-import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
-
-import java.io.IOException;
-import java.io.InputStream;
-
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -24,6 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import static com.icthh.xm.commons.tenant.TenantContextUtils.getRequiredTenantKeyValue;
+import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
+import static com.icthh.xm.ms.scheduler.repository.SystemTaskRepository.FILE_PATTERN;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -40,9 +39,6 @@ public class SystemTaskRepositoryTest extends AbstractSpringContextTest {
     @Autowired
     private SchedulingManager schedulingManager;
 
-    @Autowired
-    ApplicationProperties applicationProperties;
-
     private String key;
     private String config;
     private String configUpdated;
@@ -58,7 +54,7 @@ public class SystemTaskRepositoryTest extends AbstractSpringContextTest {
         configUpdated = readConfig(TEST_YAML_UPDATED);
 
         String tenantName = getRequiredTenantKeyValue(tenantContextHolder);
-        key = applicationProperties.getScheduler().getTaskPathPattern().replace("{tenantName}", tenantName);
+        key = FILE_PATTERN.replace("{tenantName}", tenantName);
 
     }
 
