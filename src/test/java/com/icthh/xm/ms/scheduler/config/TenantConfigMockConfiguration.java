@@ -3,8 +3,10 @@ package com.icthh.xm.ms.scheduler.config;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.icthh.xm.commons.config.client.repository.CommonConfigRepository;
 import com.icthh.xm.commons.config.client.repository.TenantConfigRepository;
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
+import com.icthh.xm.commons.config.client.service.TenantAliasService;
 import com.icthh.xm.commons.web.spring.TenantVerifyInterceptor;
 import com.icthh.xm.ms.scheduler.TaskTestUtil;
 
@@ -39,5 +41,10 @@ public class TenantConfigMockConfiguration {
     @Primary
     public TenantVerifyInterceptor tenantVerifyInterceptor() {
         return mock(TenantVerifyInterceptor.class);
+    }
+
+    @Bean
+    public TenantAliasService tenantAliasService() {
+        return new TenantAliasService(mock(CommonConfigRepository.class), mock(TenantListRepository.class));
     }
 }

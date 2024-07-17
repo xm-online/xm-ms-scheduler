@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -93,6 +94,9 @@ public class SystemTaskRepository implements RefreshableConfiguration {
         Map<String, TaskDTO> tasks = new HashMap<>();
         byFiles.values().forEach(tasks::putAll);
         configTasks.put(tenant, tasks);
+        if (MapUtils.isEmpty(configTasks.get(tenant))) {
+            configTasks.remove(tenant);
+        }
     }
 
     private String extractTenant(final String updatedKey) {

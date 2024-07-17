@@ -4,8 +4,7 @@ import com.icthh.xm.commons.logging.util.MdcUtils;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.TenantKey;
-import com.icthh.xm.commons.topic.message.LepMessageHandler;
-import com.icthh.xm.commons.topic.service.TopicConfigurationService;
+import com.icthh.xm.commons.tenant.spring.config.TenantContextConfiguration;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
 import com.icthh.xm.ms.scheduler.config.DefaultProfileUtil;
 
@@ -21,23 +20,17 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 @SpringBootApplication(scanBasePackages = "com.icthh.xm")
-@EnableAutoConfiguration
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
-@ComponentScan(excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = TopicConfigurationService.class),
-    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = LepMessageHandler.class)
-})
+@Import({TenantContextConfiguration.class})
 public class SchedulerApp {
 
     private static final Logger log = LoggerFactory.getLogger(SchedulerApp.class);
