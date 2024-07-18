@@ -135,6 +135,8 @@ xm-config:
     enabled: false
 
 application:
+    scheduler-task-consumer:
+        enabled: false
     timeline-ignored-http-methods:
     scheduler:
         thread-pool-size: 5
