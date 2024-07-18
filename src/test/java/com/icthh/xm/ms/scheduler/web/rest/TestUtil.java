@@ -3,6 +3,7 @@ package com.icthh.xm.ms.scheduler.web.rest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.SneakyThrows;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
@@ -48,6 +49,11 @@ public final class TestUtil {
     public static byte[] convertObjectToJsonBytes(Object object)
             throws IOException {
         return mapper.writeValueAsBytes(object);
+    }
+
+    @SneakyThrows
+    public static String convertObjectToJsons(Object object) {
+        return mapper.writeValueAsString(object);
     }
 
     /**

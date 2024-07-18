@@ -33,12 +33,18 @@ public class ApplicationProperties {
     private String h2Port = "9099";
 
     private KafkaMetric kafkaMetric;
+    private SchedulerTaskConsumer schedulerTaskConsumer;
 
     @Getter
     @Setter
     public static class Scheduler {
         private int threadPoolSize = 5;
-        private String taskPathPattern;
+    }
+
+    @Getter
+    @Setter
+    public static class SchedulerTaskConsumer {
+        private Boolean enabled = true;
     }
 
     // TODO - do we need this properties?

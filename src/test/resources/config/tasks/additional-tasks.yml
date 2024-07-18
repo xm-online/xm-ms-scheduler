@@ -1,0 +1,23 @@
+tasks:
+    - key: task-3
+      typeKey: TASK.TEST.THREE
+      stateKey:
+      name: "name of task 3"
+      scheduleType: "FIXED_DELAY"
+      channelType: "QUEUE"
+      endDate:
+      startDate:
+      delay: 10000
+      cronExpression:
+      data: |
+                {
+                    "key1": "value3",
+                    "key2": 12345,
+                    "complex": {
+                        "subkey": "test subkey 3",
+                        "subkey2": 12121.14
+                    }
+                }
+      createdBy: "testCreatedBy"
+      description: "testDescription"
+

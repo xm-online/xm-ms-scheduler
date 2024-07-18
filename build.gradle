@@ -77,7 +77,7 @@ eclipse {
 
 pmd {
     rulePriority = 3
-    toolVersion = '5.5.4'
+    toolVersion = '6.55.0'
     ignoreFailures = true
     ruleSetFiles = files("./qa/pmd.xml")
 }
@@ -300,6 +300,8 @@ dependencies {
     implementation "com.icthh.xm.commons:xm-commons-permission:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-timeline:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-metric:${xm_commons_version}"
+    implementation "com.icthh.xm.commons:xm-commons-topic:${xm_commons_version}"
+    implementation "com.icthh.xm.commons:xm-commons-lep-groovy:${xm_commons_version}"
 
     implementation "io.undertow:undertow-core:${undertow_version}"
     implementation "io.undertow:undertow-servlet:${undertow_version}"

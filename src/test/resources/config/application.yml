@@ -135,9 +135,10 @@ xm-config:
     enabled: false
 
 application:
+    scheduler-task-consumer:
+        enabled: false
     timeline-ignored-http-methods:
     scheduler:
-        task-path-pattern: /config/tenants/{tenantName}/scheduler/tasks.yml
         thread-pool-size: 5
     kafka-system-topic: system_topic
     kafka-system-queue: system_queue
