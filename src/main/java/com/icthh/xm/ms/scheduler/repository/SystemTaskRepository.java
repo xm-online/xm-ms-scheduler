@@ -2,6 +2,7 @@ package com.icthh.xm.ms.scheduler.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.icthh.xm.commons.config.client.api.RefreshableConfiguration;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
 import com.icthh.xm.ms.scheduler.domain.spec.TasksSpec;
@@ -31,7 +32,7 @@ public class SystemTaskRepository implements RefreshableConfiguration {
     public static final String FOLDER_PATTERN = "/config/tenants/{tenantName}/scheduler/tasks/*.yml";
 
     private AntPathMatcher matcher = new AntPathMatcher();
-    private ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).registerModule(new JavaTimeModule());
 
     @Getter // tenant -> taskKey -> TaskDTO
     private Map<String, Map<String, TaskDTO>> configTasks = new ConcurrentHashMap<>();
