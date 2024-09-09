@@ -302,6 +302,8 @@ dependencies {
     implementation "com.icthh.xm.commons:xm-commons-metric:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-topic:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-lep-groovy:${xm_commons_version}"
+    implementation "com.icthh.xm.commons:xm-commons-lep-annotation-processor:${xm_commons_version}"
+    annotationProcessor "com.icthh.xm.commons:xm-commons-lep-annotation-processor:${xm_commons_version}"
 
     implementation "io.undertow:undertow-core:${undertow_version}"
     implementation "io.undertow:undertow-servlet:${undertow_version}"
