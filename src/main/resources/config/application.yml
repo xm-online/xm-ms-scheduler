@@ -3,16 +3,42 @@ management:
         web:
             base-path: /management
             exposure:
-                include: ["configprops", "env", "health", "info", "threaddump", "logfile", "jhimetrics", "prometheus" ]
+                include:
+                    - configprops
+                    - env
+                    - health
+                    - info
+                    - threaddump
+                    - logfile
+                    - jhimetrics
+                    - prometheus
     endpoint:
         health:
             show-details: when_authorized
+            roles: 'SUPER-ADMIN'
+            probes:
+                enabled: true
+            group:
+                liveness:
+                    include: livenessState
+                readiness:
+                    include: readinessState,db
+        jhimetrics:
+            enabled: true
     info:
         git:
             mode: full
     health:
         mail:
             enabled: false # When using the MailService, configure an SMTP server and set this to true
+    observations:
+        key-values:
+            application: ${spring.application.name}
+    prometheus:
+        metrics:
+            export:
+                enabled: true
+                step: 60
     metrics:
         enable:
             http: true
@@ -20,27 +46,30 @@ management:
             logback: true
             process: true
             system: true
-    prometheus:
-        metrics:
-            export:
-                enabled: true
-                step: 60
+        distribution:
+            percentiles-histogram:
+                all: true
+            percentiles:
+                all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+        tags:
+            application: ${spring.application.name}
+
 spring:
     application:
         name: scheduler
+    main:
+        allow-bean-definition-overriding: true
+        web-application-type: servlet
     cloud:
         consul:
+            enabled: true
             discovery:
                 healthCheckPath: /management/health
                 instanceId: ${spring.application.name}:${spring.application.instance-id:${random.value}}
+                service-name: ${spring.application.name}
             config:
                 watch:
                     enabled: false
-        stream:
-            kafka:
-                binder:
-                    autoCreateTopics: true
-                    healthTimeout: 2
 
     jackson:
         serialization.write_dates_as_timestamps: false
@@ -53,11 +82,8 @@ spring:
                 implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
     messages:
         basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: false
     thymeleaf:
-        mode: XHTML
+        mode: HTML
     kafka:
         consumer:
             group-id: ${spring.application.name}
@@ -71,6 +97,7 @@ spring:
     liquibase:
         default-schema: XM
         change-log: classpath:config/liquibase/master.xml
+        enabled: true
 
 security:
     basic:
