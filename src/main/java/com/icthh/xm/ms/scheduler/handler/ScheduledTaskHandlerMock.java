@@ -3,7 +3,7 @@ package com.icthh.xm.ms.scheduler.handler;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

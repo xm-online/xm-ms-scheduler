@@ -2,15 +2,12 @@ package com.icthh.xm.ms.scheduler.service.dto;
 
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-
-import io.github.jhipster.service.filter.Filter;
-import io.github.jhipster.service.filter.InstantFilter;
-import io.github.jhipster.service.filter.LongFilter;
-import io.github.jhipster.service.filter.StringFilter;
+import tech.jhipster.service.filter.Filter;
+import tech.jhipster.service.filter.InstantFilter;
+import tech.jhipster.service.filter.LongFilter;
+import tech.jhipster.service.filter.StringFilter;
 
 import java.io.Serializable;
-
-
 
 
 /**

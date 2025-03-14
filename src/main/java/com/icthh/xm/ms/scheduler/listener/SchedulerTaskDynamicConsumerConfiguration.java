@@ -11,9 +11,7 @@ import com.icthh.xm.ms.scheduler.service.TaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,19 +22,18 @@ import java.util.List;
 
 import static com.icthh.xm.commons.tenant.TenantContextUtils.buildTenant;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "application.scheduler-task-consumer.enabled", havingValue = "false", matchIfMissing = true)
 public class SchedulerTaskDynamicConsumerConfiguration implements DynamicConsumerConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(SchedulerTaskDynamicConsumerConfiguration.class);
     private final SchedulerTaskConsumerRefreshableConfiguration consumerConfiguration;
     private final TaskService taskService;
     private final TenantContextHolder tenantContextHolder;
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final TenantListRepository tenantListRepository;
-
 
     @EventListener
     public void onReady(ApplicationReadyEvent applicationReadyEvent) {

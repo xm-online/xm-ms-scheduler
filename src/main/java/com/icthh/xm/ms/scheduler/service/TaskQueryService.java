@@ -4,16 +4,10 @@ import com.icthh.xm.commons.permission.annotation.FindWithPermission;
 import com.icthh.xm.commons.permission.annotation.PrivilegeDescription;
 import com.icthh.xm.commons.permission.repository.CriteriaPermittedRepository;
 import com.icthh.xm.ms.scheduler.domain.Task;
-
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskCriteria;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
-
-import io.github.jhipster.service.QueryService;
-
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.jhipster.service.QueryService;
+
+import java.util.List;
 
 /**
  * Service for executing complex queries for Task entities in the database.

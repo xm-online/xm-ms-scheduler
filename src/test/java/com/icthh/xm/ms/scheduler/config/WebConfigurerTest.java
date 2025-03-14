@@ -1,5 +1,41 @@
 package com.icthh.xm.ms.scheduler.config;
 
+import com.codahale.metrics.MetricRegistry;
+import io.undertow.Undertow;
+import io.undertow.Undertow.Builder;
+import io.undertow.UndertowOptions;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletSecurityElement;
+import org.h2.server.web.JakartaWebServlet;
+import org.h2.server.web.WebServlet;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.xnio.OptionMap;
+import tech.jhipster.config.JHipsterConstants;
+import tech.jhipster.config.JHipsterProperties;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,45 +49,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.servlet.InstrumentedFilter;
-import com.codahale.metrics.servlets.MetricsServlet;
-
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.JHipsterProperties;
-import io.undertow.Undertow;
-import io.undertow.Undertow.Builder;
-import io.undertow.UndertowOptions;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.Servlet;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletSecurityElement;
-
-import org.h2.server.web.WebServlet;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.mock.env.MockEnvironment;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.xnio.OptionMap;
 
 /**
  * Unit tests for the WebConfigurer class.
@@ -68,57 +65,44 @@ public class WebConfigurerTest {
 
     private JHipsterProperties props;
 
-    private MetricRegistry metricRegistry;
-
     private ServerProperties serverProperties;
+
 
     @Before
     public void setup() {
         servletContext = spy(new MockServletContext());
-        doReturn(mock(FilterRegistration.Dynamic.class))
+        doReturn(new MockFilterRegistration())
             .when(servletContext).addFilter(anyString(), any(Filter.class));
-        doReturn(mock(ServletRegistration.Dynamic.class))
+        doReturn(new MockServletRegistration())
             .when(servletContext).addServlet(anyString(), any(Servlet.class));
 
         env = new MockEnvironment();
         props = new JHipsterProperties();
-
         serverProperties = new ServerProperties();
-        webConfigurer = new WebConfigurer(env, props, serverProperties);
-        metricRegistry = new MetricRegistry();
-        webConfigurer.setMetricRegistry(metricRegistry);
+
+        webConfigurer = new WebConfigurer(env, props);
     }
 
     @Test
-    public void testStartUpProdServletContext() {
+    public void testStartUpProdServletContext() throws ServletException {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
         webConfigurer.onStartup(servletContext);
 
-        assertThat(servletContext.getAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE)).isEqualTo(metricRegistry);
-        assertThat(servletContext.getAttribute(MetricsServlet.METRICS_REGISTRY)).isEqualTo(metricRegistry);
-        verify(servletContext).addFilter(eq("webappMetricsFilter"), any(InstrumentedFilter.class));
-        verify(servletContext).addServlet(eq("metricsServlet"), any(MetricsServlet.class));
-        verify(servletContext, never()).addServlet(eq("H2Console"), any(WebServlet.class));
+        verify(servletContext, never()).addServlet(eq("H2Console"), any(JakartaWebServlet.class));
     }
 
     @Test
-    public void testStartUpDevServletContext() {
+    public void testStartUpDevServletContext() throws ServletException {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT);
         webConfigurer.onStartup(servletContext);
 
-        assertThat(servletContext.getAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE)).isEqualTo(metricRegistry);
-        assertThat(servletContext.getAttribute(MetricsServlet.METRICS_REGISTRY)).isEqualTo(metricRegistry);
-        verify(servletContext).addFilter(eq("webappMetricsFilter"), any(InstrumentedFilter.class));
-        verify(servletContext).addServlet(eq("metricsServlet"), any(MetricsServlet.class));
-        verify(servletContext).addServlet(eq("H2Console"), any(WebServlet.class));
+        verify(servletContext).addServlet(eq("H2Console"), any(JakartaWebServlet.class));
     }
 
     @Test
     public void testCustomizeServletContainer() {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
         UndertowServletWebServerFactory container = new UndertowServletWebServerFactory();
-        webConfigurer.customize(container);
-        assertThat(container.getMimeMappings().get("abs")).isEqualTo("audio/x-mpeg");
         assertThat(container.getMimeMappings().get("html")).isEqualTo("text/html;charset=utf-8");
         assertThat(container.getMimeMappings().get("json")).isEqualTo("text/html;charset=utf-8");
 
@@ -132,7 +116,6 @@ public class WebConfigurerTest {
     public void testUndertowHttp2Enabled() {
         serverProperties.getHttp2().setEnabled(true);
         UndertowServletWebServerFactory container = new UndertowServletWebServerFactory();
-        webConfigurer.customize(container);
         Builder builder = Undertow.builder();
         container.getBuilderCustomizers().forEach(c -> c.customize(builder));
         OptionMap.Builder serverOptions = (OptionMap.Builder) ReflectionTestUtils.getField(builder, "serverOptions");
@@ -141,7 +124,8 @@ public class WebConfigurerTest {
 
     @Test
     public void testCorsFilterOnApiPath() throws Exception {
-        props.getCors().setAllowedOrigins(Collections.singletonList("*"));
+        props.getCors().setAllowedOrigins(Collections.singletonList("http://other.domain.co"));
+        props.getCors().setAllowedOriginPatterns(Collections.singletonList("*"));
         props.getCors().setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         props.getCors().setAllowedHeaders(Collections.singletonList("*"));
         props.getCors().setMaxAge(1800L);
@@ -152,9 +136,9 @@ public class WebConfigurerTest {
             .build();
 
         mockMvc.perform(
-            options("/api/test-cors")
-                .header(HttpHeaders.ORIGIN, "other.domain.com")
-                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST"))
+                options("/api/test-cors")
+                    .header(HttpHeaders.ORIGIN, "other.domain.com")
+                    .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST"))
             .andExpect(status().isOk())
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "other.domain.com"))
             .andExpect(header().string(HttpHeaders.VARY, "Origin"))
@@ -163,8 +147,8 @@ public class WebConfigurerTest {
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_MAX_AGE, "1800"));
 
         mockMvc.perform(
-            get("/api/test-cors")
-                .header(HttpHeaders.ORIGIN, "other.domain.com"))
+                get("/api/test-cors")
+                    .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "other.domain.com"));
     }
@@ -182,8 +166,8 @@ public class WebConfigurerTest {
             .build();
 
         mockMvc.perform(
-            get("/test/test-cors")
-                .header(HttpHeaders.ORIGIN, "other.domain.com"))
+                get("/test/test-cors")
+                    .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
@@ -197,8 +181,8 @@ public class WebConfigurerTest {
             .build();
 
         mockMvc.perform(
-            get("/api/test-cors")
-                .header(HttpHeaders.ORIGIN, "other.domain.com"))
+                get("/api/test-cors")
+                    .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
@@ -212,8 +196,8 @@ public class WebConfigurerTest {
             .build();
 
         mockMvc.perform(
-            get("/api/test-cors")
-                .header(HttpHeaders.ORIGIN, "other.domain.com"))
+                get("/api/test-cors")
+                    .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
     }

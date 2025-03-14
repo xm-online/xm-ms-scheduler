@@ -1,24 +1,16 @@
 package com.icthh.xm.ms.scheduler.nameresolver;
 
+import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static org.junit.Assert.assertEquals;
 
-import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
-import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-/**
- *
- */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class TenantAwareChannelNameResolverTest extends AbstractSpringContextTest {
+public class TenantAwareChannelNameResolverTest extends AbstractSpringBootTest {
 
     @Autowired
     ChannelNameResolver nameResolver;

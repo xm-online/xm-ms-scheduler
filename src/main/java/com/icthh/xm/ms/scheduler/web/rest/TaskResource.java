@@ -6,22 +6,12 @@ import com.icthh.xm.commons.exceptions.ErrorConstants;
 import com.icthh.xm.commons.permission.annotation.PrivilegeDescription;
 import com.icthh.xm.ms.scheduler.service.TaskQueryService;
 import com.icthh.xm.ms.scheduler.service.TaskService;
-
 import com.icthh.xm.ms.scheduler.service.dto.TaskCriteria;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.web.rest.util.HeaderUtil;
 import com.icthh.xm.ms.scheduler.web.rest.util.PaginationUtil;
-
-import io.github.jhipster.web.util.ResponseUtil;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.Valid;
-
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +27,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing Task.

@@ -19,11 +19,6 @@ logging:
         com.icthh.xm.ms.scheduler: INFO
         io.github.jhipster: INFO
 
-management:
-    health:
-        binders:
-            enabled: true
-
 spring:
     devtools:
         restart:
@@ -36,19 +31,11 @@ spring:
                prefer-ip-address: true
             host: localhost
             port: 8500
-        stream:
-            kafka:
-                binder:
-                    brokers: localhost
-                    defaultBrokerPort: 9092
-            bindings:
-                output:
-                    destination: topic-jhipster
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:postgresql://localhost:5432/scheduler
-        username: scheduler
-        password:
+        username: postgres
+        password: postgres
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
@@ -79,7 +66,7 @@ spring:
             discovery:
                 enabled: true
     kafka:
-        bootstrap-servers: localhost:9093
+        bootstrap-servers: localhost:9092
 
     liquibase:
         contexts: prod
@@ -111,8 +98,6 @@ server:
         min-response-size: 1024
     http2:
         enabled: false # To use HTTP/2 you will need SSL support (see above the "server.ssl" configuration)
-        cache: # Used by the CachingHttpHeadersFilter
-            timeToLiveInDays: 1461
 
 # ===================================================================
 # JHipster specific properties
@@ -121,37 +106,25 @@ server:
 # ===================================================================
 
 jhipster:
+    http:
+        cache: # Used by the CachingHttpHeadersFilter
+            timeToLiveInDays: 1461
+    cache: # Cache configuration
+        caffeine: # Caffeine configuration
+            time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache. This sets expireAfterWrite in Caffeine (https://github.com/ben-manes/caffeine/wiki/Eviction#time-based)
+            max-entries: 1000 # Number of objects in each cache entry
     security:
         client-authorization:
             access-token-uri: http://uaa/oauth/token
             token-service-id: uaa
             client-id: internal
             client-secret: internal
-    mail: # specific JHipster mail property, for standard properties see MailProperties
-        from: scheduler@localhost
-        base-url: http://my-server-url-to-change # Modify according to your server's URL
-    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-        logs: # Reports Dropwizard metrics in the logs
-            enabled: false
-            report-frequency: 60 # in seconds
     logging:
+        use-json-format: false # By default, logs are not in Json format
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
             enabled: false
             host: localhost
             port: 5000
-            queue-size: 512
-
-oauth2:
-    signature-verification:
-         public-key-endpoint-uri: http://config/api/token_key
-         #ttl for public keys to verify JWT tokens (in ms)
-         ttl: 3600000
-         #max. rate at which public keys will be fetched (in ms)
-         public-key-refresh-rate-limit: 10000
-    web-client-configuration:
-        #keep in sync with UAA configuration
-        client-id: web_app
-        secret: changeit
 
 # ===================================================================
 # Application specific properties

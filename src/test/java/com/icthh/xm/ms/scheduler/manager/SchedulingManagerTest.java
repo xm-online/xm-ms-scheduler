@@ -6,9 +6,7 @@ import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
-import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
-import com.icthh.xm.ms.scheduler.SchedulerApp;
-import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
@@ -20,15 +18,12 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -51,22 +46,13 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-/**
- *
- */
 @Slf4j
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {
-    SchedulerApp.class,
-    SecurityBeanOverrideConfiguration.class
-})
-public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
+public class SchedulingManagerTest extends AbstractSpringBootTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
     private Multiset<Long> executedTasks = HashMultiset.create();
@@ -98,9 +84,9 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
 
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
-                                                  executed -> executedTasks.add(executed.getId()),
-                                                  expired -> expiredTasks.add(expired.getId()),
-                                                  tenantListRepository, taskRepository);
+            executed -> executedTasks.add(executed.getId()),
+            expired -> expiredTasks.add(expired.getId()),
+            tenantListRepository, taskRepository);
     }
 
     @Test
@@ -113,7 +99,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         Future<TaskDTO> task1 = thread1.submit(() -> {
             TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
             when(taskRepository.findById(1L)).thenReturn(Optional.of(
-                    new Task().startDate(Instant.now()).endDate(Instant.now())
+                new Task().startDate(Instant.now()).endDate(Instant.now())
             ));
 
             TaskDTO taskDto = new TaskDTO() {
@@ -141,7 +127,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
         Future<TaskDTO> task2 = thread2.submit(() -> {
             TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
             when(taskRepository.findById(2L)).thenReturn(Optional.of(
-                    new Task().startDate(Instant.now()).endDate(Instant.now())
+                new Task().startDate(Instant.now()).endDate(Instant.now())
             ));
 
             TaskDTO taskDto = new TaskDTO();
@@ -387,7 +373,7 @@ public class SchedulingManagerUnitTest extends AbstractSpringContextTest {
     }
 
     private void initScheduling(TaskDTO... tasks) {
-        List taskList = Arrays.asList(tasks);
+        List<TaskDTO> taskList = Arrays.asList(tasks);
 
         Answer<List<TaskDTO>> answer = invocation -> {
             if (TenantContextUtils.getRequiredTenantKey(tenantContextHolder).getValue().equals(XM_TENANT)) {

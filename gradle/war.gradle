@@ -1,7 +1,7 @@
 apply plugin: "war"
 
 bootWar {
-    mainClassName = "com.icthh.xm.ms.scheduler.SchedulerApp"
+    mainClass = "com.icthh.xm.ms.scheduler.SchedulerApp"
     includes = ["WEB-INF/**", "META-INF/**"]
 }
 

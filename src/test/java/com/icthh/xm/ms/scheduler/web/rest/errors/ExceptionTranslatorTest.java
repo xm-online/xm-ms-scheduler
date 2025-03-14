@@ -2,15 +2,12 @@ package com.icthh.xm.ms.scheduler.web.rest.errors;
 
 import com.icthh.xm.commons.exceptions.ErrorConstants;
 import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
-import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
+import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -19,14 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Test class for the ExceptionTranslator controller advice.
- *
- * @see ExceptionTranslator
- */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ExceptionTranslatorIntTest extends AbstractSpringContextTest {
+public class ExceptionTranslatorTest extends AbstractSpringBootTest {
 
     @Autowired
     private ExceptionTranslatorTestController controller;

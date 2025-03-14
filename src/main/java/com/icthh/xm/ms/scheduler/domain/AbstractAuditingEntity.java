@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.time.Instant;
-import javax.persistence.Column;
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
 
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
@@ -19,8 +19,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * Base abstract class for entities which will hold definitions for created, last modified by and created,
  * last modified by date.
  */
-@MappedSuperclass
 @Audited
+@MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractAuditingEntity implements Serializable {
 

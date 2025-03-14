@@ -1,0 +1,29 @@
+/*
+ * Plugin that provides API-first development using OpenAPI-generator to
+ * generate Spring-MVC endpoint stubs at compile time from an OpenAPI definition file
+ */
+apply plugin: "org.openapi.generator"
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$rootDir/src/main/resources/swagger/api.yml".toString()
+    outputDir = "$buildDir/openapi".toString()
+    apiPackage = "com.icthh.xm.ms.scheduler.web.api"
+    modelPackage = "com.icthh.xm.ms.scheduler.service.api.dto"
+    apiFilesConstrainedTo = [""]
+    modelFilesConstrainedTo = [""]
+    supportingFilesConstrainedTo = ["ApiUtil.java"]
+    configOptions = [delegatePattern: "true", title: "scheduler", useSpringBoot3: "true", useJakartaEe: "true"]
+    validateSpec = true
+    importMappings = [Problem:"org.springframework.http.ProblemDetail"]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir file("${project.buildDir.path}/openapi/src/main/java")
+        }
+    }
+}
+
+compileJava.dependsOn("openApiGenerate")
