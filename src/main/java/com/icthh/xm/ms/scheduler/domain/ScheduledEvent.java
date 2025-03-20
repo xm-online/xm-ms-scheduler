@@ -5,7 +5,7 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;

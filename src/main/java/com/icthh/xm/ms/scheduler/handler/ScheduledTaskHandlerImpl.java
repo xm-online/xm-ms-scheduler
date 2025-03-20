@@ -1,38 +1,30 @@
 package com.icthh.xm.ms.scheduler.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icthh.xm.commons.topic.service.KafkaTemplateService;
 import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
-import org.springframework.messaging.support.MessageBuilder;
-
-/**
- * Default implementation for scheduled task handler. Sends messages to spring cloud stream (kafka binding)
- *
- * <p>Receives {@link ChannelNameResolver} for tenant based resolver name creation
- *
- * <p>and {@link BinderAwareChannelResolver} for actual message sending into the channel.
- */
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
 
     private static final String DEFAULT_KEY = "value";
-    private final BinderAwareChannelResolver channelResolver;
+    private final KafkaTemplateService kafkaTemplateService;
     private final ChannelNameResolver nameResolver;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
     @Override
     public void handle(final TaskDTO task) {
@@ -41,24 +33,23 @@ public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
 
         try {
             ScheduledEvent event = ScheduledEvent.builder()
-                                                 .uuid(UUID.randomUUID().toString())
-                                                 .handlingTime(Instant.now())
-                                                 .id(task.getId())
-                                                 .key(task.getKey())
-                                                 .name(task.getName())
-                                                 .typeKey(task.getTypeKey())
-                                                 .stateKey(task.getStateKey())
-                                                 .createdBy(task.getCreatedBy())
-                                                 .startDate(task.getStartDate())
-                                                 .endDate(task.getEndDate())
-                                                 .channelType(task.getChannelType())
-                                                 .data(Optional.ofNullable(task.getData())
-                                                               .map(this::parseDataSilent).orElse(null))
-                                                 .build();
+                .uuid(UUID.randomUUID().toString())
+                .handlingTime(Instant.now())
+                .id(task.getId())
+                .key(task.getKey())
+                .name(task.getName())
+                .typeKey(task.getTypeKey())
+                .stateKey(task.getStateKey())
+                .createdBy(task.getCreatedBy())
+                .startDate(task.getStartDate())
+                .endDate(task.getEndDate())
+                .channelType(task.getChannelType())
+                .data(Optional.ofNullable(task.getData()).map(this::parseDataSilent).orElse(null))
+                .build();
 
             log.info("send into channel [{}], event: {}", channel, event);
-            channelResolver.resolveDestination(channel).send(MessageBuilder.withPayload(event).build());
 
+            kafkaTemplateService.send(channel, Base64.getEncoder().encodeToString(mapper.writeValueAsBytes(event)));
         } catch (Exception e) {
             log.error("unable to send task into channel [{}], task: {}, error: {}", channel, task, e.getMessage());
             throw new RuntimeException(e);

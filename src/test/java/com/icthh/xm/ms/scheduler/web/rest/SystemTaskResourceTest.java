@@ -1,5 +1,25 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
+import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
+import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import com.icthh.xm.ms.scheduler.service.SystemTaskService;
+import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.Collections;
+
 import static com.icthh.xm.ms.scheduler.web.rest.TestUtil.createFormattingConversionService;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.nullValue;
@@ -9,35 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
-import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-import com.icthh.xm.ms.scheduler.service.SystemTaskService;
-import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.Collections;
-
-/**
- *
- */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class SystemTaskResourceTest extends AbstractSpringContextTest {
+public class SystemTaskResourceTest extends AbstractSpringBootTest {
 
     private static final String DEFAULT_KEY = "systask1";
     private static final String DEFAULT_NAME = null;
@@ -73,9 +65,9 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
         when(systemTaskService.findOneSystemTask("systask1")).thenReturn(createTask());
 
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
-                                              .setControllerAdvice(exceptionTranslator)
-                                              .setConversionService(createFormattingConversionService())
-                                              .setMessageConverters(jacksonMessageConverter).build();
+            .setControllerAdvice(exceptionTranslator)
+            .setConversionService(createFormattingConversionService())
+            .setMessageConverters(jacksonMessageConverter).build();
     }
 
     private TaskDTO createTask() {
@@ -104,22 +96,22 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
 
         // Get the task
         restTaskMockMvc.perform(get("/api/systasks/{key}", task.getKey()))
-                       .andExpect(status().isOk())
-                       .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                       .andExpect(jsonPath("$.id").value(nullValue()))
-                       .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
-                       .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-                       .andExpect(jsonPath("$.typeKey").value(DEFAULT_TYPE_KEY))
-                       .andExpect(jsonPath("$.stateKey").value(DEFAULT_STATE_KEY))
-                       .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY))
-                       .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE))
-                       .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE))
-                       .andExpect(jsonPath("$.scheduleType").value(DEFAULT_SCHEDULE_TYPE.toString()))
-                       .andExpect(jsonPath("$.delay").value(DEFAULT_DELAY.intValue()))
-                       .andExpect(jsonPath("$.cronExpression").value(DEFAULT_CRON_EXPRESSION))
-                       .andExpect(jsonPath("$.channelType").value(DEFAULT_CHANNEL_TYPE))
-                       .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
-                       .andExpect(jsonPath("$.data").value(DEFAULT_DATA));
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.id").value(nullValue()))
+            .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.typeKey").value(DEFAULT_TYPE_KEY))
+            .andExpect(jsonPath("$.stateKey").value(DEFAULT_STATE_KEY))
+            .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY))
+            .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE))
+            .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE))
+            .andExpect(jsonPath("$.scheduleType").value(DEFAULT_SCHEDULE_TYPE.toString()))
+            .andExpect(jsonPath("$.delay").value(DEFAULT_DELAY.intValue()))
+            .andExpect(jsonPath("$.cronExpression").value(DEFAULT_CRON_EXPRESSION))
+            .andExpect(jsonPath("$.channelType").value(DEFAULT_CHANNEL_TYPE))
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.data").value(DEFAULT_DATA));
     }
 
     @Test
@@ -128,22 +120,22 @@ public class SystemTaskResourceTest extends AbstractSpringContextTest {
 
         // Get all the taskList
         restTaskMockMvc.perform(get("/api/systasks"))
-                       .andExpect(status().isOk())
-                       .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                       .andExpect(jsonPath("$.[*].id").value(hasItem(nullValue())))
-                       .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
-                       .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-                       .andExpect(jsonPath("$.[*].typeKey").value(hasItem(DEFAULT_TYPE_KEY)))
-                       .andExpect(jsonPath("$.[*].stateKey").value(hasItem(DEFAULT_STATE_KEY)))
-                       .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
-                       .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE)))
-                       .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE)))
-                       .andExpect(jsonPath("$.[*].scheduleType").value(hasItem(DEFAULT_SCHEDULE_TYPE.toString())))
-                       .andExpect(jsonPath("$.[*].delay").value(hasItem(DEFAULT_DELAY.intValue())))
-                       .andExpect(jsonPath("$.[*].cronExpression").value(hasItem(DEFAULT_CRON_EXPRESSION)))
-                       .andExpect(jsonPath("$.[*].channelType").value(hasItem(DEFAULT_CHANNEL_TYPE)))
-                       .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-                       .andExpect(jsonPath("$.[*].data").value(hasItem(DEFAULT_DATA)));
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(nullValue())))
+            .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].typeKey").value(hasItem(DEFAULT_TYPE_KEY)))
+            .andExpect(jsonPath("$.[*].stateKey").value(hasItem(DEFAULT_STATE_KEY)))
+            .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
+            .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE)))
+            .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE)))
+            .andExpect(jsonPath("$.[*].scheduleType").value(hasItem(DEFAULT_SCHEDULE_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].delay").value(hasItem(DEFAULT_DELAY.intValue())))
+            .andExpect(jsonPath("$.[*].cronExpression").value(hasItem(DEFAULT_CRON_EXPRESSION)))
+            .andExpect(jsonPath("$.[*].channelType").value(hasItem(DEFAULT_CHANNEL_TYPE)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].data").value(hasItem(DEFAULT_DATA)));
     }
 
 }

@@ -9,10 +9,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Properties specific to Scheduler.
- *
- * Properties are configured in the application.yml file.
- * See {@link io.github.jhipster.config.JHipsterProperties} for a good example.
+ * Properties specific to JHipster.
+ * <p> Properties are configured in the application.yml file. </p>
  */
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 @Getter

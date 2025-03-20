@@ -3,17 +3,14 @@ package com.icthh.xm.ms.scheduler.repository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
-import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
+import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,9 +22,7 @@ import static com.icthh.xm.ms.scheduler.repository.SystemTaskRepository.FOLDER_P
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class SystemTaskRepositoryTest extends AbstractSpringContextTest {
+public class SystemTaskRepositoryTest extends AbstractSpringBootTest {
 
     private static final String TEST_YAML = "config/tasks/tasks.yml";
     private static final String TEST_ADDITIONAL_YAML = "config/tasks/additional-tasks.yml";
@@ -75,16 +70,16 @@ public class SystemTaskRepositoryTest extends AbstractSpringContextTest {
         systemTaskRepository.onRefresh(additionalKey, additionalConfig);
         assertThat(systemTaskRepository.getConfigTasks().size()).isEqualTo(1);
         assertThat(systemTaskRepository.getConfigTasks()
-                                       .get(getRequiredTenantKeyValue(tenantContextHolder))
-                                       .size()).isEqualTo(3);
+            .get(getRequiredTenantKeyValue(tenantContextHolder))
+            .size()).isEqualTo(3);
         assertThat(systemTaskRepository.getConfigTasks()
-                                       .get(getRequiredTenantKeyValue(tenantContextHolder))
-                                       .get("task-1")
-                                       .getData()).contains("\"subkey\": \"test subkey\"");
+            .get(getRequiredTenantKeyValue(tenantContextHolder))
+            .get("task-1")
+            .getData()).contains("\"subkey\": \"test subkey\"");
         assertThat(systemTaskRepository.getConfigTasks()
-                                        .get(getRequiredTenantKeyValue(tenantContextHolder))
-                                        .get("task-3")
-                                        .getData()).contains("\"subkey\": \"test subkey 3\"");
+            .get(getRequiredTenantKeyValue(tenantContextHolder))
+            .get("task-3")
+            .getData()).contains("\"subkey\": \"test subkey 3\"");
         systemTaskRepository.onRefresh(key, null);
         assertThat(systemTaskRepository.getConfigTasks().size()).isEqualTo(1);
         systemTaskRepository.onRefresh(additionalKey, null);

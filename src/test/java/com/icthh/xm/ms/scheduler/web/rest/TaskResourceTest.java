@@ -1,57 +1,51 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
 import com.icthh.xm.commons.i18n.error.web.ExceptionTranslator;
-import com.icthh.xm.ms.scheduler.AbstractSpringContextTest;
-import com.icthh.xm.ms.scheduler.SchedulerApp;
-import com.icthh.xm.ms.scheduler.config.SecurityBeanOverrideConfiguration;
+import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
+import com.icthh.xm.ms.scheduler.service.TaskQueryService;
 import com.icthh.xm.ms.scheduler.service.TaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
-import com.icthh.xm.ms.scheduler.service.TaskQueryService;
-
+import jakarta.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import static com.icthh.xm.ms.scheduler.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
-import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 /**
  * Test class for the TaskResource REST controller.
  *
  * @see TaskResource
  */
-@RunWith(SpringRunner.class)
+
 @WithMockUser(authorities = {"SUPER-ADMIN"})
-@SpringBootTest(classes = {
-    SchedulerApp.class,
-    SecurityBeanOverrideConfiguration.class
-})
-public class TaskResourceIntTest extends AbstractSpringContextTest {
+public class TaskResourceTest extends AbstractSpringBootTest {
 
     private static final String DEFAULT_KEY = "AAAAAAAAAA";
     private static final String UPDATED_KEY = "BBBBBBBBBB";
@@ -127,13 +121,14 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setConversionService(TestUtil.createFormattingConversionService())
+            .setMessageConverters(jacksonMessageConverter)
+            .build();
     }
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -168,8 +163,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         // Create the Task
         TaskDTO taskDTO = taskMapper.toDto(task);
         restTaskMockMvc.perform(post("/api/tasks")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Task in the database
@@ -202,8 +197,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTaskMockMvc.perform(post("/api/tasks")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Task in the database
@@ -222,8 +217,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         TaskDTO taskDTO = taskMapper.toDto(task);
 
         restTaskMockMvc.perform(post("/api/tasks")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isBadRequest());
 
         List<Task> taskList = taskRepository.findAll();
@@ -241,8 +236,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         TaskDTO taskDTO = taskMapper.toDto(task);
 
         restTaskMockMvc.perform(post("/api/tasks")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isBadRequest());
 
         List<Task> taskList = taskRepository.findAll();
@@ -836,6 +831,7 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         // Get all the taskList where data is null
         defaultTaskShouldNotBeFound("data.specified=false");
     }
+
     /**
      * Executes the search, and checks that the default entity is returned
      */
@@ -908,8 +904,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
         TaskDTO taskDTO = taskMapper.toDto(updatedTask);
 
         restTaskMockMvc.perform(put("/api/tasks")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isOk());
 
         // Validate the Task in the database
@@ -941,8 +937,8 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
         restTaskMockMvc.perform(put("/api/tasks")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Task in the database
@@ -959,7 +955,7 @@ public class TaskResourceIntTest extends AbstractSpringContextTest {
 
         // Get the task
         restTaskMockMvc.perform(delete("/api/tasks/{id}", task.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+                .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
         // Validate the database is empty

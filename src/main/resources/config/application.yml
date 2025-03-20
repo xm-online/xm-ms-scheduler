@@ -1,50 +1,44 @@
-# ===================================================================
-# Spring Boot configuration.
-#
-# This configuration will be overridden by the Spring profile you use,
-# for example application-dev.yml if you use the "dev" profile.
-#
-# More information on profiles: https://www.jhipster.tech/profiles/
-# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
-# ===================================================================
-
-# ===================================================================
-# Standard Spring Boot properties.
-# Full reference is available at:
-# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
-# ===================================================================
-
-feign:
-    hystrix:
-        enabled: true
-
-# See https://github.com/Netflix/Hystrix/wiki/Configuration
-hystrix:
-    command:
-        default:
-            execution:
-                isolation:
-                    strategy: SEMAPHORE
-# See https://github.com/spring-cloud/spring-cloud-netflix/issues/1330
-#                    thread:
-#                        timeoutInMilliseconds: 10000
-    shareSecurityContext: true
-
 management:
     endpoints:
         web:
             base-path: /management
             exposure:
-                include: ["configprops", "env", "health", "info", "threaddump", "logfile", "jhimetrics", "prometheus" ]
+                include:
+                    - configprops
+                    - env
+                    - health
+                    - info
+                    - threaddump
+                    - logfile
+                    - jhimetrics
+                    - prometheus
     endpoint:
         health:
             show-details: when_authorized
+            roles: 'SUPER-ADMIN'
+            probes:
+                enabled: true
+            group:
+                liveness:
+                    include: livenessState
+                readiness:
+                    include: readinessState,db
+        jhimetrics:
+            enabled: true
     info:
         git:
             mode: full
     health:
         mail:
             enabled: false # When using the MailService, configure an SMTP server and set this to true
+    observations:
+        key-values:
+            application: ${spring.application.name}
+    prometheus:
+        metrics:
+            export:
+                enabled: true
+                step: 60
     metrics:
         enable:
             http: true
@@ -52,26 +46,30 @@ management:
             logback: true
             process: true
             system: true
-        export:
-            prometheus:
-                enabled: true
-                step: 60
+        distribution:
+            percentiles-histogram:
+                all: true
+            percentiles:
+                all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+        tags:
+            application: ${spring.application.name}
+
 spring:
     application:
         name: scheduler
+    main:
+        allow-bean-definition-overriding: true
+        web-application-type: servlet
     cloud:
         consul:
+            enabled: true
             discovery:
                 healthCheckPath: /management/health
                 instanceId: ${spring.application.name}:${spring.application.instance-id:${random.value}}
+                service-name: ${spring.application.name}
             config:
                 watch:
                     enabled: false
-        stream:
-            kafka:
-                binder:
-                    autoCreateTopics: true
-                    healthTimeout: 2
 
     jackson:
         serialization.write_dates_as_timestamps: false
@@ -84,23 +82,22 @@ spring:
                 implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
     messages:
         basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: false
     thymeleaf:
-        mode: XHTML
+        mode: HTML
     kafka:
         consumer:
-            group-id: scheduler
+            group-id: ${spring.application.name}
             key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
         listener:
             concurrency: 16
         producer:
-            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer
     liquibase:
         default-schema: XM
         change-log: classpath:config/liquibase/master.xml
+        enabled: true
 
 security:
     basic:
@@ -127,31 +124,16 @@ info:
 # ===================================================================
 
 jhipster:
-    async:
-        core-pool-size: 2
-        max-pool-size: 50
-        queue-capacity: 10000
-    # By default CORS is disabled. Uncomment to enable.
-    #cors:
-        #allowed-origins: "*"
-        #allowed-methods: "*"
-        #allowed-headers: "*"
-        #exposed-headers: "Authorization,Link,X-Total-Count"
-        #allow-credentials: true
-        #max-age: 1800
-    mail:
-        from: scheduler@localhost
-    swagger:
-        default-include-pattern: /api/.*
-        title: scheduler API
-        description: scheduler API documentation
-        version: 0.0.1
-        terms-of-service-url:
-        contact-name:
-        contact-url:
-        contact-email:
-        license:
-        license-url:
+    clientApp:
+        name: 'schedulerApp'
+    api-docs:
+        default-include-pattern: ${server.servlet.context-path:}/api/**
+        management-include-pattern: ${server.servlet.context-path:}/management/**
+        title: Scheduler API
+        description: Scheduler API documentation
+    security:
+        content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:"
+
 
 # ===================================================================
 # Application specific properties
@@ -164,7 +146,8 @@ jhipster:
 
 xm-config:
     enabled: true
-    xm-config-url: http://config
+    configMode: FILE
+    configDirPath: D:\work\IdeaProjects\dila\dila-config-repository
     kafka-config-topic: config_topic
 
 application:
