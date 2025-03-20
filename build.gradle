@@ -73,6 +73,15 @@ springBoot {
     mainClass = "com.icthh.xm.ms.scheduler.SchedulerApp"
 }
 
+bootWar {
+    mainClass = "com.icthh.xm.ms.scheduler.SchedulerApp"
+    manifest {
+        attributes(
+            "Implementation-Version": archiveVersion
+        )
+    }
+}
+
 String[] testCategories = ['com.icthh.xm.ms.scheduler.AbstractSpringBootTest',
                            'com.icthh.xm.ms.scheduler.AbstractUnitTest']
 
