@@ -21,6 +21,7 @@ plugins {
     id "org.sonarqube"
     id "io.spring.nohttp"
     id 'pmd'
+    id "war"
     id "com.github.spotbugs"
     id "com.github.andygoossens.gradle-modernizer-plugin"
     id "org.liquibase.gradle"
