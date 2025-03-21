@@ -146,8 +146,7 @@ jhipster:
 
 xm-config:
     enabled: true
-    configMode: FILE
-    configDirPath: D:\work\IdeaProjects\dila\dila-config-repository
+    xm-config-url: http://config
     kafka-config-topic: config_topic
 
 application:
