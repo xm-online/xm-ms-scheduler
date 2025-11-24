@@ -219,6 +219,7 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
 
+    implementation("io.swagger.core.v3:swagger-annotations-jakarta")
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenapiVersion}"
     implementation 'io.micrometer:micrometer-tracing'
     implementation 'io.micrometer:micrometer-core'
