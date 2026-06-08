@@ -72,14 +72,17 @@ spring:
                     enabled: false
 
     jackson:
-        serialization.write_dates_as_timestamps: false
+        serialization:
+            indent-output: true
+        mapper:
+            sort-properties-alphabetically: false
     jpa:
         open-in-view: false
         hibernate:
             ddl-auto: none
             naming:
-                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl
+                implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
     messages:
         basename: i18n/messages
     thymeleaf:

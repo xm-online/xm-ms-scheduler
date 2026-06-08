@@ -25,7 +25,7 @@ plugins {
     id "com.github.spotbugs"
     id "com.github.andygoossens.gradle-modernizer-plugin"
     id "org.liquibase.gradle"
-    id 'io.spring.dependency-management' version '1.1.4'
+    id "io.spring.dependency-management" version "${springDependencyManagement}"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
@@ -37,11 +37,11 @@ dependencyManagement {
 group = "com.icthh.xm.ms.scheduler"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
-assert System.properties["java.specification.version"] == "21"
+assert System.properties["java.specification.version"] == "25"
 
 apply from: "gradle/docker.gradle"
 apply from: "gradle/swagger.gradle"
@@ -104,10 +104,15 @@ test {
     include '**/*UnitTest*'
     include '**/*IntTest*'
 
-    // to run all test that was not categorized
-    useJUnit {
-        excludeCategories(testCategories)
+    useJUnitPlatform {
+        includeTags(testCategories)
     }
+
+    jvmArgs += [
+            '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.util=ALL-UNNAMED'
+    ]
 
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
@@ -163,8 +168,6 @@ nohttp {
 }
 
 configurations {
-    providedRuntime
-    implementation.exclude module: "spring-boot-starter-tomcat"
     configureEach {
         resolutionStrategy {
             // Inherited version from Spring Boot can't be used because of regressions:
@@ -184,14 +187,12 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${lombok_version}"
     annotationProcessor "org.projectlombok:lombok:${lombok_version}"
 
-    implementation platform("tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}")
-    implementation group: "tech.jhipster", name: "jhipster-framework"
+    implementation("tech.jhipster:jhipster-framework:${jhipsterFrameworkDependenciesVersion}")
 
     implementation "io.micrometer:micrometer-registry-prometheus"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6"
-    implementation "com.fasterxml.jackson.core:jackson-annotations"
-    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "tools.jackson.datatype:jackson-datatype-hppc"
+    implementation "tools.jackson.datatype:jackson-datatype-hibernate7"
+    implementation "tools.jackson.core:jackson-databind"
     implementation "org.hibernate.orm:hibernate-core:${hibernateVersion}"
     implementation "org.hibernate.orm:hibernate-envers:${hibernateVersion}"
     implementation "com.zaxxer:HikariCP"
@@ -200,16 +201,17 @@ dependencies {
     implementation "org.hibernate.validator:hibernate-validator"
     implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
 
-    implementation "org.springframework.boot:spring-boot-loader-tools"
+    implementation "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-starter-logging"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 
     implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation ("org.springframework.boot:spring-boot-starter-web") {
-        exclude module: "spring-boot-starter-tomcat"
-    }
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+//    implementation "org.springframework.boot:spring-boot-starter-kafka"
+//    implementation "org.springframework.retry:spring-retry"
+//    implementation "org.springframework.boot:spring-boot-restclient"
+    implementation "org.springframework.boot:spring-boot-starter-aspectj"
 
     implementation "org.springframework.cloud:spring-cloud-starter"
     implementation "org.springframework.cloud:spring-cloud-starter-bootstrap"
@@ -221,10 +223,6 @@ dependencies {
 
     implementation("io.swagger.core.v3:swagger-annotations-jakarta")
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenapiVersion}"
-    implementation 'io.micrometer:micrometer-tracing'
-    implementation 'io.micrometer:micrometer-core'
-    implementation 'io.micrometer:micrometer-observation'
-    implementation "io.micrometer:micrometer-tracing-bridge-brave"
     implementation "org.postgresql:postgresql"
 
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
@@ -239,6 +237,7 @@ dependencies {
     implementation "com.icthh.xm.commons:xm-commons-migration-db:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-permission:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-metric:${xm_commons_version}"
+    implementation "com.icthh.xm.commons:xm-commons-metric-lep:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-topic:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-logging-configurable:${xm_commons_version}"
     implementation "com.icthh.xm.commons:xm-commons-logging-trace:${xm_commons_version}"
@@ -246,13 +245,16 @@ dependencies {
 
     testCompileOnly "org.projectlombok:lombok:${lombok_version}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
-    testImplementation "org.testcontainers:postgresql"
+    testImplementation "org.testcontainers:postgresql:${testPsqlContainer}"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.springframework.boot:spring-boot-test"
+    testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
     testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
     testImplementation "com.tngtech.archunit:archunit-junit5-api:${archunitJunit5Version}"
     testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunitJunit5Version}"
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
     testImplementation "com.h2database:h2"
     developmentOnly "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
@@ -265,7 +267,7 @@ tasks.register('cleanResources', Delete) {
 }
 
 wrapper {
-    gradleVersion = "8.10"
+    gradleVersion = "9.2.1"
 }
 
 compileJava {

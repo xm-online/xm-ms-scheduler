@@ -1,6 +1,5 @@
 package com.icthh.xm.ms.scheduler.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
 import com.icthh.xm.commons.permission.annotation.PrivilegeDescription;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -36,7 +35,6 @@ public class SystemTaskResource {
      */
     @PostAuthorize("hasPermission({'returnObject': returnObject.body}, 'SYSTEM_TASK.GET_LIST')")
     @GetMapping("/systasks")
-    @Timed
     @PrivilegeDescription("Privilege to get all the tasks")
     public ResponseEntity<List<TaskDTO>> getAllTasks() {
         List<TaskDTO> list = systemTaskService.getSystemTasks();
@@ -51,7 +49,6 @@ public class SystemTaskResource {
      */
     @PostAuthorize("hasPermission({'returnObject': returnObject.body}, 'SYSTEM_TASK.GET_LIST.ITEM')")
     @GetMapping("/systasks/{key}")
-    @Timed
     @PrivilegeDescription("Privilege to get the task by key")
     public ResponseEntity<TaskDTO> getTask(@PathVariable String key) {
         TaskDTO taskDTO = systemTaskService.findOneSystemTask(key);

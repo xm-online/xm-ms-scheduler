@@ -7,8 +7,8 @@ import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
@@ -42,7 +42,7 @@ public class SystemTaskRepositoryTest extends AbstractSpringBootTest {
     private String additionalConfig;
     private String configUpdated;
 
-    @Before
+    @BeforeEach
     @SneakyThrows
     public void init() {
 

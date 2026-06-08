@@ -28,7 +28,6 @@ public class ApplicationProperties {
     private String kafkaSystemTopic;
     private String kafkaSystemQueue;
     private String dbSchemaSuffix;
-    private String h2Port = "9099";
 
     private KafkaMetric kafkaMetric;
     private SchedulerTaskConsumer schedulerTaskConsumer;

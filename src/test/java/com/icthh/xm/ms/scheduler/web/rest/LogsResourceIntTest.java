@@ -5,9 +5,9 @@ import ch.qos.logback.classic.LoggerContext;
 import com.icthh.xm.commons.logging.web.rest.LogsResource;
 import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.web.rest.vm.LoggerVM;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -29,7 +29,7 @@ public class LogsResourceIntTest extends AbstractSpringBootTest {
 
     private MockMvc restLogsMockMvc;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
@@ -58,7 +58,6 @@ public class LogsResourceIntTest extends AbstractSpringBootTest {
             .andExpect(status().isNoContent());
     }
 
-    @Ignore("Test fails when run from Idea")
     @Test
     public void testLogstashAppender() {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
