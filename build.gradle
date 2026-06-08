@@ -208,9 +208,6 @@ dependencies {
 
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-web"
-//    implementation "org.springframework.boot:spring-boot-starter-kafka"
-//    implementation "org.springframework.retry:spring-retry"
-//    implementation "org.springframework.boot:spring-boot-restclient"
     implementation "org.springframework.boot:spring-boot-starter-aspectj"
 
     implementation "org.springframework.cloud:spring-cloud-starter"
@@ -249,7 +246,6 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.springframework.boot:spring-boot-test"
-    testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
     testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
     testImplementation "com.tngtech.archunit:archunit-junit5-api:${archunitJunit5Version}"
     testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunitJunit5Version}"
