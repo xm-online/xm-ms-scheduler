@@ -22,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.math.BigInteger;
@@ -59,7 +58,6 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
     private SchedulingManager schedulingManager;
 
-    @Qualifier("scheduledTaskHandlerMock")
     @Autowired
     private ScheduledTaskHandler handler;
 

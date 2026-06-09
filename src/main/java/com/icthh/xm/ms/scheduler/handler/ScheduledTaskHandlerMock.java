@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class ScheduledTaskHandlerMock implements ScheduledTaskHandler {
 
     private final ChannelNameResolver nameResolver;

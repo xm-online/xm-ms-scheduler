@@ -21,7 +21,7 @@ public class SchedulingConfiguration {
     public SchedulingManager schedulingManager(TenantContextHolder tenantContextHolder,
                                                ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                                SystemTaskService systemTaskService,
-                                               @Qualifier("scheduledTaskHandlerImpl") ScheduledTaskHandler handler,
+                                               ScheduledTaskHandler handler,
                                                TenantListRepository tenantListRepository,
                                                TaskRepository taskRepository) {
         return new SchedulingManager(tenantContextHolder, threadPoolTaskScheduler,

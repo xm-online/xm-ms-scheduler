@@ -14,12 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
 
     private static final String DEFAULT_KEY = "value";
