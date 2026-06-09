@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ExceptionTranslatorTest extends AbstractSpringBootTest {
+public class ExceptionTranslatorIntTest extends AbstractSpringBootTest {
 
     @Autowired
     private ExceptionTranslatorTestController controller;

@@ -82,4 +82,9 @@ public class IntegrationTestConfiguration {
     public TenantAliasService tenantAliasService() {
         return new TenantAliasServiceImpl(mock(CommonConfigRepository.class), mock(TenantListRepository.class));
     }
+
+    @Bean
+    public CommonConfigRepository commonConfigRepository() {
+        return mock(CommonConfigRepository.class);
+    }
 }

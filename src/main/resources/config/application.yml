@@ -81,7 +81,7 @@ spring:
         hibernate:
             ddl-auto: none
             naming:
-                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
                 implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
     messages:
         basename: i18n/messages
@@ -151,6 +151,8 @@ xm-config:
     enabled: true
     xm-config-url: http://config
     kafka-config-topic: config_topic
+    configMode: FILE
+    configDirPath: /Users/viktorpavlenko/work/xm-ms-config-repository
 
 application:
     tenant-ignored-path-list: /swagger-resources/configuration/ui, /management/health, /oauth/token_key, /h2-console

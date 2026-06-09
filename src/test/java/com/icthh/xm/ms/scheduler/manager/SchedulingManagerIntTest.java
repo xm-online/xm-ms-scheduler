@@ -23,6 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.math.BigInteger;
@@ -52,13 +53,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class SchedulingManagerTest extends AbstractSpringBootTest {
+public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
     private Multiset<Long> executedTasks = HashMultiset.create();
 
     private SchedulingManager schedulingManager;
 
+    @Qualifier("scheduledTaskHandler")
     @Autowired
     private ScheduledTaskHandler handler;
 
@@ -383,7 +385,7 @@ public class SchedulingManagerTest extends AbstractSpringBootTest {
         };
 
         // There are two tenants in the Scope, so we need to init tasks only for XM tenant.
-        Mockito.when(systemTaskService.findUserNotFinishedTasks()).thenAnswer(answer);
+        when(systemTaskService.findUserNotFinishedTasks()).thenAnswer(answer);
         schedulingManager.destroy();
         schedulingManager.init();
     }

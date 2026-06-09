@@ -124,7 +124,10 @@ public class TaskResource {
     public ResponseEntity<TaskDTO> getTask(@PathVariable Long id) {
         log.debug("REST request to get Task : {}", id);
         TaskDTO taskDTO = taskService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(taskDTO));
+        if (taskDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(taskDTO);
     }
 
     /**

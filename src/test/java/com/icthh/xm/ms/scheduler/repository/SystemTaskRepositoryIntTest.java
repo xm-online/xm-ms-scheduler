@@ -22,7 +22,7 @@ import static com.icthh.xm.ms.scheduler.repository.SystemTaskRepository.FOLDER_P
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SystemTaskRepositoryTest extends AbstractSpringBootTest {
+public class SystemTaskRepositoryIntTest extends AbstractSpringBootTest {
 
     private static final String TEST_YAML = "config/tasks/tasks.yml";
     private static final String TEST_ADDITIONAL_YAML = "config/tasks/additional-tasks.yml";

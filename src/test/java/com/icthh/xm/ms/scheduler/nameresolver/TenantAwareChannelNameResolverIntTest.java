@@ -10,7 +10,7 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TenantAwareChannelNameResolverTest extends AbstractSpringBootTest {
+public class TenantAwareChannelNameResolverIntTest extends AbstractSpringBootTest {
 
     @Autowired
     ChannelNameResolver nameResolver;

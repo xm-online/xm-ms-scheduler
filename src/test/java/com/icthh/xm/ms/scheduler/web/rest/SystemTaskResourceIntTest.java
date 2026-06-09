@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class SystemTaskResourceTest extends AbstractSpringBootTest {
+public class SystemTaskResourceIntTest extends AbstractSpringBootTest {
 
     private static final String DEFAULT_KEY = "systask1";
     private static final String DEFAULT_NAME = null;

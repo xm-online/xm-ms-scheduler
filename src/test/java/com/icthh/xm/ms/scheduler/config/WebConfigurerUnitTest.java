@@ -10,7 +10,6 @@ import jakarta.servlet.ServletSecurityElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.MimeMappings;
 import org.springframework.boot.web.server.servlet.ConfigurableServletWebServerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.env.MockEnvironment;
@@ -43,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see WebConfigurer
  */
-public class WebConfigurerTest {
+public class WebConfigurerUnitTest {
 
     private WebConfigurer webConfigurer;
 
@@ -72,6 +71,7 @@ public class WebConfigurerTest {
     public void testCustomizeServletContainer() {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
         ConfigurableServletWebServerFactory container = new TomcatServletWebServerFactory();
+        webConfigurer.customize(container);
         assertThat(container.getSettings().getMimeMappings().get("html")).isEqualTo("text/html;charset=utf-8");
         assertThat(container.getSettings().getMimeMappings().get("json")).isEqualTo("text/html;charset=utf-8");
     }

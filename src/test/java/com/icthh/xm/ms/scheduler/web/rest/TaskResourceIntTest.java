@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @WithMockUser(authorities = {"SUPER-ADMIN"})
-public class TaskResourceTest extends AbstractSpringBootTest {
+public class TaskResourceIntTest extends AbstractSpringBootTest {
 
     private static final String DEFAULT_KEY = "AAAAAAAAAA";
     private static final String UPDATED_KEY = "BBBBBBBBBB";
@@ -654,10 +654,10 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         taskRepository.saveAndFlush(task);
 
         // Get all the taskList where delay greater than or equals to DEFAULT_DELAY
-        defaultTaskShouldBeFound("delay.greaterOrEqualThan=" + DEFAULT_DELAY);
+        defaultTaskShouldBeFound("delay.greaterThanOrEqual=" + DEFAULT_DELAY);
 
         // Get all the taskList where delay greater than or equals to UPDATED_DELAY
-        defaultTaskShouldNotBeFound("delay.greaterOrEqualThan=" + UPDATED_DELAY);
+        defaultTaskShouldNotBeFound("delay.greaterThanOrEqual=" + UPDATED_DELAY);
     }
 
     @Test
