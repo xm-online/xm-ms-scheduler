@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * Mock class for scheduler task. Initialized in case if messaging system is disabled with property:
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class ScheduledTaskHandlerMock implements ScheduledTaskHandler {
 
     private final ChannelNameResolver nameResolver;

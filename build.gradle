@@ -104,7 +104,7 @@ test {
     include '**/*UnitTest*'
     include '**/*IntTest*'
 
-    useJUnitPlatform()
+    useJUnitPlatform{}
 
     jvmArgs += [
             '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
