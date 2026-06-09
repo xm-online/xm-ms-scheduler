@@ -65,7 +65,7 @@ spring:
         hibernate:
             ddl-auto: none
             naming:
-                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
                 implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
         database-platform: com.icthh.xm.commons.migration.db.jsonb.CustomPostgreSQLDialect
         database: POSTGRESQL
