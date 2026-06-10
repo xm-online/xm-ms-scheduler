@@ -264,6 +264,12 @@ wrapper {
     gradleVersion = "9.2.1"
 }
 
+tasks.register('preCompileLep', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.icthh.xm.commons.lep.groovy.LepCompiler'
+    args = findProperty('exportArgs')?.split(' ')?.toList() ?: []
+}
+
 compileJava {
     dependsOn processResources
     // add method parameters names to .class (used by LEP scripts)
