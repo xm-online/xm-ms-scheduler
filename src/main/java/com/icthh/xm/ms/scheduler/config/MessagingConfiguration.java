@@ -21,11 +21,6 @@ public class MessagingConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(
-            value = "application.stream-binding-enabled",
-            havingValue = "true",
-            matchIfMissing = true
-    )
     public ScheduledTaskHandler scheduledTaskHandler(KafkaTemplateService kafkaTemplateService,
                                                      ChannelNameResolver nameResolver, JsonMapper objectMapper) {
 
