@@ -24,11 +24,6 @@ public class LocaleConfiguration implements WebMvcConfigurer {
         return new CookieLocaleResolver("NG_TRANSLATE_LANG_KEY");
     }
 
-    @Bean
-    public JacksonJsonHttpMessageConverter converter(JsonMapper jsonMapper) {
-        return new JacksonJsonHttpMessageConverter(jsonMapper);
-    }
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
