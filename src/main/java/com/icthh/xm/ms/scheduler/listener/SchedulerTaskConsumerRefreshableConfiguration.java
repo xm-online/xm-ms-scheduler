@@ -1,7 +1,8 @@
 package com.icthh.xm.ms.scheduler.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.icthh.xm.commons.tenant.YamlMapperUtils;
+import tools.jackson.databind.ObjectMapper;
 import com.icthh.xm.commons.config.client.api.RefreshableConfiguration;
 import com.icthh.xm.commons.topic.domain.TopicConfig;
 import com.icthh.xm.commons.topic.service.dto.RefreshDynamicConsumersEvent;
@@ -24,7 +25,7 @@ public class SchedulerTaskConsumerRefreshableConfiguration implements Refreshabl
     private static final String TENANT_NAME = "tenantName";
     private static final String FILE_PATTERN = "/config/tenants/{tenantName}/scheduler/tasks-consumer.yml";
     private final AntPathMatcher matcher = new AntPathMatcher();
-    private ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private ObjectMapper mapper = YamlMapperUtils.yamlDefaultMapper();
 
     private final ApplicationEventPublisher eventPublisher;
 

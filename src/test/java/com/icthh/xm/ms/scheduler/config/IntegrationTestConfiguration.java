@@ -8,7 +8,6 @@ import com.icthh.xm.commons.config.client.service.TenantAliasServiceImpl;
 import com.icthh.xm.commons.security.jwt.TokenProvider;
 import com.icthh.xm.commons.security.oauth2.JwtVerificationKeyClient;
 import com.icthh.xm.commons.web.spring.TenantVerifyInterceptor;
-import io.prometheus.client.CollectorRegistry;
 import lombok.SneakyThrows;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
@@ -35,11 +34,6 @@ public class IntegrationTestConfiguration {
         tenants.add("DEMO");
         tenants.add("TEST");
         tenants.add("RESINTTEST");
-    }
-
-    @Bean
-    public CollectorRegistry collectorRegistry() {
-        return new CollectorRegistry();
     }
 
     @Bean
@@ -87,5 +81,10 @@ public class IntegrationTestConfiguration {
     @Bean
     public TenantAliasService tenantAliasService() {
         return new TenantAliasServiceImpl(mock(CommonConfigRepository.class), mock(TenantListRepository.class));
+    }
+
+    @Bean
+    public CommonConfigRepository commonConfigRepository() {
+        return mock(CommonConfigRepository.class);
     }
 }

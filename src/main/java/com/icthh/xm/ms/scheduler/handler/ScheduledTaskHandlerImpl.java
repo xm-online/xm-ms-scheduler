@@ -1,6 +1,5 @@
 package com.icthh.xm.ms.scheduler.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icthh.xm.commons.topic.service.KafkaTemplateService;
 import com.icthh.xm.ms.scheduler.domain.ScheduledEvent;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class ScheduledTaskHandlerImpl implements ScheduledTaskHandler {
     private final KafkaTemplateService kafkaTemplateService;
     private final ChannelNameResolver nameResolver;
 
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     @Override
     public void handle(final TaskDTO task) {

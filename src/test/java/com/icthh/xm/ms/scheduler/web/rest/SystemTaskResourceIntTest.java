@@ -6,13 +6,13 @@ import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class SystemTaskResourceTest extends AbstractSpringBootTest {
+public class SystemTaskResourceIntTest extends AbstractSpringBootTest {
 
     private static final String DEFAULT_KEY = "systask1";
     private static final String DEFAULT_NAME = null;
@@ -46,7 +46,7 @@ public class SystemTaskResourceTest extends AbstractSpringBootTest {
     private static final String DEFAULT_DATA = "{\"key\": \"value\"}";
 
     @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+    private JacksonJsonHttpMessageConverter jacksonMessageConverter;
 
     @Autowired
     private ExceptionTranslator exceptionTranslator;
@@ -56,7 +56,7 @@ public class SystemTaskResourceTest extends AbstractSpringBootTest {
 
     private MockMvc restTaskMockMvc;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         final SystemTaskResource taskResource = new SystemTaskResource(systemTaskService);
@@ -97,7 +97,7 @@ public class SystemTaskResourceTest extends AbstractSpringBootTest {
         // Get the task
         restTaskMockMvc.perform(get("/api/systasks/{key}", task.getKey()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(nullValue()))
             .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
@@ -121,7 +121,7 @@ public class SystemTaskResourceTest extends AbstractSpringBootTest {
         // Get all the taskList
         restTaskMockMvc.perform(get("/api/systasks"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(nullValue())))
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))

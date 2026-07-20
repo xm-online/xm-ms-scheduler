@@ -3,14 +3,14 @@ package com.icthh.xm.ms.scheduler.nameresolver;
 import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ChannelType;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.TEST_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TenantAwareChannelNameResolverTest extends AbstractSpringBootTest {
+public class TenantAwareChannelNameResolverIntTest extends AbstractSpringBootTest {
 
     @Autowired
     ChannelNameResolver nameResolver;

@@ -7,8 +7,8 @@ import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
@@ -22,7 +22,7 @@ import static com.icthh.xm.ms.scheduler.repository.SystemTaskRepository.FOLDER_P
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SystemTaskRepositoryTest extends AbstractSpringBootTest {
+public class SystemTaskRepositoryIntTest extends AbstractSpringBootTest {
 
     private static final String TEST_YAML = "config/tasks/tasks.yml";
     private static final String TEST_ADDITIONAL_YAML = "config/tasks/additional-tasks.yml";
@@ -42,7 +42,7 @@ public class SystemTaskRepositoryTest extends AbstractSpringBootTest {
     private String additionalConfig;
     private String configUpdated;
 
-    @Before
+    @BeforeEach
     @SneakyThrows
     public void init() {
 

@@ -1,6 +1,11 @@
 package com.icthh.xm.ms.scheduler.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static com.icthh.xm.commons.tenant.TenantContextUtils.buildTenant;
+
+import com.icthh.xm.commons.tenant.Tenant;
+import com.icthh.xm.commons.tenant.TenantKey;
+import com.icthh.xm.commons.topic.message.MessageHandler;
+import tools.jackson.databind.ObjectMapper;
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.topic.domain.DynamicConsumer;
@@ -19,8 +24,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import static com.icthh.xm.commons.tenant.TenantContextUtils.buildTenant;
 
 @Slf4j
 @Component
@@ -48,13 +51,14 @@ public class SchedulerTaskDynamicConsumerConfiguration implements DynamicConsume
         specifyTopicName(tenantKey, topicConfig);
         DynamicConsumer dynamicConsumer = new DynamicConsumer();
         dynamicConsumer.setConfig(topicConfig);
-        dynamicConsumer.setMessageHandler((message, tenant, topic) -> {
-            try {
-                tenantContextHolder.getPrivilegedContext().execute(buildTenant(tenant), () -> {
-                    handleMessage(message);
-                });
-            } catch (Exception e) {
-                log.error("Error handling message", e);
+        dynamicConsumer.setMessageHandler(new MessageHandler() {
+            @Override
+            public void onMessage(String message, String tenant, TopicConfig topic) {
+                try {
+                    tenantContextHolder.getPrivilegedContext().execute(buildTenant(tenant), () -> handleMessage(message));
+                } catch (Exception e) {
+                    log.error("Error handling message", e);
+                }
             }
         });
         return List.of(dynamicConsumer);

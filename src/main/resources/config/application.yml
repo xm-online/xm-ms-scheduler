@@ -1,4 +1,11 @@
 management:
+    tracing:
+        export:
+            enabled: ${MANAGEMENT_TRACING_EXPORT_ENABLED:false}
+    otlp:
+        metrics:
+            export:
+                enabled: ${MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED:false}
     endpoints:
         web:
             base-path: /management
@@ -64,6 +71,7 @@ spring:
         consul:
             enabled: true
             discovery:
+                query-passing: true
                 healthCheckPath: /management/health
                 instanceId: ${spring.application.name}:${spring.application.instance-id:${random.value}}
                 service-name: ${spring.application.name}
@@ -72,14 +80,17 @@ spring:
                     enabled: false
 
     jackson:
-        serialization.write_dates_as_timestamps: false
+        serialization:
+            indent-output: true
+        mapper:
+            sort-properties-alphabetically: false
     jpa:
         open-in-view: false
         hibernate:
             ddl-auto: none
             naming:
-                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+                implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
     messages:
         basename: i18n/messages
     thymeleaf:

@@ -11,14 +11,14 @@ import com.icthh.xm.ms.scheduler.service.TaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
 import jakarta.persistence.EntityManager;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @WithMockUser(authorities = {"SUPER-ADMIN"})
-public class TaskResourceTest extends AbstractSpringBootTest {
+public class TaskResourceIntTest extends AbstractSpringBootTest {
 
     private static final String DEFAULT_KEY = "AAAAAAAAAA";
     private static final String UPDATED_KEY = "BBBBBBBBBB";
@@ -99,7 +99,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
     private TaskQueryService taskQueryService;
 
     @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+    private JacksonJsonHttpMessageConverter jacksonMessageConverter;
 
     @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
@@ -114,7 +114,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
 
     private Task task;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         final TaskResource taskResource = new TaskResource(taskService, taskQueryService);
@@ -150,7 +150,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         return task;
     }
 
-    @Before
+    @BeforeEach
     public void initTest() {
         task = createEntity(em);
     }
@@ -253,7 +253,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         // Get all the taskList
         restTaskMockMvc.perform(get("/api/tasks?sort=id,desc"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY.toString())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
@@ -279,7 +279,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         // Get the task
         restTaskMockMvc.perform(get("/api/tasks/{id}", task.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(task.getId().intValue()))
             .andExpect(jsonPath("$.key").value(DEFAULT_KEY.toString()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
@@ -654,10 +654,10 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         taskRepository.saveAndFlush(task);
 
         // Get all the taskList where delay greater than or equals to DEFAULT_DELAY
-        defaultTaskShouldBeFound("delay.greaterOrEqualThan=" + DEFAULT_DELAY);
+        defaultTaskShouldBeFound("delay.greaterThanOrEqual=" + DEFAULT_DELAY);
 
         // Get all the taskList where delay greater than or equals to UPDATED_DELAY
-        defaultTaskShouldNotBeFound("delay.greaterOrEqualThan=" + UPDATED_DELAY);
+        defaultTaskShouldNotBeFound("delay.greaterThanOrEqual=" + UPDATED_DELAY);
     }
 
     @Test
@@ -791,7 +791,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         defaultTaskShouldNotBeFound("description.specified=false");
     }
 
-    @Ignore("ignore test for not supported filtering by 'data' field")
+    @Disabled("ignore test for not supported filtering by 'data' field")
     @Test
     @Transactional
     public void getAllTasksByDataIsEqualToSomething() throws Exception {
@@ -805,7 +805,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
         defaultTaskShouldNotBeFound("data.equals=" + UPDATED_DATA);
     }
 
-    @Ignore("ignore test for not supported filtering by 'data' field")
+    @Disabled("ignore test for not supported filtering by 'data' field")
     @Test
     @Transactional
     public void getAllTasksByDataIsInShouldWork() throws Exception {
@@ -838,7 +838,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
     private void defaultTaskShouldBeFound(String filter) throws Exception {
         restTaskMockMvc.perform(get("/api/tasks?sort=id,desc&" + filter))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY.toString())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
@@ -861,7 +861,7 @@ public class TaskResourceTest extends AbstractSpringBootTest {
     private void defaultTaskShouldNotBeFound(String filter) throws Exception {
         restTaskMockMvc.perform(get("/api/tasks?sort=id,desc&" + filter))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$").isEmpty());
     }

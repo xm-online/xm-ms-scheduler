@@ -7,8 +7,8 @@ import com.icthh.xm.commons.tenantendpoint.provisioner.TenantAbilityCheckerProvi
 import com.icthh.xm.commons.tenantendpoint.provisioner.TenantConfigProvisioner;
 import com.icthh.xm.commons.tenantendpoint.provisioner.TenantListProvisioner;
 import com.icthh.xm.ms.scheduler.AbstractUnitTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -34,7 +34,7 @@ public class TenantManagerConfigurationUnitTest extends AbstractUnitTest {
     @Mock
     private TenantListProvisioner tenantListProvisioner;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         tenantManager = configuration.tenantManager(abilityCheckerProvisioner, databaseProvisioner,

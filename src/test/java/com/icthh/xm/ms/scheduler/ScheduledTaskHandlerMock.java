@@ -1,20 +1,12 @@
-package com.icthh.xm.ms.scheduler.handler;
+package com.icthh.xm.ms.scheduler;
 
+import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.nameresolver.ChannelNameResolver;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
-
 import jakarta.annotation.PostConstruct;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Mock class for scheduler task. Initialized in case if messaging system is disabled with property:
- *
- *<p>'application.stream-binding-enabled'
- *
- *<p>Should be used for test reasons.
- */
 @Slf4j
 @RequiredArgsConstructor
 public class ScheduledTaskHandlerMock implements ScheduledTaskHandler {

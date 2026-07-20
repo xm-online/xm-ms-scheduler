@@ -16,10 +16,9 @@ import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +45,13 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedDelay;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskFixedRate;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class SchedulingManagerTest extends AbstractSpringBootTest {
+public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
     private Multiset<Long> expiredTasks = HashMultiset.create();
     private Multiset<Long> executedTasks = HashMultiset.create();
@@ -76,7 +75,7 @@ public class SchedulingManagerTest extends AbstractSpringBootTest {
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
 
-    @Before
+    @BeforeEach
     public void init() {
         MockitoAnnotations.initMocks(this);
 
@@ -383,7 +382,7 @@ public class SchedulingManagerTest extends AbstractSpringBootTest {
         };
 
         // There are two tenants in the Scope, so we need to init tasks only for XM tenant.
-        Mockito.when(systemTaskService.findUserNotFinishedTasks()).thenAnswer(answer);
+        when(systemTaskService.findUserNotFinishedTasks()).thenAnswer(answer);
         schedulingManager.destroy();
         schedulingManager.init();
     }
