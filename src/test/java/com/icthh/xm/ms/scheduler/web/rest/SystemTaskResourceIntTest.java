@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,7 @@ public class SystemTaskResourceIntTest extends AbstractSpringBootTest {
     private static final String DEFAULT_DATA = "{\"key\": \"value\"}";
 
     @Autowired
-    private JacksonJsonHttpMessageConverter jacksonMessageConverter;
+    private JsonMapper jsonMapper;
 
     @Autowired
     private ExceptionTranslator exceptionTranslator;
@@ -67,7 +68,7 @@ public class SystemTaskResourceIntTest extends AbstractSpringBootTest {
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(new JacksonJsonHttpMessageConverter(jsonMapper)).build();
     }
 
     private TaskDTO createTask() {

@@ -14,13 +14,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import tech.jhipster.config.JHipsterProperties;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
@@ -48,10 +46,6 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         log.info("Web application fully configured");
     }
 
-    @Bean
-    public JacksonJsonHttpMessageConverter converter(JsonMapper jsonMapper) {
-        return new JacksonJsonHttpMessageConverter(jsonMapper);
-    }
 
     @Bean
     public CorsFilter corsFilter() {
