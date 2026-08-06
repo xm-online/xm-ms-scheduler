@@ -161,7 +161,7 @@ xm-config:
     kafka-config-topic: config_topic
 
 application:
-    tenant-ignored-path-list: /swagger-resources/configuration/ui, /management/health, /oauth/token_key, /h2-console
+    tenant-ignored-path-list: /swagger-resources/configuration/ui, /management/health, /oauth/token_key, /h2-console, /v3/api-docs
     timeline-ignored-http-methods:
     stream-binding-enabled: true
     kafka-enabled: true
