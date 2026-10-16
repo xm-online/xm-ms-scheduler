@@ -109,6 +109,9 @@ public class TaskResourceIntTest extends AbstractSpringBootTest {
     private ExceptionTranslator exceptionTranslator;
 
     @Autowired
+    private TaskResource taskResourceProxy;
+
+    @Autowired
     private EntityManager em;
 
     private MockMvc restTaskMockMvc;
@@ -119,6 +122,7 @@ public class TaskResourceIntTest extends AbstractSpringBootTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         final TaskResource taskResource = new TaskResource(taskService, taskQueryService);
+        taskResource.setSelf(taskResourceProxy);
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -154,6 +158,35 @@ public class TaskResourceIntTest extends AbstractSpringBootTest {
     @BeforeEach
     public void initTest() {
         task = createEntity(em);
+    }
+
+    @Test
+    @Transactional
+    public void createTaskWithPutWithoutId() throws Exception {
+        int databaseSizeBeforeCreate = taskRepository.findAll().size();
+
+        TaskDTO taskDTO = taskMapper.toDto(task);
+        restTaskMockMvc.perform(put("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+            .andExpect(status().isCreated());
+
+        assertThat(taskRepository.findAll()).hasSize(databaseSizeBeforeCreate + 1);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = {"ROLE_USER"})
+    public void createTaskWithPutWithoutIdRequiresCreatePrivilege() throws Exception {
+        int databaseSizeBeforeCreate = taskRepository.findAll().size();
+
+        TaskDTO taskDTO = taskMapper.toDto(task);
+        restTaskMockMvc.perform(put("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+            .andExpect(status().isForbidden());
+
+        assertThat(taskRepository.findAll()).hasSize(databaseSizeBeforeCreate);
     }
 
     @Test

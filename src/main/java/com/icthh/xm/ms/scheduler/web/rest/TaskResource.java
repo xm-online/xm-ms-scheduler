@@ -11,6 +11,8 @@ import com.icthh.xm.ms.scheduler.web.rest.util.HeaderUtil;
 import com.icthh.xm.ms.scheduler.web.rest.util.PaginationUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -47,9 +49,18 @@ public class TaskResource {
 
     private final TaskQueryService taskQueryService;
 
+    private TaskResource self;
+
     public TaskResource(TaskService taskService, TaskQueryService taskQueryService) {
         this.taskService = taskService;
         this.taskQueryService = taskQueryService;
+    }
+
+    @Autowired
+    public void setSelf(@Lazy TaskResource self) {
+        if (this.self == null) {
+            this.self = self;
+        }
     }
 
     /**
@@ -89,7 +100,8 @@ public class TaskResource {
     public ResponseEntity<TaskDTO> updateTask(@Valid @RequestBody TaskDTO taskDTO) throws URISyntaxException {
         log.debug("REST request to update Task : {}", taskDTO);
         if (taskDTO.getId() == null) {
-            return createTask(taskDTO);
+            // through the proxy, so @PreAuthorize of createTask (TASK.CREATE) is applied
+            return self.createTask(taskDTO);
         }
         TaskDTO result = taskService.save(taskDTO);
         return ResponseEntity.ok()
