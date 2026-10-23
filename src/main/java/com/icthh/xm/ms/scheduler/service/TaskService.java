@@ -1,7 +1,7 @@
 package com.icthh.xm.ms.scheduler.service;
 
 import com.icthh.xm.ms.scheduler.domain.Task;
-import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
@@ -26,12 +26,12 @@ public class TaskService {
 
     private final TaskMapper taskMapper;
 
-    private final SchedulingManager schedulingManager;
+    private final TaskChangeNotifier changeNotifier;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, SchedulingManager schedulingManager) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, TaskChangeNotifier changeNotifier) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
-        this.schedulingManager = schedulingManager;
+        this.changeNotifier = changeNotifier;
     }
 
     /**
@@ -42,10 +42,15 @@ public class TaskService {
      */
     public TaskDTO save(TaskDTO taskDtO) {
         log.debug("Request to save Task : {}", taskDtO);
+        TaskScheduleRules.validate(taskDtO);
         Task task = taskMapper.toEntity(taskDtO);
+        if (ScheduleType.ONE_TIME.equals(task.getScheduleType())) {
+            // computed here, inside the user's transaction, on every create and PUT: a client value is replaced
+            task.setEndDate(TaskScheduleRules.oneTimeEndDate(task.getStartDate(), task.getTtl()));
+        }
         task = taskRepository.saveAndFlush(task);
         TaskDTO dto = taskMapper.toDto(task);
-        schedulingManager.createOrUpdateActiveUserTask(dto);
+        changeNotifier.taskSaved(dto);
         return dto;
     }
 
@@ -82,7 +87,7 @@ public class TaskService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Task : {}", id);
-        schedulingManager.deleteActiveTask(String.valueOf(id));
+        changeNotifier.taskDeleted(id);
         taskRepository.deleteById(id);
     }
 }

@@ -26,6 +26,7 @@ public class DefaultRunnableTask implements RunnableTask {
     final Consumer<TaskDTO> afterRun;
     final Consumer<TaskDTO> afterExpiry;
     final CountDownLatch latch;
+    final TaskOwnership ownership;
 
     @Override
     @SneakyThrows
@@ -37,21 +38,15 @@ public class DefaultRunnableTask implements RunnableTask {
         MdcUtils.putRid(MdcUtils.generateRid() + "::" + task.getTenant());
 
         try {
-            if (isExpiredBeforeExecution()) {
-                deleteExpired();
-                return;
-            }
-
-            log.info("execute scheduled task: {}", task);
-            manager.handleTask(task);
-
-            if (afterRun != null) {
-                afterRun.accept(task);
-            }
-
-            if (isExpiredAfterExecution()) {
-                // time to delete
-                deleteExpired();
+            // a frozen and resumed instance must not send or change anything for tasks it no longer owns
+            if (ownership.beginFiring(task)) {
+                try {
+                    execute();
+                } finally {
+                    ownership.endFiring(task);
+                }
+            } else {
+                log.debug("skip task {}: not owned now", task.getId() != null ? task.getId() : task.getKey());
             }
         } finally {
             MdcUtils.clear();
@@ -59,16 +54,39 @@ public class DefaultRunnableTask implements RunnableTask {
 
     }
 
+    private void execute() {
+        if (isExpiredBeforeExecution()) {
+            deleteExpired();
+            return;
+        }
+
+        log.info("execute scheduled task: {}", task);
+        manager.handleTask(task);
+
+        if (afterRun != null) {
+            afterRun.accept(task);
+        }
+
+        if (isExpiredAfterExecution()) {
+            // time to delete
+            deleteExpired();
+        }
+    }
+
     /**
      * Deletes the expired task.
      */
     private void deleteExpired() {
-        manager.deleteExpiredTask(task);
-        if (afterExpiry != null) {
-            afterExpiry.accept(task);
-        }
-        if (ONE_TIME.equals(task.getScheduleType())) {
-            manager.setState(StateKey.DONE, task);
+        try {
+            if (ONE_TIME.equals(task.getScheduleType())) {
+                // DONE is committed before the task leaves the map, otherwise a reload in between fires it again
+                manager.setState(StateKey.DONE, task);
+            }
+        } finally {
+            manager.deleteExpiredTask(task);
+            if (afterExpiry != null) {
+                afterExpiry.accept(task);
+            }
         }
     }
 

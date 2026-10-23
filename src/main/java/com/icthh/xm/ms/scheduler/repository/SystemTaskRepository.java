@@ -5,7 +5,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.icthh.xm.commons.config.client.api.RefreshableConfiguration;
 import com.icthh.xm.ms.scheduler.config.ApplicationProperties;
 import com.icthh.xm.ms.scheduler.domain.spec.TasksSpec;
-import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
+import com.icthh.xm.ms.scheduler.service.TaskChangeNotifier;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
 import java.util.HashMap;
@@ -40,20 +40,20 @@ public class SystemTaskRepository implements RefreshableConfiguration {
 
     private final ApplicationProperties applicationProperties;
 
-    private final SchedulingManager schedulingManager;
+    private final TaskChangeNotifier changeNotifier;
 
     // TODO - avoid @Lazy initialization
     public SystemTaskRepository(ApplicationProperties applicationProperties,
-                                @Lazy SchedulingManager schedulingManager) {
+                                @Lazy TaskChangeNotifier changeNotifier) {
         log.info("Init of SystemTaskRepository");
         this.applicationProperties = applicationProperties;
-        this.schedulingManager = schedulingManager;
+        this.changeNotifier = changeNotifier;
     }
 
     @Override
     public void onRefresh(String updatedKey, String config) {
         refreshConfig(updatedKey, config);
-        schedulingManager.mergeSystemTasksFromConfig(extractTenant(updatedKey));
+        changeNotifier.systemTasksChanged(extractTenant(updatedKey));
     }
 
     @Override
