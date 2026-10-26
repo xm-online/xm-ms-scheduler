@@ -48,6 +48,7 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -237,7 +238,10 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
         waitAndDeleteTask(3500, task);
 
-        expectRunAndExpiryCounts(task, 2, 1);
+        // runs at +1.0 s and +1.5 s; the run at +2.0 s sits exactly on the expiry instant and may go either way
+        int runs = executedTasks.count(task.getId());
+        assertTrue(runs == 2 || runs == 3, "unexpected run count " + runs);
+        assertEquals(1, expiredTasks.count(task.getId()));
 
     }
 
@@ -324,9 +328,8 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
         expectRunAndExpiryCounts(task, 1, 1);
 
-        Optional<Task> stored = taskRepository.findById(task.getId());
-        assertTrue(stored.isPresent());
-        assertEquals(stored.get().getStateKey(), StateKey.DONE.name());
+        // DONE is written by a targeted update, never by saving a whole entity
+        verify(taskRepository).updateStateKey(task.getId(), StateKey.DONE.name());
     }
 
     @Test

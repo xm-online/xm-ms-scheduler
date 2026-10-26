@@ -25,7 +25,7 @@ plugins {
     id "com.github.spotbugs"
     id "com.github.andygoossens.gradle-modernizer-plugin"
     id "org.liquibase.gradle"
-    id "io.spring.dependency-management" version "${springDependencyManagement}"
+    id "io.spring.dependency-management"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
@@ -270,6 +270,7 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombok_version}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
     testImplementation "org.testcontainers:postgresql:${testPsqlContainer}"
+    testImplementation "org.awaitility:awaitility"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.springframework.boot:spring-boot-test"

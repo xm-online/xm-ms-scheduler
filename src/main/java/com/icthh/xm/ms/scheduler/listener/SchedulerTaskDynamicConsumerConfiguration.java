@@ -17,6 +17,7 @@ import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -67,6 +68,12 @@ public class SchedulerTaskDynamicConsumerConfiguration implements DynamicConsume
     @SneakyThrows
     private void handleMessage(String message) {
         TaskDTO taskDto = objectMapper.readValue(message, TaskDTO.class);
+        if (StringUtils.isNotBlank(taskDto.getCronTriggerTimeZoneId())) {
+            log.warn("Task message {} has cronTriggerTimeZoneId {}: time zones are not supported yet, "
+                + "the zone is ignored and the task runs in the server zone",
+                taskDto.getTypeKey(), taskDto.getCronTriggerTimeZoneId());
+            taskDto.setCronTriggerTimeZoneId(null);
+        }
         taskService.save(taskDto);
     }
 

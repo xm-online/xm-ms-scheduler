@@ -220,6 +220,85 @@ public class TaskResourceIntTest extends AbstractSpringBootTest {
         assertThat(testTask.getData()).isEqualTo(DEFAULT_DATA);
     }
 
+    private void expectCreateRejected(Task invalid) throws Exception {
+        int databaseSizeBefore = taskRepository.findAll().size();
+        restTaskMockMvc.perform(post("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskMapper.toDto(invalid))))
+            .andExpect(status().isBadRequest());
+        assertThat(taskRepository.findAll()).hasSize(databaseSizeBefore);
+    }
+
+    @Test
+    @Transactional
+    public void invalidScheduleIsRejectedWith400() throws Exception {
+        expectCreateRejected(createEntity(em).scheduleType(ScheduleType.CRON).cronExpression("not a cron"));
+        expectCreateRejected(createEntity(em).scheduleType(ScheduleType.FIXED_DELAY).delay(null));
+        expectCreateRejected(createEntity(em).scheduleType(ScheduleType.ONE_TIME).startDate(null));
+        expectCreateRejected(createEntity(em).scheduleType(null));
+    }
+
+    @Test
+    @Transactional
+    public void cronZoneIsRejectedWith400OnCreateAndUpdate() throws Exception {
+        int sizeBefore = taskRepository.findAll().size();
+        TaskDTO invalid = taskMapper.toDto(createEntity(em).scheduleType(ScheduleType.CRON)
+            .cronExpression("0/30 * * * * ?"));
+        invalid.setCronTriggerTimeZoneId("Mars/Olympus");
+        restTaskMockMvc.perform(post("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(invalid)))
+            .andExpect(status().isBadRequest());
+        assertThat(taskRepository.findAll()).hasSize(sizeBefore);
+
+        TaskDTO saved = taskService.save(taskMapper.toDto(createEntity(em).scheduleType(ScheduleType.CRON)
+            .cronExpression("0/30 * * * * ?")));
+        saved.setCronTriggerTimeZoneId("Mars/Olympus");
+        restTaskMockMvc.perform(put("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(saved)))
+            .andExpect(status().isBadRequest());
+
+        saved.setCronTriggerTimeZoneId("Europe/Kyiv"); // known, but not persisted: rejected as well
+        restTaskMockMvc.perform(put("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(saved)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    public void oneTimeEndDateIsComputedOnCreateAndReplacesClientValue() throws Exception {
+        Instant start = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MILLIS);
+        TaskDTO withTtl = taskMapper.toDto(createEntity(em).scheduleType(ScheduleType.ONE_TIME)
+            .startDate(start).endDate(Instant.ofEpochMilli(1L)));
+        withTtl.setTtl(30);
+        TaskDTO withoutTtl = taskMapper.toDto(createEntity(em).scheduleType(ScheduleType.ONE_TIME)
+            .startDate(start).endDate(Instant.ofEpochMilli(1L)));
+
+        assertThat(taskService.save(withTtl).getEndDate()).isEqualTo(start.plusSeconds(30));
+        assertThat(taskService.save(withoutTtl).getEndDate()).isEqualTo(start.plus(1, ChronoUnit.HOURS));
+    }
+
+    @Test
+    @Transactional
+    public void putMovingStartDateMovesEndDate() throws Exception {
+        Instant start = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MILLIS);
+        TaskDTO saved = taskService.save(taskMapper.toDto(createEntity(em).scheduleType(ScheduleType.ONE_TIME)
+            .startDate(start)));
+        saved.setTtl(30);
+        saved = taskService.save(saved);
+
+        saved.setStartDate(start.plusSeconds(600));
+        restTaskMockMvc.perform(put("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(saved)))
+            .andExpect(status().isOk());
+
+        assertThat(taskRepository.findById(saved.getId()).orElseThrow().getEndDate())
+            .isEqualTo(start.plusSeconds(630));
+    }
+
     @Test
     @Transactional
     public void createTaskWithExistingId() throws Exception {

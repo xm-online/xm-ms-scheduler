@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
-import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.repository.SystemTaskRepository;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
@@ -44,8 +43,7 @@ public class SystemTaskService {
     public List<TaskDTO> findUserNotFinishedTasks() {
         log.debug("Request to get all Tasks without paging");
 
-        return taskRepository.findByEndDateGreaterThanEqualAndStateKeyNotOrStateKeyNull(Instant.now(),
-            StateKey.DONE.name()).stream().map(taskMapper::toDto).collect(toList());
+        return taskRepository.findActive(Instant.now()).stream().map(taskMapper::toDto).collect(toList());
     }
 
     /**
