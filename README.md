@@ -42,7 +42,7 @@ In case you need to send scheduled messages to real kafka destination do the fol
     /opt/kafka_2.11-0.10.1.0/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
    ```
 
-## Kafka connection
+### Kafka connection
 
 The connection to Kafka (SASL login and password, SSL, OAUTHBEARER, GSSAPI, `spring.ssl.bundle`) is set by environment
 variables, `PLAINTEXT` when they are not set. The full sets of variables for each `security.protocol` and
