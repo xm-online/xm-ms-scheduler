@@ -22,7 +22,6 @@ management:
     endpoint:
         health:
             show-details: when_authorized
-            roles: 'SUPER-ADMIN'
             probes:
                 enabled: true
             group:
@@ -105,6 +104,7 @@ spring:
         producer:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        # Kafka connection by environment variables, PLAINTEXT when not set: https://github.com/xm-online/xm-ms-template/blob/main/README.md#kafka-connection
     liquibase:
         default-schema: XM
         change-log: classpath:config/liquibase/master.xml
@@ -161,7 +161,7 @@ xm-config:
     kafka-config-topic: config_topic
 
 application:
-    tenant-ignored-path-list: /swagger-resources/configuration/ui, /management/health, /oauth/token_key, /h2-console, /v3/api-docs
+    tenant-ignored-path-list: /swagger-resources/configuration/ui, /management/health, /management/health/liveness, /management/health/readiness, /oauth/token_key, /h2-console, /v3/api-docs, /error
     timeline-ignored-http-methods:
     stream-binding-enabled: true
     kafka-enabled: true
@@ -178,6 +178,9 @@ application:
         enabled: true
         connectionTimeoutTopic: 1000
         metricTopics: system_topic
+    api-docs:
+        privilege-check: true
+    config-private-key:
 
 gracefulShutdown:
     enabled: false
