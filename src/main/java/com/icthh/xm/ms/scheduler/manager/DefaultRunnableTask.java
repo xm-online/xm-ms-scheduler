@@ -37,38 +37,43 @@ public class DefaultRunnableTask implements RunnableTask {
         MdcUtils.putRid(MdcUtils.generateRid() + "::" + task.getTenant());
 
         try {
-            if (isExpiredBeforeExecution()) {
-                deleteExpired();
-                return;
-            }
-
-            log.info("execute scheduled task: {}", task);
-            manager.handleTask(task);
-
-            if (afterRun != null) {
-                afterRun.accept(task);
-            }
-
-            if (isExpiredAfterExecution()) {
-                // time to delete
-                deleteExpired();
-            }
+            manager.execute(task, this::runFiring);
         } finally {
             MdcUtils.clear();
         }
 
     }
 
+    private void runFiring() {
+        if (isExpiredBeforeExecution()) {
+            deleteExpired();
+            return;
+        }
+
+        log.info("execute scheduled task: {}", task);
+        manager.handleTask(task);
+
+        if (afterRun != null) {
+            afterRun.accept(task);
+        }
+
+        if (isExpiredAfterExecution()) {
+            // time to delete
+            deleteExpired();
+        }
+    }
+
     /**
      * Deletes the expired task.
      */
     private void deleteExpired() {
+        // DONE is stored before the task leaves the schedule, so a reload in between cannot fire it again
+        if (ONE_TIME.equals(task.getScheduleType())) {
+            manager.setState(StateKey.DONE, task);
+        }
         manager.deleteExpiredTask(task);
         if (afterExpiry != null) {
             afterExpiry.accept(task);
-        }
-        if (ONE_TIME.equals(task.getScheduleType())) {
-            manager.setState(StateKey.DONE, task);
         }
     }
 

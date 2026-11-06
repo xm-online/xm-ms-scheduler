@@ -1,6 +1,10 @@
 package com.icthh.xm.ms.scheduler.manager;
 
 import static com.icthh.xm.commons.tenant.TenantContextUtils.buildTenant;
+import static com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType.CRON;
+import static com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType.FIXED_DELAY;
+import static com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType.FIXED_RATE;
+import static com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType.ONE_TIME;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 import com.icthh.xm.commons.config.client.repository.TenantListRepository;
@@ -8,15 +12,18 @@ import com.icthh.xm.commons.exceptions.BusinessException;
 import com.icthh.xm.commons.tenant.PrivilegedTenantContext;
 import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
-import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 
-import java.math.BigInteger;
+import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,11 +36,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.scheduling.support.CronTrigger;
 
 /**
@@ -48,12 +57,20 @@ public class SchedulingManager {
     private final ScheduledTaskHandler handler;
     private final TenantListRepository tenantListRepository;
     private final TaskRepository taskRepository;
+    private final TaskExecutionPolicy policy;
 
     private Consumer<TaskDTO> afterRun;
     private Consumer<TaskDTO> afterExpiration;
 
-    private Map<String, Map<String, ScheduledFuture>> systemSchedulers = new ConcurrentHashMap<>();
-    private Map<String, Map<String, ScheduledFuture>> userSchedulers = new ConcurrentHashMap<>();
+    private Map<String, Map<String, Scheduled>> systemSchedulers = new ConcurrentHashMap<>();
+    private Map<String, Map<String, Scheduled>> userSchedulers = new ConcurrentHashMap<>();
+
+    /** A task that the manager did not schedule, with the reason. */
+    public record Rejected(TaskDTO task, String reason) {
+    }
+
+    private record Scheduled(TaskDTO task, ScheduledFuture<?> future) {
+    }
 
     /** The constructor. */
     public SchedulingManager(final TenantContextHolder tenantContextHolder,
@@ -61,13 +78,15 @@ public class SchedulingManager {
                              final SystemTaskService taskService,
                              final ScheduledTaskHandler handler,
                              final TenantListRepository tenantListRepository,
-                             final TaskRepository taskRepository) {
+                             final TaskRepository taskRepository,
+                             final TaskExecutionPolicy policy) {
         this.tenantContextHolder = tenantContextHolder;
         this.taskScheduler = taskScheduler;
         this.taskService = taskService;
         this.handler = handler;
         this.tenantListRepository = tenantListRepository;
         this.taskRepository = taskRepository;
+        this.policy = policy;
     }
 
     /** The constructor. */
@@ -78,8 +97,9 @@ public class SchedulingManager {
                              final Consumer<TaskDTO> afterRun,
                              final Consumer<TaskDTO> afterExpiration,
                              final TenantListRepository tenantListRepository,
-                             final TaskRepository taskRepository) {
-        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository, taskRepository);
+                             final TaskRepository taskRepository,
+                             final TaskExecutionPolicy policy) {
+        this(tenantContextHolder, taskScheduler, taskService, handler, tenantListRepository, taskRepository, policy);
         this.afterRun = afterRun;
         this.afterExpiration = afterExpiration;
     }
@@ -88,6 +108,9 @@ public class SchedulingManager {
      * Init.
      */
     public void init() {
+        if (!policy.loadsOnStartup()) {
+            return;
+        }
 
         int taskCount = 0;
 
@@ -110,7 +133,8 @@ public class SchedulingManager {
 
         tenantContextHolder.getPrivilegedContext().execute(buildTenant(tenant), () -> {
 
-            List<TaskDTO> newTasks = taskService.findSystemNotFinishedTasks();
+            List<TaskDTO> newTasks = taskService.findSystemNotFinishedTasks().stream()
+                .filter(policy::accepts).collect(Collectors.toList());
             Map<String, TaskDTO> remainingTasks = newTasks.stream()
                 .collect(Collectors.toMap(SchedulingManager::getTaskKey,
                     Function.identity()));
@@ -141,19 +165,11 @@ public class SchedulingManager {
     }
 
     private Integer initInsideTenant(final String tenantName, List<TaskDTO> tasks,
-                                     Map<String, Map<String, ScheduledFuture>> schedulers) {
-
-        //Synchronization is necessary because task can start earlier than its future is created in collection
-        CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
-        Map<String, ScheduledFuture> scheduledTasks = tasks
-            .stream()
-            .peek(task -> task.setTenant(tenantName))
-            .collect(Collectors.toConcurrentMap(SchedulingManager::getTaskKey, taskDTO -> this.schedule(taskDTO, latch)));
-
-        schedulers.put(tenantName, scheduledTasks);
-        latch.countDown();
-
-        return tasks.size();
+                                     Map<String, Map<String, Scheduled>> schedulers) {
+        List<Rejected> rejected = scheduleAll(tasks, schedulers, this::replaceTask);
+        rejected.forEach(r -> log.error("Task {} of tenant {} not scheduled: {}",
+            getTaskKey(r.task()), tenantName, r.reason()));
+        return tasks.size() - rejected.size();
     }
 
     public void destroy() {
@@ -164,7 +180,7 @@ public class SchedulingManager {
         log.info("cancelled system tasks count: {}", cnt);
     }
 
-    private long destroy(Map<String, Map<String, ScheduledFuture>> schedulers) {
+    private long destroy(Map<String, Map<String, Scheduled>> schedulers) {
         long cnt = schedulers.values().stream().flatMap(m -> m.values().stream()).map(this::cancelTask).count();
         schedulers.clear();
         return cnt;
@@ -178,18 +194,122 @@ public class SchedulingManager {
         createOrUpdateActiveTask(task, systemSchedulers);
     }
 
-    private void createOrUpdateActiveTask(TaskDTO task, Map<String, Map<String, ScheduledFuture>> schedulers) {
+    private void createOrUpdateActiveTask(TaskDTO task, Map<String, Map<String, Scheduled>> schedulers) {
+        validateSchedule(task);
+        scheduleAll(List.of(task), schedulers, this::rescheduleTask);
+    }
 
+    /**
+     * Schedules the tasks in the current tenant; each replaces the task with the same key.
+     * Tasks that fail {@link #validateSchedule} are returned. Logs nothing above DEBUG.
+     */
+    public List<Rejected> scheduleUserTasks(Collection<TaskDTO> tasks) {
+        return scheduleAll(tasks, userSchedulers, this::replaceTask);
+    }
+
+    /** Same as {@link #scheduleUserTasks} for system tasks. */
+    public List<Rejected> scheduleSystemTasks(Collection<TaskDTO> tasks) {
+        return scheduleAll(tasks, systemSchedulers, this::replaceTask);
+    }
+
+    private List<Rejected> scheduleAll(Collection<TaskDTO> tasks, Map<String, Map<String, Scheduled>> schedulers,
+                                       Replacer replacer) {
+        String tenant = getTenant();
+        Map<String, Scheduled> scheduled = schedulers.computeIfAbsent(tenant, t -> new ConcurrentHashMap<>());
+        List<Rejected> rejected = new ArrayList<>();
         //Synchronization is necessary because task can start earlier than its future is created in collection
-        CountDownLatch latch = new CountDownLatch(BigInteger.ONE.intValue());
-        String currentTenant = TenantContextUtils.getRequiredTenantKeyValue(tenantContextHolder);
-        schedulers.computeIfAbsent(currentTenant, tenant -> new ConcurrentHashMap<>());
+        CountDownLatch latch = new CountDownLatch(1);
+        try {
+            for (TaskDTO task : tasks) {
+                if (!policy.accepts(task)) {
+                    continue;
+                }
+                try {
+                    validateSchedule(task);
+                } catch (BusinessException e) {
+                    rejected.add(new Rejected(task, e.getMessage()));
+                    continue;
+                }
+                task.setTenant(tenant);
+                scheduled.compute(getTaskKey(task), (key, old) -> replacer.replace(task, old, latch));
+            }
+        } finally {
+            latch.countDown();
+        }
+        return rejected;
+    }
 
-        task.setTenant(currentTenant);
+    /**
+     * Cancels every scheduled task, of all tenants, that matches. Returns how many were cancelled.
+     */
+    public int cancelTasks(Predicate<TaskDTO> filter) {
+        return cancelMatching(userSchedulers, filter) + cancelMatching(systemSchedulers, filter);
+    }
 
-        schedulers.get(currentTenant)
-            .compute(getTaskKey(task), (taskKey, oldFuture) -> rescheduleTask(task, oldFuture, latch));
-        latch.countDown();
+    private int cancelMatching(Map<String, Map<String, Scheduled>> schedulers, Predicate<TaskDTO> filter) {
+        int cancelled = 0;
+        for (Map<String, Scheduled> tenantTasks : schedulers.values()) {
+            for (Map.Entry<String, Scheduled> entry : tenantTasks.entrySet()) {
+                if (filter.test(entry.getValue().task()) && tenantTasks.remove(entry.getKey(), entry.getValue())) {
+                    cancelTask(entry.getValue());
+                    cancelled++;
+                }
+            }
+        }
+        return cancelled;
+    }
+
+    /** The scheduled user tasks of the current tenant by task key. */
+    public Map<String, TaskDTO> getActiveUserTasks() {
+        return scheduledTasks(userSchedulers);
+    }
+
+    /** The scheduled system tasks of the current tenant by task key. */
+    public Map<String, TaskDTO> getActiveSystemTasks() {
+        return scheduledTasks(systemSchedulers);
+    }
+
+    private Map<String, TaskDTO> scheduledTasks(Map<String, Map<String, Scheduled>> schedulers) {
+        return schedulers.getOrDefault(getTenant(), Collections.emptyMap()).entrySet().stream()
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, e -> e.getValue().task()));
+    }
+
+    /**
+     * Checks the fields that scheduling the task needs.
+     *
+     * @throws BusinessException when the task cannot be scheduled
+     */
+    public static void validateSchedule(TaskDTO task) {
+        ScheduleType type = task.getScheduleType();
+        String problem = null;
+        if (type == null) {
+            problem = "scheduleType is required";
+        } else if ((type == FIXED_DELAY || type == FIXED_RATE) && (task.getDelay() == null || task.getDelay() <= 0)) {
+            problem = "delay must be positive";
+        } else if (type == CRON && !CronExpression.isValidExpression(task.getCronExpression())) {
+            problem = "cronExpression is not valid: " + task.getCronExpression();
+        } else if (type == CRON && !isZoneIdOrBlank(task.getCronTriggerTimeZoneId())) {
+            problem = "cronTriggerTimeZoneId is not valid: " + task.getCronTriggerTimeZoneId();
+        } else if (type == ONE_TIME && task.getStartDate() == null) {
+            problem = "startDate is required for ONE_TIME";
+        }
+        if (problem != null) {
+            throw new BusinessException("error.task.schedule.invalid", problem);
+        }
+    }
+
+    private static boolean isZoneIdOrBlank(String zoneId) {
+        try {
+            return StringUtils.isBlank(zoneId) || ZoneId.of(zoneId) != null;
+        } catch (DateTimeException e) {
+            return false;
+        }
+    }
+
+    /** The end of a ONE_TIME task: start date plus ttl seconds, or one hour. */
+    public static Instant oneTimeEndDate(TaskDTO task) {
+        return task.getTtl() != null ? task.getStartDate().plusSeconds(task.getTtl())
+                                     : task.getStartDate().plus(1, HOURS);
     }
 
     public void deleteActiveTask(String taskKey) {
@@ -213,6 +333,10 @@ public class SchedulingManager {
         deleteTaskFromTenant(task.getTenant(), getTaskKey(task));
     }
 
+    void execute(TaskDTO task, Runnable firing) {
+        policy.execute(task, firing);
+    }
+
     void handleTask(TaskDTO task) {
         handler.handle(task);
     }
@@ -227,7 +351,7 @@ public class SchedulingManager {
     }
 
     private boolean deleteTaskFromTenant(String tenant, String taskKey,
-                                         Map<String, Map<String, ScheduledFuture>> schedulers) {
+                                         Map<String, Map<String, Scheduled>> schedulers) {
         boolean cancelled = Optional.ofNullable(schedulers.get(tenant))
             .map(tenantMap -> tenantMap.remove(taskKey))
             .map(this::cancelTask)
@@ -247,32 +371,34 @@ public class SchedulingManager {
         final Long taskId = task.getId();
         log.info("Marking task as finished id: {}, tenant: {}", task.getId(), task.getTenant());
 
-        tenantContextHolder.getPrivilegedContext().execute(buildTenant(task.getTenant()), () -> {
-
-            Task taskFromDb = taskRepository.findById(taskId).orElseThrow(()
-                -> new BusinessException("Task not found for id " + taskId));
-
-            taskFromDb.setStateKey(state.toString());
-            taskRepository.save(taskFromDb);
-        });
+        tenantContextHolder.getPrivilegedContext().execute(buildTenant(task.getTenant()),
+            () -> taskRepository.updateStateKey(taskId, state.name()));
     }
 
-    private ScheduledFuture rescheduleTask(TaskDTO task, ScheduledFuture oldFuture, CountDownLatch latch) {
-        if (oldFuture != null) {
-            boolean cancelled = cancelTask(oldFuture);
+    @FunctionalInterface
+    private interface Replacer {
+        Scheduled replace(TaskDTO task, Scheduled old, CountDownLatch latch);
+    }
+
+    private Scheduled replaceTask(TaskDTO task, Scheduled old, CountDownLatch latch) {
+        if (old != null) {
+            cancelTask(old);
+        }
+        return new Scheduled(task, schedule(task, latch));
+    }
+
+    private Scheduled rescheduleTask(TaskDTO task, Scheduled old, CountDownLatch latch) {
+        if (old != null) {
+            boolean cancelled = cancelTask(old);
             log.info("cancel active task: {} for update. cancelled result: {}", getTaskKey(task), cancelled);
         } else {
             log.info("create new task during update: {}", getTaskKey(task));
         }
-        return schedule(task, latch);
+        return new Scheduled(task, schedule(task, latch));
     }
 
-    private boolean cancelTask(ScheduledFuture future) {
-        boolean cancelled = false;
-        if (future != null) {
-            cancelled = future.cancel(false);
-        }
-        return cancelled;
+    private boolean cancelTask(Scheduled scheduled) {
+        return scheduled.future() != null && scheduled.future().cancel(false);
     }
 
     private ScheduledFuture schedule(TaskDTO task, CountDownLatch latch) {
@@ -312,19 +438,16 @@ public class SchedulingManager {
     }
 
     private ScheduledFuture scheduleOneTimeTask(RunnableTask expirable, TaskDTO task) {
-        if (task.getTtl() != null) {
-            task.setEndDate(task.getStartDate().plusSeconds(task.getTtl()));
-        } else {
-            task.setEndDate(task.getStartDate().plus(1, HOURS));
+        if (task.getEndDate() == null) {
+            task.setEndDate(oneTimeEndDate(task));
+            if (task.getId() != null) {
+                taskRepository.backfillEndDate(task.getId(), task.getEndDate());
+            }
         }
-        Task entity = taskRepository.findById(task.getId()).orElseThrow(() ->
-            new BusinessException("Task is not found for id " + task.getId()));
-        entity.setEndDate(task.getEndDate());
-        taskRepository.save(entity);
         return taskScheduler.schedule(expirable, task.getStartDate());
     }
 
-    private static String getTaskKey(TaskDTO task) {
+    public static String getTaskKey(TaskDTO task) {
         return Optional.ofNullable(task.getId()).map(String::valueOf).orElse(task.getKey());
     }
 
