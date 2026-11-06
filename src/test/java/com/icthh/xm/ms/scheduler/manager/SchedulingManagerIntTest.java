@@ -36,6 +36,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.XM_TENANT;
@@ -308,7 +309,8 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
         TaskDTO task = createTaskOneTime(Instant.now().plusMillis(1000), 3);
         AtomicBoolean stillScheduledWhenDone = new AtomicBoolean();
-        when(taskRepository.updateStateKey(task.getId(), StateKey.DONE.name())).thenAnswer(invocation -> {
+        when(taskRepository.updateStateKey(task.getId(), StateKey.DONE.name(), task.getStartDate()))
+            .thenAnswer(invocation -> {
             stillScheduledWhenDone.set(schedulingManager.getActiveUserTasks().containsKey(task.getId().toString()));
             return 1;
         });
@@ -320,8 +322,38 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
         expectRunAndExpiryCounts(task, 1, 1);
 
-        verify(taskRepository).updateStateKey(task.getId(), StateKey.DONE.name());
+        verify(taskRepository).updateStateKey(task.getId(), StateKey.DONE.name(), task.getStartDate());
         assertTrue(stillScheduledWhenDone.get(), "DONE must be stored before the task leaves the schedule");
+    }
+
+    @Test
+    @SneakyThrows
+    public void firingDoesNotRemoveTimerOfNewerVersion() {
+        CountDownLatch sent = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch expired = new CountDownLatch(1);
+        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
+            fired -> blockUntilReleased(sent, release), done -> expired.countDown(),
+            tenantListRepository, taskRepository, policy);
+        TaskDTO task = createTaskOneTime(Instant.now().plusMillis(300), 3);
+        initScheduling(task);
+        assertTrue(sent.await(5, TimeUnit.SECONDS));
+
+        TaskDTO newer = createTaskOneTime(Instant.now().plus(1, ChronoUnit.HOURS), 3);
+        newer.setId(task.getId());
+        schedulingManager.createOrUpdateActiveUserTask(newer);
+        release.countDown();
+        assertTrue(expired.await(5, TimeUnit.SECONDS));
+
+        assertEquals(newer.getStartDate(), schedulingManager.getActiveUserTasks().get(task.getId().toString())
+            .getStartDate());
+        schedulingManager.destroy();
+    }
+
+    @SneakyThrows
+    private void blockUntilReleased(CountDownLatch sent, CountDownLatch release) {
+        sent.countDown();
+        release.await(5, TimeUnit.SECONDS);
     }
 
     @Test

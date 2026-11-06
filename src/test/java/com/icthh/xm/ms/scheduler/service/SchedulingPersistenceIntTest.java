@@ -70,6 +70,19 @@ public class SchedulingPersistenceIntTest extends AbstractSpringBootTest {
         schedulingManager.deleteActiveTask(withoutEnd.getId().toString());
     }
 
+    @Test
+    public void doneIsStoredOnlyForTheFiredStartDate() {
+        Instant fired = Instant.now().plus(1, ChronoUnit.HOURS).truncatedTo(ChronoUnit.MILLIS);
+        Task task = save(null, null, fired.plus(1, ChronoUnit.DAYS));
+
+        int updated = taskRepository.updateStateKey(task.getId(), "DONE", fired);
+        em.clear();
+
+        assertThat(updated).isZero();
+        assertThat(taskRepository.findById(task.getId()).orElseThrow().getStateKey()).isNull();
+        assertThat(taskRepository.updateStateKey(task.getId(), "DONE", task.getStartDate())).isEqualTo(1);
+    }
+
     private Task save(String stateKey, Instant endDate, Instant oneTimeStart) {
         Task task = new Task().key(KEY).typeKey("T").createdBy("test").stateKey(stateKey).endDate(endDate);
         if (oneTimeStart != null) {

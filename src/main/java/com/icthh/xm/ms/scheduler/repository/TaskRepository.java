@@ -29,8 +29,9 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
 
     @Transactional
     @Modifying
-    @Query("UPDATE Task t SET t.stateKey = :stateKey WHERE t.id = :id")
-    int updateStateKey(@Param("id") Long id, @Param("stateKey") String stateKey);
+    @Query("UPDATE Task t SET t.stateKey = :stateKey WHERE t.id = :id AND t.startDate = :startDate")
+    int updateStateKey(@Param("id") Long id, @Param("stateKey") String stateKey,
+                       @Param("startDate") Instant startDate);
 
     @Transactional
     @Modifying

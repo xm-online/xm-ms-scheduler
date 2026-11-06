@@ -329,8 +329,19 @@ public class SchedulingManager {
         return Collections.unmodifiableSet(userSchedulers.getOrDefault(getTenant(), Collections.emptyMap()).keySet());
     }
 
+    /** Removes the task only while the schedule still holds this very instance: a newer version stays. */
     void deleteExpiredTask(TaskDTO task) {
-        deleteTaskFromTenant(task.getTenant(), getTaskKey(task));
+        removeOwnEntry(task, userSchedulers);
+        removeOwnEntry(task, systemSchedulers);
+    }
+
+    private void removeOwnEntry(TaskDTO task, Map<String, Map<String, Scheduled>> schedulers) {
+        String key = getTaskKey(task);
+        Map<String, Scheduled> tenantMap = schedulers.getOrDefault(task.getTenant(), Map.of());
+        Scheduled current = tenantMap.get(key);
+        if (current != null && current.task() == task && tenantMap.remove(key, current)) {
+            log.info("task [{}] removed, cancel result: {}", key, cancelTask(current));
+        }
     }
 
     void execute(TaskDTO task, Runnable firing) {
@@ -372,7 +383,7 @@ public class SchedulingManager {
         log.info("Marking task as finished id: {}, tenant: {}", task.getId(), task.getTenant());
 
         tenantContextHolder.getPrivilegedContext().execute(buildTenant(task.getTenant()),
-            () -> taskRepository.updateStateKey(taskId, state.name()));
+            () -> taskRepository.updateStateKey(taskId, state.name(), task.getStartDate()));
     }
 
     @FunctionalInterface
