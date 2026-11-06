@@ -1,10 +1,13 @@
 package com.icthh.xm.ms.scheduler.service;
 
 import com.icthh.xm.ms.scheduler.domain.Task;
+import com.icthh.xm.commons.exceptions.BusinessException;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.dto.TaskDTO;
 import com.icthh.xm.ms.scheduler.service.mapper.TaskMapper;
+import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -26,12 +29,12 @@ public class TaskService {
 
     private final TaskMapper taskMapper;
 
-    private final SchedulingManager schedulingManager;
+    private final TaskChangeListener changeListener;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, SchedulingManager schedulingManager) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, TaskChangeListener changeListener) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
-        this.schedulingManager = schedulingManager;
+        this.changeListener = changeListener;
     }
 
     /**
@@ -42,10 +45,18 @@ public class TaskService {
      */
     public TaskDTO save(TaskDTO taskDtO) {
         log.debug("Request to save Task : {}", taskDtO);
+        if (StringUtils.isNotBlank(taskDtO.getCronTriggerTimeZoneId())) {
+            throw new BusinessException("error.task.cron-trigger-time-zone-id.not-supported",
+                "cronTriggerTimeZoneId is not stored and not supported");
+        }
+        SchedulingManager.validateSchedule(taskDtO);
+        if (taskDtO.getScheduleType() == ScheduleType.ONE_TIME) {
+            taskDtO.setEndDate(SchedulingManager.oneTimeEndDate(taskDtO));
+        }
         Task task = taskMapper.toEntity(taskDtO);
         task = taskRepository.saveAndFlush(task);
         TaskDTO dto = taskMapper.toDto(task);
-        schedulingManager.createOrUpdateActiveUserTask(dto);
+        changeListener.onSave(dto);
         return dto;
     }
 
@@ -82,7 +93,7 @@ public class TaskService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Task : {}", id);
-        schedulingManager.deleteActiveTask(String.valueOf(id));
+        changeListener.onDelete(id);
         taskRepository.deleteById(id);
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -218,6 +219,68 @@ public class TaskResourceIntTest extends AbstractSpringBootTest {
         assertThat(testTask.getChannelType()).isEqualTo(DEFAULT_CHANNEL_TYPE);
         assertThat(testTask.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testTask.getData()).isEqualTo(DEFAULT_DATA);
+    }
+
+    @Test
+    @Transactional
+    public void invalidScheduleIsRejected() throws Exception {
+        int databaseSizeBeforeCreate = taskRepository.findAll().size();
+
+        for (Consumer<Task> invalidate : List.<Consumer<Task>>of(
+            t -> t.setScheduleType(null),
+            t -> t.setDelay(null),
+            t -> t.scheduleType(ScheduleType.CRON).cronExpression("bad"),
+            t -> t.scheduleType(ScheduleType.ONE_TIME).startDate(null))) {
+            Task invalid = createEntity(em);
+            invalidate.accept(invalid);
+            restTaskMockMvc.perform(post("/api/tasks")
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                    .content(TestUtil.convertObjectToJsonBytes(taskMapper.toDto(invalid))))
+                .andExpect(status().isBadRequest());
+        }
+
+        assertThat(taskRepository.findAll()).hasSize(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    @Transactional
+    public void timeZoneIdIsRejected() throws Exception {
+        TaskDTO taskDTO = taskMapper.toDto(task.scheduleType(ScheduleType.CRON).cronExpression("0 0 * * * ?"));
+        taskDTO.setCronTriggerTimeZoneId("Europe/Kyiv");
+
+        restTaskMockMvc.perform(post("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    public void oneTimeEndDateFollowsStartDate() throws Exception {
+        Instant start = Instant.now().plus(1, ChronoUnit.HOURS).truncatedTo(ChronoUnit.MILLIS);
+        task.scheduleType(ScheduleType.ONE_TIME).startDate(start).endDate(DEFAULT_END_DATE);
+        TaskDTO taskDTO = taskMapper.toDto(task);
+        taskDTO.setTtl(60);
+
+        restTaskMockMvc.perform(post("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+            .andExpect(status().isCreated());
+        Task stored = taskRepository.findAll().get(taskRepository.findAll().size() - 1);
+        assertThat(stored.getEndDate()).isEqualTo(start.plusSeconds(60));
+
+        Instant later = start.plus(1, ChronoUnit.HOURS);
+        TaskDTO update = taskMapper.toDto(stored);
+        update.setStartDate(later);
+        update.setTtl(null);
+        restTaskMockMvc.perform(put("/api/tasks")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(update)))
+            .andExpect(status().isOk());
+        em.flush();
+        em.clear();
+        assertThat(taskRepository.findById(stored.getId()).orElseThrow().getEndDate())
+            .isEqualTo(later.plus(1, ChronoUnit.HOURS));
     }
 
     @Test

@@ -7,7 +7,6 @@ import com.icthh.xm.commons.tenant.TenantContextHolder;
 import com.icthh.xm.commons.tenant.TenantContextUtils;
 import com.icthh.xm.commons.tenant.internal.DefaultTenantContextHolder;
 import com.icthh.xm.ms.scheduler.AbstractSpringBootTest;
-import com.icthh.xm.ms.scheduler.domain.Task;
 import com.icthh.xm.ms.scheduler.domain.enumeration.ScheduleType;
 import com.icthh.xm.ms.scheduler.domain.enumeration.StateKey;
 import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
@@ -32,12 +31,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.XM_TENANT;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskByCron;
@@ -47,7 +47,8 @@ import static com.icthh.xm.ms.scheduler.TaskTestUtil.createTaskOneTime;
 import static com.icthh.xm.ms.scheduler.TaskTestUtil.waitFor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -57,6 +58,8 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
     private Multiset<Long> executedTasks = HashMultiset.create();
 
     private SchedulingManager schedulingManager;
+
+    private TaskExecutionPolicy policy = new TaskExecutionPolicy() { };
 
     @Autowired
     private ScheduledTaskHandler handler;
@@ -85,7 +88,7 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
         schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
             executed -> executedTasks.add(executed.getId()),
             expired -> expiredTasks.add(expired.getId()),
-            tenantListRepository, taskRepository);
+            tenantListRepository, taskRepository, policy);
     }
 
     @Test
@@ -97,10 +100,6 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
         Future<TaskDTO> task1 = thread1.submit(() -> {
             TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
-            when(taskRepository.findById(1L)).thenReturn(Optional.of(
-                new Task().startDate(Instant.now()).endDate(Instant.now())
-            ));
-
             TaskDTO taskDto = new TaskDTO() {
                 @Override
                 @SneakyThrows
@@ -125,10 +124,6 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
         runLatch.await();
         Future<TaskDTO> task2 = thread2.submit(() -> {
             TenantContextUtils.setTenant(tenantContextHolder, XM_TENANT);
-            when(taskRepository.findById(2L)).thenReturn(Optional.of(
-                new Task().startDate(Instant.now()).endDate(Instant.now())
-            ));
-
             TaskDTO taskDto = new TaskDTO();
             taskDto.setId(2L);
             taskDto.setKey(UUID.randomUUID().toString());
@@ -313,9 +308,12 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
     public void testInitOneTimeTasks() {
 
         TaskDTO task = createTaskOneTime(Instant.now().plusMillis(1000), 3);
-
-        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
-        when(taskRepository.save(any())).thenReturn(new Task());
+        AtomicBoolean stillScheduledWhenDone = new AtomicBoolean();
+        when(taskRepository.updateStateKey(task.getId(), StateKey.DONE.name(), task.getStartDate()))
+            .thenAnswer(invocation -> {
+            stillScheduledWhenDone.set(schedulingManager.getActiveUserTasks().containsKey(task.getId().toString()));
+            return 1;
+        });
 
         initScheduling(task);
 
@@ -324,18 +322,74 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
 
         expectRunAndExpiryCounts(task, 1, 1);
 
-        Optional<Task> stored = taskRepository.findById(task.getId());
-        assertTrue(stored.isPresent());
-        assertEquals(stored.get().getStateKey(), StateKey.DONE.name());
+        verify(taskRepository).updateStateKey(task.getId(), StateKey.DONE.name(), task.getStartDate());
+        assertTrue(stillScheduledWhenDone.get(), "DONE must be stored before the task leaves the schedule");
+    }
+
+    @Test
+    @SneakyThrows
+    public void firingDoesNotRemoveTimerOfNewerVersion() {
+        CountDownLatch sent = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch expired = new CountDownLatch(1);
+        schedulingManager = new SchedulingManager(tenantContextHolder, taskScheduler, systemTaskService, handler,
+            fired -> blockUntilReleased(sent, release), done -> expired.countDown(),
+            tenantListRepository, taskRepository, policy);
+        TaskDTO task = createTaskOneTime(Instant.now().plusMillis(300), 3);
+        initScheduling(task);
+        assertTrue(sent.await(5, TimeUnit.SECONDS));
+
+        TaskDTO newer = createTaskOneTime(Instant.now().plus(1, ChronoUnit.HOURS), 3);
+        newer.setId(task.getId());
+        schedulingManager.createOrUpdateActiveUserTask(newer);
+        release.countDown();
+        assertTrue(expired.await(5, TimeUnit.SECONDS));
+
+        assertEquals(newer.getStartDate(), schedulingManager.getActiveUserTasks().get(task.getId().toString())
+            .getStartDate());
+        schedulingManager.destroy();
+    }
+
+    @SneakyThrows
+    private void blockUntilReleased(CountDownLatch sent, CountDownLatch release) {
+        sent.countDown();
+        release.await(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void initSkipsUnschedulableTask() {
+        TaskDTO invalid = createTaskByCron("not a cron", null, null);
+        TaskDTO valid = createTaskFixedDelay(300L, null, null);
+
+        initScheduling(invalid, valid);
+
+        waitAndDeleteTask(1000, valid);
+        assertTrue(executedTasks.count(valid.getId()) > 0);
+        assertEquals(0, executedTasks.count(invalid.getId()));
+    }
+
+    @Test
+    public void initLoadsNothingWhenPolicyDeclines() {
+        policy = new TaskExecutionPolicy() {
+            @Override
+            public boolean loadsOnStartup() {
+                return false;
+            }
+        };
+        init();
+        TaskDTO task = createTaskFixedDelay(300L, null, null);
+
+        initScheduling(task);
+        waitFor(1000);
+
+        assertEquals(0, executedTasks.count(task.getId()));
+        verify(systemTaskService, never()).findUserNotFinishedTasks();
     }
 
     @Test
     public void testInitOneTimeExpiredEndDateTasks() {
 
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(1000), 3);
-
-        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
-        when(taskRepository.save(any())).thenReturn(new Task());
 
         initScheduling(task);
 
@@ -349,9 +403,6 @@ public class SchedulingManagerIntTest extends AbstractSpringBootTest {
     public void testInitOneTimeExpiredTasks() {
 
         TaskDTO task = createTaskOneTime(Instant.now().minusMillis(5000), 3);
-
-        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(new Task()));
-        when(taskRepository.save(any())).thenReturn(new Task());
 
         initScheduling(task);
 
