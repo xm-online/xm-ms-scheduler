@@ -6,9 +6,13 @@ import com.icthh.xm.ms.scheduler.handler.ScheduledTaskHandler;
 import com.icthh.xm.ms.scheduler.manager.SchedulingManager;
 import com.icthh.xm.ms.scheduler.repository.TaskRepository;
 import com.icthh.xm.ms.scheduler.service.SystemTaskService;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
 
 /**
  * The scheduling configuration.
@@ -33,10 +37,14 @@ public class SchedulingConfiguration {
      * @return the scheduler
      */
     @Bean
-    public ThreadPoolTaskScheduler threadPoolTaskScheduler(ApplicationProperties applicationProperties) {
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(ApplicationProperties applicationProperties,
+                                                           ObjectProvider<ObservationRegistry> observationRegistry) {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         threadPoolTaskScheduler.setPoolSize(applicationProperties.getScheduler().getThreadPoolSize());
         threadPoolTaskScheduler.setThreadNamePrefix("xm-sc-thread");
+        ObservationRegistry registry = observationRegistry.getIfAvailable(() -> ObservationRegistry.NOOP);
+        threadPoolTaskScheduler.setTaskDecorator(runnable -> () ->
+            Observation.createNotStarted("scheduler.task", registry).observe(runnable));
         return threadPoolTaskScheduler;
     }
 
